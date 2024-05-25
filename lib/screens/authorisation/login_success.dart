@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:wagtrack/services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 // temporary page to allow for logging out after a successful login
@@ -16,6 +14,9 @@ class _LoginSuccessState extends State<LoginSuccess> {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textStyles = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     final user = FirebaseAuth.instance.currentUser!;
 
     return Scaffold(
@@ -35,7 +36,7 @@ class _LoginSuccessState extends State<LoginSuccess> {
               width: 300,
               height: 40,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(5),
               ),
               child: const Center(

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-// import 'package:wagtrack/models/color_models.dart';
 import 'package:wagtrack/screens/authorisation/login_tab.dart';
 import 'package:wagtrack/screens/authorisation/register_tab.dart';
-// import 'package:wagtrack/services/auth.dart';
 
 // import '../mainTemplate.dart';
 
@@ -21,6 +18,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textStyles = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final sidePadding = screenWidth * 0.05;
@@ -37,52 +37,50 @@ class _LoginPageState extends State<LoginPage> {
               children: <Widget>[
                 Image.asset(
                   "assets/wagtrack_v1.png",
-                  height: 150,
-                  width: 150,
+                  height: 121,
+                  width: 298,
                   fit: BoxFit.fitWidth,
                 ),
-                // const SizedBox(height: 10),
-                // const Text(
-                //   'wagtrack',
-                //   textAlign: TextAlign.center,
-                //   style: TextStyle(
-                //     fontSize: 36.0,
-                //   ),
-                // ),
                 const SizedBox(height: 10),
-                const Text(
-                  'By signing in you are agreeing to our ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                  ),
-                ),
-                const Text(
-                  'Terms and privacy policy',
-                  style: TextStyle(fontSize: 16, color: Colors.orange),
-                ),
+                Text.rich(
+                    textAlign: TextAlign.center,
+                    TextSpan(style: textStyles.bodyLarge, children: [
+                      const TextSpan(
+                          text: 'By signing in you are agreeing to our '),
+                      TextSpan(
+                        text: 'terms ',
+                        style: textStyles.bodyLarge
+                            ?.copyWith(color: colorScheme.tertiary),
+                      ),
+                      const TextSpan(text: 'and '),
+                      TextSpan(
+                        text: 'privacy policy ',
+                        style: textStyles.bodyLarge
+                            ?.copyWith(color: colorScheme.tertiary),
+                      ),
+                    ])),
                 const SizedBox(height: 10),
                 SizedBox(
                   height: screenHeight * 0.6,
-                  child: const DefaultTabController(
+                  child: DefaultTabController(
                     length: 2,
                     child: Scaffold(
                       appBar: PreferredSize(
-                        preferredSize: Size.fromHeight(kToolbarHeight),
+                        preferredSize: const Size.fromHeight(kToolbarHeight),
                         child: SizedBox(
                           height: 50.0,
                           child: TabBar(
                             unselectedLabelColor: Colors.grey,
-                            labelColor: Colors.orange,
-                            indicatorColor: Colors.orange,
-                            tabs: [
+                            labelColor: colorScheme.tertiary,
+                            indicatorColor: colorScheme.tertiary,
+                            tabs: const [
                               Tab(child: Text('Login')),
                               Tab(child: Text('Register'))
                             ],
                           ),
                         ),
                       ),
-                      body: TabBarView(
+                      body: const TabBarView(
                         children: [LoginTab(), RegisterTab()],
                       ),
                     ),

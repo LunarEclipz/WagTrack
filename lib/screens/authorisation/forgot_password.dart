@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// import 'package:wagtrack/models/color_models.dart';
 import 'package:wagtrack/services/auth.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
@@ -10,16 +9,26 @@ class ForgotPasswordPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textStyles = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Forgot Password'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: const Text(
+          'Forgot Password',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: colorScheme.primary,
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text(
+                'Please provide your Email Address and we will send you a reset password request. ',
+                style: textStyles.bodyMedium
+                    ?.copyWith(fontStyle: FontStyle.italic)),
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
@@ -70,10 +79,15 @@ class ForgotPasswordPage extends StatelessWidget {
                 }
               },
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    Theme.of(context).colorScheme.primary),
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(colorScheme.primary),
               ),
-              child: const Text('Send Reset Password Email'),
+              child: const Center(
+                child: Text(
+                  'Reset Password',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
             ),
           ],
         ),

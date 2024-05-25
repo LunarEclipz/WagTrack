@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-// import 'package:wagtrack/models/color_models.dart';
 import 'package:wagtrack/screens/authorisation/forgot_password.dart';
 import 'package:wagtrack/services/auth.dart';
 
@@ -16,10 +14,15 @@ class _LoginTabState extends State<LoginTab> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool _obscureText = true;
-  bool _rememberMeIsChecked = false;
+  // bool _rememberMeIsChecked = false;
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textStyles = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // final CustomColors customColors =
+    //     Theme.of(context).extension<CustomColors>()!;
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Form(
@@ -29,11 +32,7 @@ class _LoginTabState extends State<LoginTab> {
               controller: emailController,
               decoration: const InputDecoration(
                 labelText: 'Email',
-                labelStyle: TextStyle(color: Colors.grey),
                 hintText: 'Enter your email address',
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
               ),
             ),
             TextFormField(
@@ -41,7 +40,6 @@ class _LoginTabState extends State<LoginTab> {
               controller: passwordController,
               decoration: InputDecoration(
                 labelText: 'Password',
-                labelStyle: const TextStyle(color: Colors.grey),
                 hintText: 'Enter your password',
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -51,30 +49,15 @@ class _LoginTabState extends State<LoginTab> {
                   },
                   icon: Icon(
                     _obscureText ? Icons.visibility_off : Icons.visibility,
-                    // color: Colors.orange,
+                    // color: colorScheme.tertiary,
                   ),
-                ),
-                focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey),
                 ),
               ),
             ),
+            const SizedBox(height: 10),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _rememberMeIsChecked,
-                      onChanged: (value) {
-                        setState(() {
-                          _rememberMeIsChecked = value!;
-                        });
-                      },
-                    ),
-                    const Text('Remember me'),
-                  ],
-                ),
                 GestureDetector(
                   onTap: () {
                     // Handle forgot password tap
@@ -84,13 +67,10 @@ class _LoginTabState extends State<LoginTab> {
                           builder: (context) => ForgotPasswordPage()),
                     );
                   },
-                  child: const Text(
-                    'Forgot Password',
-                    style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Colors.orange,
-                      fontSize: 14.0,
-                    ),
+                  child: Text(
+                    'Forgot Password?',
+                    style: textStyles.bodyLarge
+                        ?.copyWith(color: colorScheme.tertiary),
                   ),
                 ),
               ],
@@ -142,7 +122,7 @@ class _LoginTabState extends State<LoginTab> {
                 width: 300,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: colorScheme.primary,
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: const Center(
@@ -169,12 +149,6 @@ class _LoginTabState extends State<LoginTab> {
                     const SizedBox(width: 20),
                     Image.asset(
                       'assets/icons/facebook.png',
-                      width: 40,
-                      height: 40,
-                    ),
-                    const SizedBox(width: 20),
-                    Image.asset(
-                      'assets/icons/instagram.png',
                       width: 40,
                       height: 40,
                     ),

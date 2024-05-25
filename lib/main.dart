@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
 import 'package:wagtrack/services/auth.dart';
-import 'firebase_options.dart';
+import 'package:wagtrack/shared/themes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,30 +30,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: true,
         title: 'wagtrack',
-        theme: ThemeData(
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          // scaffoldBackgroundColor: Colors.orange[100],
-
-          useMaterial3: true,
-
-          // Define the default brightness and colors.
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.orange,
-            // TRY THIS: Change to "Brightness.light"
-            //           and see that all colors change
-            //           to better contrast a light background.
-            // brightness: Brightness.dark,
-          ),
-
-          // Define the default `TextTheme`. Use this to specify the default
-          // text styling for headlines, titles, bodies of text, and more.
-          textTheme: const TextTheme(
-            displayLarge: TextStyle(
-              fontSize: 72,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
+        theme: AppTheme.light,
         home: const Authenticate(),
       ),
     );

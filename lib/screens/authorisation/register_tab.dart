@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-// import 'package:wagtrack/models/color_models.dart';
 import 'package:wagtrack/services/auth.dart';
 
 class RegisterTab extends StatefulWidget {
@@ -25,6 +23,9 @@ class _RegisterTabState extends State<RegisterTab> {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textStyles = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Form(
@@ -34,12 +35,8 @@ class _RegisterTabState extends State<RegisterTab> {
               controller: usernameController,
               decoration: InputDecoration(
                 labelText: 'Username',
-                labelStyle: const TextStyle(color: Colors.grey),
                 errorText: _isUsernameValid ? null : 'Invalid username',
                 hintText: 'Enter your username',
-                focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
               ),
               onChanged: (value) {
                 setState(() {
@@ -55,12 +52,8 @@ class _RegisterTabState extends State<RegisterTab> {
               controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Email Address',
-                labelStyle: const TextStyle(color: Colors.grey),
                 errorText: _isEmailValid ? null : 'Invalid email',
                 hintText: 'Enter your email address',
-                focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
               ),
               onChanged: (value) {
                 setState(() {
@@ -75,7 +68,6 @@ class _RegisterTabState extends State<RegisterTab> {
               obscureText: _obscureTextPassword,
               decoration: InputDecoration(
                 labelText: 'Password',
-                labelStyle: const TextStyle(color: Colors.grey),
                 errorText:
                     _isPasswordTooShort ? null : 'Enter more than 6 characters',
                 hintText: 'Enter your password',
@@ -89,11 +81,7 @@ class _RegisterTabState extends State<RegisterTab> {
                     _obscureTextPassword
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    // color: Colors.orange,
                   ),
-                ),
-                focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey),
                 ),
               ),
               onChanged: (value) {
@@ -111,7 +99,6 @@ class _RegisterTabState extends State<RegisterTab> {
               obscureText: _obscureTextConfirmPassword,
               decoration: InputDecoration(
                 labelText: 'Confirm Password',
-                labelStyle: const TextStyle(color: Colors.grey),
                 errorText: _isConfirmPasswordTooShort
                     ? null
                     : 'Enter more than 6 characters',
@@ -127,11 +114,8 @@ class _RegisterTabState extends State<RegisterTab> {
                     _obscureTextConfirmPassword
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    // color: Colors.orange,
+                    // color: colorScheme.tertiary,
                   ),
-                ),
-                focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey),
                 ),
               ),
               onChanged: (value) {
@@ -239,7 +223,7 @@ class _RegisterTabState extends State<RegisterTab> {
                 width: 300,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.orange,
+                  color: colorScheme.primary,
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: const Center(
@@ -253,7 +237,7 @@ class _RegisterTabState extends State<RegisterTab> {
             const SizedBox(height: 10),
             const Column(
               children: [
-                Text("or login with"),
+                Text("or register with"),
                 SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -266,12 +250,6 @@ class _RegisterTabState extends State<RegisterTab> {
                     SizedBox(width: 20),
                     Image(
                       image: AssetImage('assets/icons/facebook.png'),
-                      width: 40,
-                      height: 40,
-                    ),
-                    SizedBox(width: 20),
-                    Image(
-                      image: AssetImage('assets/icons/instagram.png'),
                       width: 40,
                       height: 40,
                     ),
