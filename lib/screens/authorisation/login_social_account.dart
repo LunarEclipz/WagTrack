@@ -23,12 +23,10 @@ class _LoginSocialState extends State<LoginSocial> {
               children: [
                 InkWell(
                   onTap: () async {
-                    debugPrint("DEBUG aaaa");
                     String? result = await context
                         .read<AuthenticationService>()
                         .signInWithGoogle();
-                    // TODO
-                    debugPrint('DEBUG $result');
+                    // debugPrint('DEBUG $result');
 
                     if (result != "Success") {
                       showDialog(
@@ -61,10 +59,25 @@ class _LoginSocialState extends State<LoginSocial> {
                   ),
                 ),
                 const SizedBox(width: 20),
-                Image.asset(
-                  'assets/icons/facebook.png',
-                  width: 40,
-                  height: 40,
+                InkWell(
+                  onTap: () async {
+                    String? result = await context
+                        .read<AuthenticationService>()
+                        .signInWithFacebook();
+                    // TODO
+                    debugPrint('DEBUG $result');
+                  },
+                  customBorder: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Image.asset(
+                      'assets/icons/facebook.png',
+                      width: 40,
+                      height: 40,
+                    ),
+                  ),
                 ),
               ],
             )
