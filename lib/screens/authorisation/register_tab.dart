@@ -4,7 +4,7 @@ import 'package:wagtrack/screens/authorisation/login_social_account.dart';
 import 'package:wagtrack/services/auth.dart';
 
 class RegisterTab extends StatefulWidget {
-  const RegisterTab({Key? key}) : super(key: key);
+  const RegisterTab({super.key});
 
   @override
   State<RegisterTab> createState() => _RegisterTabState();

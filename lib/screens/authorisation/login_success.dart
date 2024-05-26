@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 // temporary page to allow for logging out after a successful login
 class LoginSuccess extends StatefulWidget {
-  const LoginSuccess({Key? key}) : super(key: key);
+  const LoginSuccess({super.key});
 
   @override
   State<LoginSuccess> createState() => _LoginSuccessState();

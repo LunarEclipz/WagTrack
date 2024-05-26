@@ -5,7 +5,7 @@ import 'package:wagtrack/screens/authorisation/login_social_account.dart';
 import 'package:wagtrack/services/auth.dart';
 
 class LoginTab extends StatefulWidget {
-  const LoginTab({Key? key}) : super(key: key);
+  const LoginTab({super.key});
 
   @override
   State<LoginTab> createState() => _LoginTabState();

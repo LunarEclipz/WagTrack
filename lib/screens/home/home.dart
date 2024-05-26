@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:wagtrack/services/auth.dart';
 
 class Home extends StatefulWidget {
   final Function(int) setIndex;
 
-  const Home({Key? key, required this.setIndex}) : super(key: key);
+  const Home({super.key, required this.setIndex});
 
   @override
   State<Home> createState() => _HomeState();

@@ -1,12 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/authorisation_frame.dart';
 import 'package:wagtrack/screens/authorisation/login_success.dart';
 // import 'package:wagtrack/screens/mainTemplate.dart';
 
 class Authenticate extends StatefulWidget {
-  const Authenticate({Key? key}) : super(key: key);
+  const Authenticate({super.key});
 
   @override
   _AuthenticateState createState() => _AuthenticateState();

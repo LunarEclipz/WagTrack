@@ -6,7 +6,7 @@ import 'package:wagtrack/screens/authorisation/register_tab.dart';
 
 class LoginPage extends StatefulWidget {
   final Function toggleView;
-  const LoginPage({Key? key, required this.toggleView}) : super(key: key);
+  const LoginPage({super.key, required this.toggleView});
 
   @override
   State<LoginPage> createState() => _LoginPageState();

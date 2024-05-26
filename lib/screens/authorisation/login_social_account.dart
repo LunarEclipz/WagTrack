@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/services/auth.dart';
 
 class LoginSocial extends StatefulWidget {
-  const LoginSocial({Key? key}) : super(key: key);
+  const LoginSocial({super.key});
 
   @override
   State<LoginSocial> createState() => _LoginSocialState();
