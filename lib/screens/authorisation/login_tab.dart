@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/forgot_password.dart';
+import 'package:wagtrack/screens/authorisation/login_social_account.dart';
 import 'package:wagtrack/services/auth.dart';
 
 class LoginTab extends StatefulWidget {
@@ -134,34 +135,7 @@ class _LoginTabState extends State<LoginTab> {
               ),
             ),
             const SizedBox(height: 10),
-            Column(
-              children: [
-                const Text("or login with"),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/icons/google.png',
-                      width: 40,
-                      height: 40,
-                    ),
-                    const SizedBox(width: 20),
-                    Image.asset(
-                      'assets/icons/facebook.png',
-                      width: 40,
-                      height: 40,
-                    ),
-                  ],
-                )
-              ],
-            ),
-            // const SizedBox(height: 40),
-            // SvgPicture.asset(
-            //   'assets/icons/trekntrek.svg',
-            //   width: 90,
-            //   height: 90,
-            // )
+            const LoginSocial(),
           ],
         ),
       ),

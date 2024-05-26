@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wagtrack/screens/authorisation/login_social_account.dart';
 import 'package:wagtrack/services/auth.dart';
 
 class RegisterTab extends StatefulWidget {
@@ -235,28 +236,7 @@ class _RegisterTabState extends State<RegisterTab> {
               ),
             ),
             const SizedBox(height: 10),
-            const Column(
-              children: [
-                Text("or register with"),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image(
-                      image: AssetImage('assets/icons/google.png'),
-                      width: 40,
-                      height: 40,
-                    ),
-                    SizedBox(width: 20),
-                    Image(
-                      image: AssetImage('assets/icons/facebook.png'),
-                      width: 40,
-                      height: 40,
-                    ),
-                  ],
-                )
-              ],
-            ),
+            const LoginSocial(),
             // const SizedBox(height: 40),
             // SvgPicture.asset(
             //   'assets/images/trekntrek.svg',

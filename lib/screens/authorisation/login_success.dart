@@ -29,6 +29,7 @@ class _LoginSuccessState extends State<LoginSuccess> {
           const Text("Signed In as"),
           const SizedBox(height: 8),
           Text(user.email!),
+          // const Text("Signed In"),
           const SizedBox(height: 40),
           InkWell(
             onTap: () => FirebaseAuth.instance.signOut(),

@@ -22,13 +22,27 @@ class _AuthenticateState extends State<Authenticate> {
 
   @override
   Widget build(BuildContext context) {
-    final firebaseUser = context.watch<User?>();
-    if (firebaseUser == null) {
-      return LoginPage(toggleView: toggleView);
-    } else {
-      // return const mainTemplate();
-      // return Container();
-      return const LoginSuccess();
-    }
+    // final firebaseUser = context.watch<User?>();
+    // if (firebaseUser == null) {
+    //   return LoginPage(toggleView: toggleView);
+    // } else {
+    //   // return const mainTemplate();
+    //   // return Container();
+    //   return const LoginSuccess();
+    // }
+
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return LoginPage(toggleView: toggleView);
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
+        } else {
+          return const LoginSuccess();
+        }
+      },
+    );
   }
 }
