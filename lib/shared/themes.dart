@@ -67,13 +67,13 @@ class AppTheme {
     useMaterial3: true,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     brightness: Brightness.light,
+    scaffoldBackgroundColor: const Color(0xFFFDFCFA),
     colorScheme: ColorScheme.fromSeed(
       seedColor: Colors.red,
       brightness: Brightness.light,
       primary: const Color(0xFFB01713),
       secondary: const Color(0xFF7B0300),
       tertiary: const Color(0xFFE15216),
-      background: const Color(0xFFFDFCFA),
     ),
     textTheme: TextTheme(
       headlineMedium: GoogleFonts.rubik(

@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/services/auth.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
-  TextEditingController _emailController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
-  ForgotPasswordPage({Key? key}) : super(key: key);
+  ForgotPasswordPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +80,7 @@ class ForgotPasswordPage extends StatelessWidget {
               },
               style: ButtonStyle(
                 backgroundColor:
-                    MaterialStateProperty.all<Color>(colorScheme.primary),
+                    WidgetStateProperty.all<Color>(colorScheme.primary),
               ),
               child: const Center(
                 child: Text(
