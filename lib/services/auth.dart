@@ -23,11 +23,6 @@ class AuthenticationService {
 
       return "Success";
     } on FirebaseAuthException catch (e) {
-      // e.code == 'invalid-email'
-      // e.code == 'wrong-password'
-
-      // TODO TEMP
-      print(e.code);
       return e.code;
     }
   }
@@ -100,15 +95,10 @@ class AuthenticationService {
         idToken: googleAuth?.idToken,
       );
 
-      print(googleAuth?.accessToken);
-      print(googleAuth?.idToken);
-
       final UserCredential userCredential =
           await _firebaseAuth.signInWithCredential(credential);
       return "Success";
     } on FirebaseAuthException catch (e) {
-      // TODO
-      print(e);
       return e.code;
     }
   }
