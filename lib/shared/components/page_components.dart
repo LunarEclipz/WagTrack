@@ -3,6 +3,7 @@ import "package:wagtrack/shared/background_img.dart";
 
 // Default App Scrollbar
 class AppScrollBar extends StatelessWidget {
+  /// Creates an scrollbar using default settings.
   final Widget child;
   const AppScrollBar({super.key, required this.child});
 
@@ -15,9 +16,14 @@ class AppScrollBar extends StatelessWidget {
   }
 }
 
-// Default App Scrollable Page (with background)
+/// Default App Scrollable Page (with background)
+///
+/// Children are aligned to `CrossAxisAlignment.start`
 class AppScrollablePage extends StatelessWidget {
+  /// List of widgets to display in the page.
   final List<Widget> children;
+
+  /// Creates a page with the default background that is scrollable.
   const AppScrollablePage({super.key, required this.children});
 
   @override

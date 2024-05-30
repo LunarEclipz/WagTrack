@@ -5,7 +5,7 @@ class CustomColors extends ThemeExtension<CustomColors> {
   CustomColors({
     required this.primaryText,
     required this.secondaryText,
-    required this.textHint,
+    required this.hint,
     required this.green,
     required this.pastelOrange,
     required this.pastelPurple,
@@ -14,7 +14,7 @@ class CustomColors extends ThemeExtension<CustomColors> {
 
   final Color primaryText;
   final Color secondaryText;
-  final Color textHint;
+  final Color hint;
   final Color green;
   final Color pastelOrange;
   final Color pastelPurple;
@@ -24,7 +24,7 @@ class CustomColors extends ThemeExtension<CustomColors> {
   ThemeExtension<CustomColors> copyWith({
     Color? primaryText,
     Color? secondaryText,
-    Color? textHint,
+    Color? hint,
     Color? green,
     Color? pastelOrange,
     Color? pastelPurple,
@@ -33,7 +33,7 @@ class CustomColors extends ThemeExtension<CustomColors> {
     return CustomColors(
       primaryText: primaryText ?? this.primaryText,
       secondaryText: secondaryText ?? this.secondaryText,
-      textHint: textHint ?? this.textHint,
+      hint: hint ?? this.hint,
       green: green ?? this.green,
       pastelOrange: pastelOrange ?? this.pastelOrange,
       pastelPurple: pastelPurple ?? this.pastelPurple,
@@ -53,7 +53,7 @@ class CustomColors extends ThemeExtension<CustomColors> {
     return CustomColors(
       primaryText: Color.lerp(primaryText, other.primaryText, t)!,
       secondaryText: Color.lerp(secondaryText, other.secondaryText, t)!,
-      textHint: Color.lerp(textHint, other.textHint, t)!,
+      hint: Color.lerp(hint, other.hint, t)!,
       green: Color.lerp(green, other.green, t)!,
       pastelOrange: Color.lerp(pastelOrange, other.pastelOrange, t)!,
       pastelPurple: Color.lerp(pastelPurple, other.pastelPurple, t)!,
@@ -63,16 +63,26 @@ class CustomColors extends ThemeExtension<CustomColors> {
 }
 
 class AppTheme {
+  static const Color hintLightGrey = Color(0xFF9799AB);
+
   static final ThemeData mainTheme = ThemeData(
     useMaterial3: true,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     brightness: Brightness.light,
     scaffoldBackgroundColor: const Color(0xFFFDFCFA),
     colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.red,
+      // https://api.flutter.dev/flutter/material/ColorScheme-class.html
+      // https://m3.material.io/styles/color/static/baseline
+
+      // use different seed color to check which is using material baseline colors
+      seedColor: Colors.green,
       brightness: Brightness.light,
       primary: const Color(0xFFB01713),
+      primaryContainer: Colors.white,
+      primaryFixed: Colors.white,
       secondary: const Color(0xFF7B0300),
+      secondaryContainer: Colors.white,
+      secondaryFixed: Colors.white,
       tertiary: const Color(0xFFE15216),
     ),
     textTheme: TextTheme(
@@ -103,19 +113,21 @@ class AppTheme {
     inputDecorationTheme: InputDecorationTheme(
       labelStyle: GoogleFonts.aBeeZee(
         fontSize: 20,
-        color: const Color(0xFF9799AB),
+        color: hintLightGrey,
       ),
       hintStyle: GoogleFonts.rubik(
         fontStyle: FontStyle.italic,
-        fontSize: 10,
-        color: const Color(0xFF9799AB),
+        fontWeight: FontWeight.w200,
+        fontSize: 12,
+        color: hintLightGrey,
       ),
       enabledBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Color(0xFF9799AB)),
+        borderSide: BorderSide(color: hintLightGrey),
       ),
       focusedBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Color(0xFF9799AB)),
+        borderSide: BorderSide(color: hintLightGrey),
       ),
+      iconColor: hintLightGrey,
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: Color(0xFFB01713),
@@ -131,7 +143,7 @@ class AppTheme {
   static final customColors = CustomColors(
     primaryText: const Color(0xFF000000),
     secondaryText: const Color(0xFF575A88),
-    textHint: const Color(0xFF9798AB),
+    hint: hintLightGrey,
     green: const Color(0xFF3FA856),
     pastelOrange: const Color(0xFFFFAB75),
     pastelPurple: const Color(0xFFA976B8),

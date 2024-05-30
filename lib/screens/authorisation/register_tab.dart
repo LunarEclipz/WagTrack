@@ -24,7 +24,7 @@ class _RegisterTabState extends State<RegisterTab> {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textStyles = Theme.of(context).textTheme;
+    // final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Padding(

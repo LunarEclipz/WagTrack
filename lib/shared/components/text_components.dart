@@ -19,14 +19,54 @@ import "package:flutter/material.dart";
 //   }
 // }
 
-// Sized Box 20-
-class SizedBox20 extends StatelessWidget {
-  const SizedBox20({super.key});
+/// Sized Box of height 20
+class SizedBoxh20 extends StatelessWidget {
+  /// Creates a sized box of height 20.
+  const SizedBoxh20({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const SizedBox(
       height: 20,
+    );
+  }
+}
+
+/// Sized Box of height 10
+class SizedBoxh10 extends StatelessWidget {
+  /// Creates a sized box of height 10.
+  const SizedBoxh10({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 10,
+    );
+  }
+}
+
+/// Inkwell text widget that directs to a given widget when tapped
+class AppTextOnTap extends StatelessWidget {
+  // Wait this shouldn't need to only be text...?
+
+  /// Widget to build and display when text is tapped.
+  final Widget onTap;
+
+  /// Text to be displayed
+  final Text text;
+
+  const AppTextOnTap({super.key, required this.onTap, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => onTap),
+        );
+      },
+      child: text,
     );
   }
 }

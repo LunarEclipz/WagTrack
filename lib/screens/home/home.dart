@@ -49,8 +49,8 @@ class _HomeState extends State<Home> {
                       child: child,
                     );
                   },
-                  transitionDuration:
-                      const Duration(seconds: 1), // Adjust the duration here
+                  transitionDuration: const Duration(
+                      milliseconds: 500), // Adjust the duration here
                   pageBuilder: (context, a, b) => const AppSettings(),
                 ),
               );
@@ -68,7 +68,7 @@ class _HomeState extends State<Home> {
           "Welcome Back Damien",
           style: textStyles.headlineMedium,
         ),
-        const SizedBox20(),
+        const SizedBoxh20(),
         CallToActionButton(
           icon: Icons.book_rounded,
           title: "Pet Care Resources",
@@ -77,7 +77,7 @@ class _HomeState extends State<Home> {
           color: AppTheme.customColors.pastelBlue,
           onTap: () {},
         ),
-        const SizedBox20(),
+        const SizedBoxh20(),
         Text(
           "My Pets",
           style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -86,7 +86,7 @@ class _HomeState extends State<Home> {
           "You have not added a personal pet",
           style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
         ),
-        const SizedBox20(),
+        const SizedBoxh20(),
         Text(
           "Community Pets",
           style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
