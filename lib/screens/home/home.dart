@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wagtrack/screens/settings/app_settings.dart';
+import 'package:wagtrack/shared/background_img.dart';
 import 'package:wagtrack/shared/components/call_to_action.dart';
 import 'package:wagtrack/shared/themes.dart';
 
@@ -19,7 +20,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       // App Bar
@@ -62,29 +62,31 @@ class _HomeState extends State<Home> {
         ],
       ),
       // Body
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  "Welcome Back Damien",
-                  style: textStyles.headlineMedium,
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                CallToActionButton(
-                  icon: Icons.book_rounded,
-                  title: "Pet Care Resources",
-                  text:
-                      "Pet Care can be difficult, but we have prepared a list of resources and tools just for you! ",
-                  color: AppTheme.customColors.pastelBlue,
-                  onTap: () {},
-                )
-              ]),
+      body: BackgroundImageWrapper(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Welcome Back Damien",
+                    style: textStyles.headlineMedium,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CallToActionButton(
+                    icon: Icons.book_rounded,
+                    title: "Pet Care Resources",
+                    text:
+                        "Pet Care can be difficult, but we have prepared a list of resources and tools just for you! ",
+                    color: AppTheme.customColors.pastelBlue,
+                    onTap: () {},
+                  ),
+                ]),
+          ),
         ),
       ),
       // Floating Action Button
