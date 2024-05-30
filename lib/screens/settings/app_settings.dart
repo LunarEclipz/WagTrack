@@ -226,7 +226,10 @@ class _AppSettingsState extends State<AppSettings> {
           // LOGOUT BUTTON
           Center(
             child: InkWell(
-              onTap: () => context.read<AuthenticationService>().signOutUser(),
+              onTap: () {
+                context.read<AuthenticationService>().signOutUser();
+                Navigator.pop(context);
+              },
               child: Container(
                 width: 300,
                 height: 40,
