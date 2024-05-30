@@ -85,6 +85,9 @@ class AppTheme {
         fontWeight: FontWeight.w600,
       ),
       bodyMedium: GoogleFonts.openSans(
+        fontSize: 14,
+      ),
+      bodySmall: GoogleFonts.openSans(
         fontSize: 12,
       ),
       titleMedium: GoogleFonts.rubik(
@@ -110,6 +113,9 @@ class AppTheme {
       focusedBorder: const UnderlineInputBorder(
         borderSide: BorderSide(color: Color(0xFF9799AB)),
       ),
+    ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: Color(0xFFB01713),
     ),
   );
 
