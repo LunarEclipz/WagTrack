@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wagtrack/screens/settings/app_settings.dart';
 import 'package:wagtrack/shared/components/call_to_action.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
+import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
 
 class Home extends StatefulWidget {
@@ -67,9 +68,7 @@ class _HomeState extends State<Home> {
           "Welcome Back Damien",
           style: textStyles.headlineMedium,
         ),
-        const SizedBox(
-          height: 20,
-        ),
+        const SizedBox20(),
         CallToActionButton(
           icon: Icons.book_rounded,
           title: "Pet Care Resources",
@@ -78,9 +77,7 @@ class _HomeState extends State<Home> {
           color: AppTheme.customColors.pastelBlue,
           onTap: () {},
         ),
-        const SizedBox(
-          height: 20,
-        ),
+        const SizedBox20(),
         Text(
           "My Pets",
           style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -89,9 +86,7 @@ class _HomeState extends State<Home> {
           "You have not added a personal pet",
           style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
         ),
-        const SizedBox(
-          height: 20,
-        ),
+        const SizedBox20(),
         Text(
           "Community Pets",
           style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
