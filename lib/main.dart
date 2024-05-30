@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/firebase_options.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
@@ -13,11 +13,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(const WagTrackApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class WagTrackApp extends StatelessWidget {
+  const WagTrackApp({super.key});
 
   // This widget is the root of your application.
   @override

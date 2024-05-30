@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wagtrack/screens/settings/app_settings.dart';
-import 'package:wagtrack/shared/background_img.dart';
 import 'package:wagtrack/shared/components/call_to_action.dart';
+import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/themes.dart';
 
 class Home extends StatefulWidget {
@@ -62,59 +62,45 @@ class _HomeState extends State<Home> {
         ],
       ),
       // Body
-      body: BackgroundImageWrapper(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "Welcome Back Damien",
-                    style: textStyles.headlineMedium,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  CallToActionButton(
-                    icon: Icons.book_rounded,
-                    title: "Pet Care Resources",
-                    text:
-                        "Pet Care Resources at Your Fingertips! Click to learn more ...",
-                    color: AppTheme.customColors.pastelBlue,
-                    onTap: () {},
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    "My Pets",
-                    style: textStyles.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "You have not added a personal pet",
-                    style: textStyles.bodySmall
-                        ?.copyWith(fontStyle: FontStyle.italic),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    "Community Pets",
-                    style: textStyles.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "You have not added a community pet",
-                    style: textStyles.bodySmall
-                        ?.copyWith(fontStyle: FontStyle.italic),
-                  ),
-                ]),
-          ),
+      body: AppScrollablePage(children: <Widget>[
+        Text(
+          "Welcome Back Damien",
+          style: textStyles.headlineMedium,
         ),
-      ),
+        const SizedBox(
+          height: 20,
+        ),
+        CallToActionButton(
+          icon: Icons.book_rounded,
+          title: "Pet Care Resources",
+          text:
+              "Pet Care Resources at Your Fingertips! Click to learn more ...",
+          color: AppTheme.customColors.pastelBlue,
+          onTap: () {},
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        Text(
+          "My Pets",
+          style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          "You have not added a personal pet",
+          style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        Text(
+          "Community Pets",
+          style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          "You have not added a community pet",
+          style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+        ),
+      ]),
       // Floating Action Button
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
