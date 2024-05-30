@@ -37,7 +37,10 @@ class _AppSettingsState extends State<AppSettings> {
               // const Text("Signed In"),
               const SizedBox(height: 40),
               InkWell(
-                onTap: () => FirebaseAuth.instance.signOut(),
+                onTap: () {
+                  FirebaseAuth.instance.signOut();
+                  Navigator.pop(context);
+                },
                 child: Container(
                   width: 300,
                   height: 40,
