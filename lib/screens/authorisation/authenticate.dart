@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:wagtrack/screens/authorisation/authorisation_frame.dart';
 import 'package:wagtrack/screens/authorisation/login_success.dart';
+import 'package:wagtrack/screens/home/home.dart';
 // import 'package:wagtrack/screens/mainTemplate.dart';
 
 class Authenticate extends StatefulWidget {
@@ -39,7 +40,7 @@ class _AuthenticateState extends State<Authenticate> {
           return const Scaffold(
               body: Center(child: CircularProgressIndicator()));
         } else {
-          return const LoginSuccess();
+          return const Home(); // Home Screen if Onboarded, Onboarding screen if not
         }
       },
     );
