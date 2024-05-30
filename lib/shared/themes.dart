@@ -77,7 +77,7 @@ class AppTheme {
     ),
     textTheme: TextTheme(
       headlineMedium: GoogleFonts.rubik(
-        fontSize: 23,
+        fontSize: 24,
         color: const Color(0xFF7B0300),
       ),
       bodyLarge: GoogleFonts.openSans(
@@ -90,8 +90,11 @@ class AppTheme {
       bodySmall: GoogleFonts.openSans(
         fontSize: 12,
       ),
-      titleMedium: GoogleFonts.rubik(
+      titleLarge: GoogleFonts.rubik(
         fontSize: 32,
+      ),
+      titleMedium: GoogleFonts.rubik(
+        fontSize: 24,
       ),
       titleSmall: GoogleFonts.rubik(
         fontSize: 18,

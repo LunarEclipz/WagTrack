@@ -15,6 +15,7 @@ class BackgroundImageWrapper extends StatelessWidget {
         image: DecorationImage(
           // Needs to be an SVG for higher definition
           image: AssetImage('assets/background.png'),
+          opacity: 0.25,
           fit: BoxFit.cover,
         ),
       ),

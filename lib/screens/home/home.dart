@@ -81,9 +81,35 @@ class _HomeState extends State<Home> {
                     icon: Icons.book_rounded,
                     title: "Pet Care Resources",
                     text:
-                        "Pet Care can be difficult, but we have prepared a list of resources and tools just for you! ",
+                        "Pet Care Resources at Your Fingertips! Click to learn more ...",
                     color: AppTheme.customColors.pastelBlue,
                     onTap: () {},
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    "My Pets",
+                    style: textStyles.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "You have not added a personal pet",
+                    style: textStyles.bodySmall
+                        ?.copyWith(fontStyle: FontStyle.italic),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    "Community Pets",
+                    style: textStyles.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "You have not added a community pet",
+                    style: textStyles.bodySmall
+                        ?.copyWith(fontStyle: FontStyle.italic),
                   ),
                 ]),
           ),
