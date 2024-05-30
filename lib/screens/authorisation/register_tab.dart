@@ -16,12 +16,6 @@ class _RegisterTabState extends State<RegisterTab> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
-  final bool _isUsernameValid = true;
-  final bool _isEmailValid = true;
-  final bool _isPasswordTooShort = true;
-  final bool _isConfirmPasswordTooShort = true;
-  final bool _obscureTextPassword = true;
-  final bool _obscureTextConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
