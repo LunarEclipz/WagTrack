@@ -50,7 +50,7 @@ class _HomeState extends State<Home> {
                     );
                   },
                   transitionDuration:
-                      const Duration(seconds: 2), // Adjust the duration here
+                      const Duration(seconds: 1), // Adjust the duration here
                   pageBuilder: (context, a, b) => const AppSettings(),
                 ),
               );
