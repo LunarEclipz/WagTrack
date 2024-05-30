@@ -43,7 +43,12 @@ class ForgotPasswordPage extends StatelessWidget {
                     .read<AuthenticationService>()
                     .resetPassword(_emailController.text);
 
+                // debugPrint('DEBUG: password reset: $result');
+
                 if (result == "Success") {
+                  // return to login
+                  Navigator.pop(context);
+
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
