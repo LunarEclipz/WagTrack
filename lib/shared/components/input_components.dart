@@ -36,10 +36,13 @@ class AppSwitch extends StatelessWidget {
 
 /// Standard text form field for WagTrack.
 ///
-/// Autovalidates for empty field by default.
+/// Validates fields on user interaction by default
 class AppTextFormField extends StatefulWidget {
   /// Hint text
   final String hintText;
+
+  /// Label Text
+  final String labelText;
 
   /// Prefix icon
   final Icon? prefixIcon;
@@ -47,15 +50,18 @@ class AppTextFormField extends StatefulWidget {
   /// TextEditingController
   final TextEditingController? controller;
 
-  /// Whether this field is obscurable
+  /// Whether this field is obscurable.
+  ///
+  /// Obscurable fields are obscured by default.
   final bool isObscurable;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
 
   const AppTextFormField({
     super.key,
-    required this.hintText,
     required this.controller,
+    this.hintText = '',
+    this.labelText = '',
     this.prefixIcon,
     this.isObscurable = false,
     this.keyboardType = TextInputType.text,
@@ -67,11 +73,25 @@ class AppTextFormField extends StatefulWidget {
 }
 
 class _AppTextFormFieldState extends State<AppTextFormField> {
-  bool _obscuretext = false;
+  late bool _obscuretext;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscuretext = widget.isObscurable;
+  }
 
   String? emptyStringValidator(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter a ${widget.hintText}';
+      String fieldName =
+          widget.hintText.isEmpty ? widget.labelText : widget.hintText;
+      // stupid silent 'y's are going to be an issue
+      if (RegExp(r'^[aeiouAEIOU]+').hasMatch(fieldName)) {
+        // starts with vowel
+        return 'Please enter an ${fieldName.toLowerCase()}';
+      }
+      // does not start with vowel
+      return 'Please enter a ${fieldName.toLowerCase()}';
     }
     return null;
   }
@@ -85,9 +105,10 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
       obscureText: _obscuretext,
       keyboardType: widget.keyboardType,
       validator: widget.validator ?? (value) => emptyStringValidator(value),
-      autovalidateMode: AutovalidateMode.always,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
         hintText: widget.hintText,
+        labelText: widget.labelText,
         prefixIcon: widget.prefixIcon,
         prefixIconColor: AppTheme.customColors.hint,
         // border: const OutlineInputBorder(),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/forgot_password.dart';
 import 'package:wagtrack/screens/authorisation/login_social_account.dart';
 import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/shared/components/input_components.dart';
 
 class LoginTab extends StatefulWidget {
   const LoginTab({super.key});
@@ -14,8 +15,6 @@ class LoginTab extends StatefulWidget {
 class _LoginTabState extends State<LoginTab> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  bool _obscureText = true;
-  // bool _rememberMeIsChecked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -29,31 +28,12 @@ class _LoginTabState extends State<LoginTab> {
       child: Form(
         child: Column(
           children: <Widget>[
-            TextFormField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                hintText: 'Enter your email address',
-              ),
-            ),
-            TextFormField(
-              obscureText: _obscureText,
+            AppTextFormField(
+                labelText: 'Email Address', controller: emailController),
+            AppTextFormField(
+              labelText: 'Password',
               controller: passwordController,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                hintText: 'Enter your password',
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
-                  icon: Icon(
-                    _obscureText ? Icons.visibility_off : Icons.visibility,
-                    // color: colorScheme.tertiary,
-                  ),
-                ),
-              ),
+              isObscurable: true,
             ),
             const SizedBox(height: 10),
             Row(

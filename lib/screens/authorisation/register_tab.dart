@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/login_social_account.dart';
 import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/shared/components/input_components.dart';
 
 class RegisterTab extends StatefulWidget {
   const RegisterTab({super.key});
@@ -15,12 +16,12 @@ class _RegisterTabState extends State<RegisterTab> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
-  bool _isUsernameValid = true;
-  bool _isEmailValid = true;
-  bool _isPasswordTooShort = true;
-  bool _isConfirmPasswordTooShort = true;
-  bool _obscureTextPassword = true;
-  bool _obscureTextConfirmPassword = true;
+  final bool _isUsernameValid = true;
+  final bool _isEmailValid = true;
+  final bool _isPasswordTooShort = true;
+  final bool _isConfirmPasswordTooShort = true;
+  final bool _obscureTextPassword = true;
+  final bool _obscureTextConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -32,102 +33,33 @@ class _RegisterTabState extends State<RegisterTab> {
       child: Form(
         child: Column(
           children: <Widget>[
-            TextFormField(
+            AppTextFormField(
               controller: usernameController,
-              decoration: InputDecoration(
-                labelText: 'Username',
-                errorText: _isUsernameValid ? null : 'Invalid username',
-                hintText: 'Enter your username',
-              ),
-              onChanged: (value) {
-                setState(() {
-                  if (usernameController.text.isEmpty) {
-                    _isUsernameValid = false;
-                  } else {
-                    _isUsernameValid = true;
-                  }
-                });
-              },
+              labelText: 'Username',
+              validator: (value) => value!.isEmpty ? 'Invalid username' : null,
             ),
-            TextFormField(
+            AppTextFormField(
               controller: emailController,
-              decoration: InputDecoration(
-                labelText: 'Email Address',
-                errorText: _isEmailValid ? null : 'Invalid email',
-                hintText: 'Enter your email address',
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _isEmailValid = context
+              labelText: 'Email Address',
+              validator: (value) => !context
                       .read<AuthenticationService>()
-                      .isEmailValidEmail(emailController.text);
-                });
-              },
+                      .isEmailValidEmail(value!)
+                  ? 'Invalid email'
+                  : null,
             ),
-            TextFormField(
+            AppTextFormField(
               controller: passwordController,
-              obscureText: _obscureTextPassword,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                errorText:
-                    _isPasswordTooShort ? null : 'Enter more than 6 characters',
-                hintText: 'Enter your password',
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _obscureTextPassword = !_obscureTextPassword;
-                    });
-                  },
-                  icon: Icon(
-                    _obscureTextPassword
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                  ),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  if (passwordController.text.length < 6) {
-                    _isPasswordTooShort = false;
-                  } else {
-                    _isPasswordTooShort = true;
-                  }
-                });
-              },
+              labelText: 'Password',
+              isObscurable: true,
+              validator: (value) =>
+                  value!.length < 6 ? 'Minimum of 6 characters' : null,
             ),
-            TextFormField(
+            AppTextFormField(
               controller: confirmPasswordController,
-              obscureText: _obscureTextConfirmPassword,
-              decoration: InputDecoration(
-                labelText: 'Confirm Password',
-                errorText: _isConfirmPasswordTooShort
-                    ? null
-                    : 'Enter more than 6 characters',
-                hintText: 'Enter to confirm your password',
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _obscureTextConfirmPassword =
-                          !_obscureTextConfirmPassword;
-                    });
-                  },
-                  icon: Icon(
-                    _obscureTextConfirmPassword
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                    // color: colorScheme.tertiary,
-                  ),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  if (confirmPasswordController.text.length < 6) {
-                    _isConfirmPasswordTooShort = false;
-                  } else {
-                    _isConfirmPasswordTooShort = true;
-                  }
-                });
-              },
+              labelText: 'Confirm Password',
+              isObscurable: true,
+              validator: (value) =>
+                  value!.length < 6 ? 'Minimum of 6 characters' : null,
             ),
             const SizedBox(height: 16.0),
             InkWell(

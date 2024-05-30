@@ -112,13 +112,14 @@ class AppTheme {
     ),
     inputDecorationTheme: InputDecorationTheme(
       labelStyle: GoogleFonts.aBeeZee(
-        fontSize: 20,
+        fontWeight: FontWeight.w400,
+        fontSize: 16,
         color: hintLightGrey,
       ),
       hintStyle: GoogleFonts.rubik(
-        fontStyle: FontStyle.italic,
+        // fontStyle: FontStyle.italic,
         fontWeight: FontWeight.w200,
-        fontSize: 12,
+        fontSize: 14,
         color: hintLightGrey,
       ),
       enabledBorder: const UnderlineInputBorder(
