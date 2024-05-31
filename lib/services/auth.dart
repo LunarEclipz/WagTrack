@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // import '../models/user.dart';
 
@@ -80,6 +81,11 @@ class AuthenticationService {
       //   journeysID: [],
       //   sightingsID: [],
       // ));
+
+      // Add user data to local storage (for now)
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_name', name);
+      await prefs.setString('user_email', email);
 
       return "Success";
     } on FirebaseAuthException catch (e) {

@@ -310,7 +310,7 @@ class _AppDropdownState extends State<AppDropdown> {
       child: SizedBox(
         height: 20,
         child: DropdownButton<String>(
-          value: widget.selectedText,
+          value: widget.selectedText == '' ? null : widget.selectedText,
           icon: const Icon(Icons.expand_more),
           style: textStyles.bodyMedium
               ?.copyWith(color: AppTheme.customColors.secondaryText),
