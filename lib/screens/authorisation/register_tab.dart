@@ -35,13 +35,13 @@ class _RegisterTabState extends State<RegisterTab> {
               key: _registerFormKey,
               child: Column(
                 children: <Widget>[
-                  AppTextFormField(
+                  AppTextFormFieldLarge(
                     controller: usernameController,
                     labelText: 'Username',
                     validator: (value) =>
                         value!.isEmpty ? 'Invalid username' : null,
                   ),
-                  AppTextFormField(
+                  AppTextFormFieldLarge(
                     controller: emailController,
                     labelText: 'Email Address',
                     validator: (value) => !context
@@ -50,14 +50,14 @@ class _RegisterTabState extends State<RegisterTab> {
                         ? 'Invalid email'
                         : null,
                   ),
-                  AppTextFormField(
+                  AppTextFormFieldLarge(
                     controller: passwordController,
                     labelText: 'Password',
                     isObscurable: true,
                     validator: (value) =>
                         value!.length < 6 ? 'Minimum of 6 characters' : null,
                   ),
-                  AppTextFormField(
+                  AppTextFormFieldLarge(
                     controller: confirmPasswordController,
                     labelText: 'Confirm Password',
                     isObscurable: true,

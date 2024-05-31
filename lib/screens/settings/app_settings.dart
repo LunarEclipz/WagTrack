@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wagtrack/screens/blank_page.dart';
+import 'package:wagtrack/screens/settings/delete_settings.dart';
 import 'package:wagtrack/services/auth.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
+import 'package:wagtrack/shared/themes.dart';
 
 class AppSettings extends StatefulWidget {
   const AppSettings({super.key});
@@ -14,38 +17,92 @@ class AppSettings extends StatefulWidget {
 }
 
 class _AppSettingsState extends State<AppSettings> {
-  // please change
-  TextEditingController nameController = TextEditingController(text: 'XD');
-  TextEditingController emailController = TextEditingController(text: ':3');
-  TextEditingController phoneNumberController =
-      TextEditingController(text: 'UwU');
+  // Text controllers
+  TextEditingController nameController = TextEditingController(text: '');
+  TextEditingController emailController = TextEditingController(text: '');
+  TextEditingController phoneNumberController = TextEditingController(text: '');
 
-  // TEMPORARY, NOT CONNECTED TO ANY STORAGE
-  bool allowShareData = false;
-  bool allowShareContact = false;
-  bool allowCamera = true;
-  bool allowGallery = true;
+  // Settings values
+  late bool allowShareData = false;
+  late bool allowShareContact = false;
+  late bool allowCamera = false;
+  late bool allowGallery = false;
+  // note that selectedLocation CAN be null.
+  // Required for dropdown hint text to work.
+  String? selectedLocation;
 
+  // Temp location list
+  // TODO: Should be imported from elsewhere
   List<String> locationList = <String>[
     'Yishun',
     'Jurong',
     'Tampines',
     'Bedok',
-    'Hougang'
+    'Hougang',
   ];
-  String selectedLocation = 'Yishun';
 
   // Form key for personal info
   final _personalInfoFormKey = GlobalKey<FormState>();
 
+  /// Initialise state
+  @override
+  void initState() {
+    super.initState();
+
+    /// load settings values
+    _loadSavedValues();
+  }
+
+  /// Load values from saved preferences
+  void _loadSavedValues() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // USER VALUES - local for the time being
+      nameController.text = prefs.getString('user_name') ?? "";
+      emailController.text = prefs.getString('user_email') ?? "";
+      phoneNumberController.text = prefs.getString('user_phone_number') ?? "";
+      selectedLocation = prefs.getString('user_location');
+      selectedLocation = selectedLocation!.isNotEmpty ? selectedLocation : null;
+      allowShareData = prefs.getBool('user_allow_share_data') ?? false;
+      allowShareContact = prefs.getBool('user_allow_share_contact') ?? false;
+
+      // DEVICE VALUES
+      allowCamera = prefs.getBool('device_allow_camera') ?? false;
+      allowGallery = prefs.getBool('device_allow_gallery') ?? false;
+    });
+  }
+
   /// Save changes to personal info from form.
-  void _savePersonalInfoChanges() {
+  ///
+  /// Saves to shared preferences
+  void _savePersonalInfoChanges() async {
     if (_personalInfoFormKey.currentState!.validate()) {
-      // TODO: save changes
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      // Save personal info values
+      await prefs.setString('user_name', nameController.text);
+      await prefs.setString('user_email', emailController.text);
+      await prefs.setString('user_phone_number', phoneNumberController.text);
+      await prefs.setString('user_location', selectedLocation!);
+      // await prefs.setBool('user_allow_share_data', allowShareData);
+      // await prefs.setBool('user_allow_share_contact', allowShareContact);
+      // await prefs.setBool('device_allow_camera', allowCamera);
+      // await prefs.setBool('device_allow_gallery', allowGallery);
+
+      // Tell user data is saved
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Changes saved!')),
       );
     }
+  }
+
+  /// Save changes to boolean data
+  void _saveBooleanPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('user_allow_share_data', allowShareData);
+    await prefs.setBool('user_allow_share_contact', allowShareContact);
+    await prefs.setBool('device_allow_camera', allowCamera);
+    await prefs.setBool('device_allow_gallery', allowGallery);
   }
 
   @override
@@ -72,14 +129,14 @@ class _AppSettingsState extends State<AppSettings> {
           const SizedBoxh10(),
           Text('Default Location', style: textStyles.bodySmall),
           AppDropdown(
-            optionsList: locationList,
-            selectedText: selectedLocation,
-            onChanged: (String? value) {
-              setState(() {
-                selectedLocation = value!;
-              });
-            },
-          ),
+              optionsList: locationList,
+              selectedText: selectedLocation,
+              onChanged: (String? value) {
+                setState(() {
+                  selectedLocation = value!;
+                });
+              },
+              hint: const Text('Please select a location...')),
           const SizedBoxh10(),
           Form(
             key: _personalInfoFormKey,
@@ -94,13 +151,36 @@ class _AppSettingsState extends State<AppSettings> {
                 controller: emailController,
                 hintText: 'Email',
                 prefixIcon: const Icon(Icons.mail_outline),
+                validator: (value) => !context
+                        .read<AuthenticationService>()
+                        .isEmailValidEmail(value!)
+                    ? 'Please enter a valid email'
+                    : null,
               ),
               const SizedBoxh10(),
               AppTextFormField(
                 controller: phoneNumberController,
                 hintText: 'Phone Number',
-                prefixIcon: const Icon(Icons.phone_android_outlined),
-                prefixText: '+65 ',
+                prefixIcon: SizedBox(
+                  width: 90,
+                  child: Row(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(right: 10, left: 12),
+                        child: Icon(Icons.phone_android_outlined),
+                      ),
+                      Text(
+                        '+65 ',
+                        style: textStyles.bodyLarge?.copyWith(
+                            color: AppTheme.customColors.secondaryText),
+                      )
+                    ],
+                  ),
+                ),
+                validator: (String? value) =>
+                    !RegExp(r'^[0-9]{8}$').hasMatch(value!)
+                        ? 'Please enter a valid Singapore phone number'
+                        : null,
               ),
             ]),
           ),
@@ -144,7 +224,10 @@ class _AppSettingsState extends State<AppSettings> {
               ),
               AppSwitch(
                   value: allowShareData,
-                  onChanged: (value) => setState(() => allowShareData = value)),
+                  onChanged: (value) => setState(() {
+                        allowShareData = value;
+                        _saveBooleanPreferences();
+                      })),
             ],
           ),
           const SizedBoxh10(),
@@ -161,8 +244,10 @@ class _AppSettingsState extends State<AppSettings> {
               ),
               AppSwitch(
                   value: allowShareContact,
-                  onChanged: (value) =>
-                      setState(() => allowShareContact = value)),
+                  onChanged: (value) => setState(() {
+                        allowShareContact = value;
+                        _saveBooleanPreferences();
+                      })),
             ],
           ),
           const SizedBoxh20(),
@@ -178,7 +263,10 @@ class _AppSettingsState extends State<AppSettings> {
               const Text('Camera'),
               AppSwitch(
                   value: allowCamera,
-                  onChanged: (value) => setState(() => allowCamera = value)),
+                  onChanged: (value) => setState(() {
+                        allowCamera = value;
+                        _saveBooleanPreferences();
+                      })),
             ],
           ),
           const SizedBoxh10(),
@@ -188,7 +276,10 @@ class _AppSettingsState extends State<AppSettings> {
               const Text('Gallery'),
               AppSwitch(
                   value: allowGallery,
-                  onChanged: (value) => setState(() => allowGallery = value)),
+                  onChanged: (value) => setState(() {
+                        allowGallery = value;
+                        _saveBooleanPreferences();
+                      })),
             ],
           ),
           const SizedBoxh20(),
@@ -222,6 +313,11 @@ class _AppSettingsState extends State<AppSettings> {
           const AppTextOnTap(
             onTap: BlankPage(),
             text: Text('Frequently Asked Questions'),
+          ),
+          const SizedBoxh10(),
+          const AppTextOnTap(
+            onTap: DeletionSettings(),
+            text: Text('Reset Settings'),
           ),
           const SizedBoxh20(),
           // LOGOUT BUTTON
