@@ -114,7 +114,7 @@ class AuthenticationService {
       return "Success";
     } on FirebaseAuthException catch (e) {
       debugPrint("[AUTH_ERROR] $e");
-      return e.code;
+      return '${e.code}:  \n ${e.message}';
     }
   }
 
@@ -136,7 +136,7 @@ class AuthenticationService {
       }
     } on FirebaseAuthException catch (e) {
       debugPrint("[AUTH_ERROR] $e");
-      return e.code;
+      return '${e.code}:  \n ${e.message}';
     }
   }
 

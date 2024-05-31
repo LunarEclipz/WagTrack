@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/shared/components/dialogs.dart';
 
 class LoginSocial extends StatefulWidget {
   const LoginSocial({super.key});
@@ -29,21 +30,11 @@ class _LoginSocialState extends State<LoginSocial> {
                     // debugPrint('DEBUG $result');
 
                     if (result != "Success") {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text(result!),
-                            content: Text(result),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Try again'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      showAppErrorAlertDialog(
+                          // ignore: use_build_context_synchronously
+                          context: context,
+                          titleString: 'Account Login Failed',
+                          contentString: result!);
                     }
                   },
                   customBorder: RoundedRectangleBorder(
@@ -64,8 +55,14 @@ class _LoginSocialState extends State<LoginSocial> {
                     String? result = await context
                         .read<AuthenticationService>()
                         .signInWithFacebook();
-                    // TODO
-                    debugPrint('DEBUG $result');
+
+                    if (result != "Success") {
+                      showAppErrorAlertDialog(
+                          // ignore: use_build_context_synchronously
+                          context: context,
+                          titleString: 'Account Login Failed',
+                          contentString: result!);
+                    }
                   },
                   customBorder: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
