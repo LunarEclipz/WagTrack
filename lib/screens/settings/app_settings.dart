@@ -100,6 +100,7 @@ class _AppSettingsState extends State<AppSettings> {
                 controller: phoneNumberController,
                 hintText: 'Phone Number',
                 prefixIcon: const Icon(Icons.phone_android_outlined),
+                prefixText: '+65 ',
               ),
             ]),
           ),

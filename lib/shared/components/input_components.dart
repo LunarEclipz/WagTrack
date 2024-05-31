@@ -49,6 +49,9 @@ class AppTextFormField extends StatefulWidget {
   /// Prefix icon
   final Icon? prefixIcon;
 
+  /// Prefix text
+  final String? prefixText;
+
   /// TextEditingController
   final TextEditingController? controller;
 
@@ -66,6 +69,7 @@ class AppTextFormField extends StatefulWidget {
     this.hintText = '',
     this.labelText = '',
     this.prefixIcon,
+    this.prefixText,
     this.isObscurable = false,
     this.keyboardType = TextInputType.text,
     this.validator,
@@ -103,33 +107,38 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
 
+    final TextStyle? inputTextStyle = textStyles.bodyLarge
+        ?.copyWith(color: AppTheme.customColors.secondaryText);
+
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscuretext,
       keyboardType: widget.keyboardType,
       validator: widget.validator ?? (value) => emptyStringValidator(value),
       autovalidateMode: AutovalidateMode.onUserInteraction,
+      textAlignVertical: TextAlignVertical.top,
       decoration: InputDecoration(
-        hintText: widget.hintText,
-        labelText: widget.labelText,
-        prefixIcon: widget.prefixIcon,
-        prefixIconColor: AppTheme.customColors.hint,
-        // border: const OutlineInputBorder(),
-        suffixIcon: widget.isObscurable
-            ? IconButton(
-                onPressed: () {
-                  setState(() {
-                    _obscuretext = !_obscuretext;
-                  });
-                },
-                icon: Icon(
-                  _obscuretext ? Icons.visibility_off : Icons.visibility,
-                ),
-              )
-            : null,
-      ),
-      style: textStyles.bodyLarge
-          ?.copyWith(color: AppTheme.customColors.secondaryText),
+          hintText: widget.hintText,
+          labelText: widget.labelText,
+          prefixIcon: widget.prefixIcon,
+          prefixIconColor: AppTheme.customColors.hint,
+          prefixText: widget.prefixText,
+          prefixStyle: inputTextStyle,
+          alignLabelWithHint: true,
+          suffixIcon: widget.isObscurable
+              ? IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _obscuretext = !_obscuretext;
+                    });
+                  },
+                  icon: Icon(
+                    _obscuretext ? Icons.visibility_off : Icons.visibility,
+                  ),
+                )
+              : null,
+          contentPadding: EdgeInsets.zero),
+      style: inputTextStyle,
     );
   }
 }
