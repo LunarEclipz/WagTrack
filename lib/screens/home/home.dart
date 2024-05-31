@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wagtrack/screens/home/add_pet.dart';
 import 'package:wagtrack/screens/settings/app_settings.dart';
 import 'package:wagtrack/shared/components/call_to_action.dart';
@@ -16,12 +17,28 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  String? name;
+
   // final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int currentPageIndex = 0;
+
+  /// Loads username - MOVE TODO:
+  void getName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    name = prefs.getString('user_name');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getName();
+  }
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
+
+    getName();
 
     return Scaffold(
       // App Bar
@@ -66,7 +83,7 @@ class _HomeState extends State<Home> {
       // Body
       body: AppScrollablePage(children: <Widget>[
         Text(
-          "Welcome Back Damien",
+          "Welcome Back ${name ?? ''}",
           style: textStyles.headlineMedium,
         ),
         const SizedBoxh20(),

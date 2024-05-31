@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wagtrack/screens/authorisation/authenticate.dart';
-import 'package:wagtrack/screens/blank_page.dart';
-import 'package:wagtrack/screens/settings/delete_settings.dart';
-import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/screens/home/home.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
 
-class AppSettings extends StatefulWidget {
-  const AppSettings({super.key});
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
 
   @override
-  State<AppSettings> createState() => _AppSettingsState();
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _AppSettingsState extends State<AppSettings> {
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  // username, to be displayed.
+  String? name;
+
   // Text controllers
-  TextEditingController nameController = TextEditingController(text: '');
-  TextEditingController emailController = TextEditingController(text: '');
   TextEditingController phoneNumberController = TextEditingController(text: '');
 
   // Settings values
@@ -44,63 +41,34 @@ class _AppSettingsState extends State<AppSettings> {
   final _personalInfoFormKey = GlobalKey<FormState>();
 
   /// Initialise state
-  @override
-  void initState() {
-    super.initState();
+  // @override
+  // void initState() {
+  //   super.initState();
+  // }
 
-    /// load settings values
-    _loadSavedValues();
-  }
-
-  /// Load values from saved preferences
-  void _loadSavedValues() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      // USER VALUES - local for the time being
-      nameController.text = prefs.getString('user_name') ?? '';
-      emailController.text = prefs.getString('user_email') ?? '';
-      phoneNumberController.text = prefs.getString('user_phone_number') ?? '';
-      selectedLocation = prefs.getString('user_location') ?? '';
-      allowShareData = prefs.getBool('user_allow_share_data') ?? false;
-      allowShareContact = prefs.getBool('user_allow_share_contact') ?? false;
-
-      // DEVICE VALUES
-      allowCamera = prefs.getBool('device_allow_camera') ?? false;
-      allowGallery = prefs.getBool('device_allow_gallery') ?? false;
-    });
-  }
-
-  /// Save changes to personal info from form.
+  /// Saves all changes from the onboarding form
   ///
   /// Saves to shared preferences
-  void _savePersonalInfoChanges() async {
+  void _saveAllChanges() async {
     if (_personalInfoFormKey.currentState!.validate()) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       // Save personal info values
-      await prefs.setString('user_name', nameController.text);
-      await prefs.setString('user_email', emailController.text);
       await prefs.setString('user_phone_number', phoneNumberController.text);
       await prefs.setString('user_location', selectedLocation);
-      // await prefs.setBool('user_allow_share_data', allowShareData);
-      // await prefs.setBool('user_allow_share_contact', allowShareContact);
-      // await prefs.setBool('device_allow_camera', allowCamera);
-      // await prefs.setBool('device_allow_gallery', allowGallery);
+      await prefs.setBool('user_allow_share_data', allowShareData);
+      await prefs.setBool('user_allow_share_contact', allowShareContact);
+      await prefs.setBool('device_allow_camera', allowCamera);
+      await prefs.setBool('device_allow_gallery', allowGallery);
 
-      // Tell user data is saved
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Changes saved!')),
-      );
+      // and set hasOnboarded to true!
+      await prefs.setBool('user_has_onboarded', true);
     }
   }
 
-  /// Save changes to boolean data
-  void _saveBooleanPreferences() async {
+  /// Loads username - MOVE TODO:
+  void getName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('user_allow_share_data', allowShareData);
-    await prefs.setBool('user_allow_share_contact', allowShareContact);
-    await prefs.setBool('device_allow_camera', allowCamera);
-    await prefs.setBool('device_allow_gallery', allowGallery);
+    name = prefs.getString('user_name');
   }
 
   @override
@@ -111,7 +79,8 @@ class _AppSettingsState extends State<AppSettings> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Application Settings',
+          // TODO: change!!!
+          'Welcome!',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: colorScheme.primary,
@@ -119,6 +88,14 @@ class _AppSettingsState extends State<AppSettings> {
       body: DefaultTextStyle.merge(
         style: textStyles.bodyLarge,
         child: AppScrollablePage(children: [
+          Text(
+              '''Note: WagTrack data is currently stored locally on your device. 
+As such, your data will persist between different accounts. and not be synced between different devices. 
+          ''',
+              style: textStyles.bodySmall),
+          const SizedBoxh10(),
+          Text('Hello, ${name ?? ''}!'),
+          const SizedBoxh10(),
           // SECTION: PERSONAL INFORMATION
           Text(
             'Personal Information',
@@ -126,7 +103,6 @@ class _AppSettingsState extends State<AppSettings> {
           ),
           const SizedBoxh10(),
           Text('Default Location', style: textStyles.bodySmall),
-          // Text('Currently selected: $selectedLocation'),
           AppDropdown(
               optionsList: locationList,
               selectedText: selectedLocation,
@@ -140,23 +116,6 @@ class _AppSettingsState extends State<AppSettings> {
           Form(
             key: _personalInfoFormKey,
             child: Column(children: [
-              AppTextFormField(
-                controller: nameController,
-                hintText: 'Name',
-                prefixIcon: const Icon(Icons.person_outline),
-              ),
-              const SizedBoxh10(),
-              AppTextFormField(
-                controller: emailController,
-                hintText: 'Email',
-                prefixIcon: const Icon(Icons.mail_outline),
-                validator: (value) => !context
-                        .read<AuthenticationService>()
-                        .isEmailValidEmail(value!)
-                    ? 'Please enter a valid email'
-                    : null,
-              ),
-              const SizedBoxh10(),
               AppTextFormField(
                 controller: phoneNumberController,
                 hintText: 'Phone Number',
@@ -183,26 +142,6 @@ class _AppSettingsState extends State<AppSettings> {
               ),
             ]),
           ),
-
-          const SizedBoxh10(),
-          // Save Personal Info Changes Button
-          InkWell(
-            onTap: () => _savePersonalInfoChanges(),
-            child: Container(
-              width: 200,
-              height: 30,
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: const Center(
-                child: Text(
-                  'Save Changes',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-            ),
-          ),
           const SizedBoxh20(),
           // SECTION: DATA CONSENT
           Text(
@@ -225,7 +164,6 @@ class _AppSettingsState extends State<AppSettings> {
                   value: allowShareData,
                   onChanged: (value) => setState(() {
                         allowShareData = value;
-                        _saveBooleanPreferences();
                       })),
             ],
           ),
@@ -245,7 +183,6 @@ class _AppSettingsState extends State<AppSettings> {
                   value: allowShareContact,
                   onChanged: (value) => setState(() {
                         allowShareContact = value;
-                        _saveBooleanPreferences();
                       })),
             ],
           ),
@@ -264,7 +201,6 @@ class _AppSettingsState extends State<AppSettings> {
                   value: allowCamera,
                   onChanged: (value) => setState(() {
                         allowCamera = value;
-                        _saveBooleanPreferences();
                       })),
             ],
           ),
@@ -277,56 +213,18 @@ class _AppSettingsState extends State<AppSettings> {
                   value: allowGallery,
                   onChanged: (value) => setState(() {
                         allowGallery = value;
-                        _saveBooleanPreferences();
                       })),
             ],
           ),
           const SizedBoxh20(),
-          // SECTION: LEGAL
-          Text(
-            'Legal',
-            style: textStyles.headlineMedium,
-          ),
-          const SizedBoxh10(),
-          const AppTextOnTap(
-            onTap: BlankPage(),
-            text: Text('Terms'),
-          ),
-          const SizedBoxh10(),
-          const AppTextOnTap(
-            onTap: BlankPage(),
-            text: Text('Data Policy'),
-          ),
-          const SizedBoxh10(),
-          const AppTextOnTap(
-            onTap: BlankPage(),
-            text: Text('Report Vulnerabilities'),
-          ),
-          const SizedBoxh20(),
-          // SECTION: SUPPORT
-          Text(
-            'Support',
-            style: textStyles.headlineMedium,
-          ),
-          const SizedBoxh10(),
-          const AppTextOnTap(
-            onTap: BlankPage(),
-            text: Text('Frequently Asked Questions'),
-          ),
-          const SizedBoxh10(),
-          const AppTextOnTap(
-            onTap: DeletionSettings(),
-            text: Text('Reset Settings'),
-          ),
-          const SizedBoxh20(),
-          // LOGOUT BUTTON
+          // SUBMIT BUTTON
           Center(
             child: InkWell(
               onTap: () {
-                context.read<AuthenticationService>().signOutUser();
+                _saveAllChanges();
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const Authenticate()),
+                  MaterialPageRoute(builder: (context) => const Home()),
                   (Route<dynamic> route) => false,
                 );
               },
@@ -339,7 +237,7 @@ class _AppSettingsState extends State<AppSettings> {
                 ),
                 child: const Center(
                   child: Text(
-                    'Log Out',
+                    'Get Started!',
                     style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),

@@ -47,7 +47,7 @@ class AppTextFormField extends StatefulWidget {
   final String labelText;
 
   /// Prefix icon
-  final Icon? prefixIcon;
+  final Widget? prefixIcon;
 
   /// TextEditingController
   final TextEditingController? controller;
@@ -103,18 +103,126 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
 
+    final TextStyle? inputTextStyle = textStyles.bodyLarge
+        ?.copyWith(color: AppTheme.customColors.secondaryText);
+
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscuretext,
       keyboardType: widget.keyboardType,
       validator: widget.validator ?? (value) => emptyStringValidator(value),
       autovalidateMode: AutovalidateMode.onUserInteraction,
+      textAlignVertical: TextAlignVertical.top,
+      decoration: InputDecoration(
+          hintText: widget.hintText,
+          labelText: widget.labelText,
+          prefixIcon: widget.prefixIcon,
+          prefixIconColor: AppTheme.customColors.hint,
+          prefixStyle: inputTextStyle,
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          suffixIcon: widget.isObscurable
+              ? IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _obscuretext = !_obscuretext;
+                    });
+                  },
+                  icon: Icon(
+                    _obscuretext ? Icons.visibility_off : Icons.visibility,
+                  ),
+                )
+              : null,
+          contentPadding: EdgeInsets.zero),
+      style: inputTextStyle,
+    );
+  }
+}
+
+/// Standard large text form field for WagTrack. For large fields like authentication
+///
+/// Validates fields on user interaction by default.
+///
+/// Wrap in a `Form` and supply a `GlobalKey` for external form validation.
+class AppTextFormFieldLarge extends StatefulWidget {
+  /// Hint text
+  final String hintText;
+
+  /// Label Text
+  final String labelText;
+
+  /// Prefix icon
+  final Widget? prefixIcon;
+
+  /// TextEditingController
+  final TextEditingController? controller;
+
+  /// Whether this field is obscurable.
+  ///
+  /// Obscurable fields are obscured by default.
+  final bool isObscurable;
+  final TextInputType keyboardType;
+  final String? Function(String?)? validator;
+
+  /// Creates a standard text form field for WagTrack.
+  const AppTextFormFieldLarge({
+    super.key,
+    required this.controller,
+    this.hintText = '',
+    this.labelText = '',
+    this.prefixIcon,
+    this.isObscurable = false,
+    this.keyboardType = TextInputType.text,
+    this.validator,
+  });
+
+  @override
+  State<AppTextFormFieldLarge> createState() => _AppTextFormFieldLargeState();
+}
+
+class _AppTextFormFieldLargeState extends State<AppTextFormFieldLarge> {
+  late bool _obscuretext;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscuretext = widget.isObscurable;
+  }
+
+  String? emptyStringValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      String fieldName =
+          widget.hintText.isEmpty ? widget.labelText : widget.hintText;
+      // stupid silent 'y's are going to be an issue
+      if (RegExp(r'^[aeiouAEIOU]+').hasMatch(fieldName)) {
+        // starts with vowel
+        return 'Please enter an ${fieldName.toLowerCase()}';
+      }
+      // does not start with vowel
+      return 'Please enter a ${fieldName.toLowerCase()}';
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textStyles = Theme.of(context).textTheme;
+
+    final TextStyle? inputTextStyle = textStyles.bodyLarge
+        ?.copyWith(color: AppTheme.customColors.secondaryText);
+
+    return TextFormField(
+      controller: widget.controller,
+      obscureText: _obscuretext,
+      keyboardType: widget.keyboardType,
+      validator: widget.validator ?? (value) => emptyStringValidator(value),
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      textAlignVertical: TextAlignVertical.top,
       decoration: InputDecoration(
         hintText: widget.hintText,
         labelText: widget.labelText,
         prefixIcon: widget.prefixIcon,
         prefixIconColor: AppTheme.customColors.hint,
-        // border: const OutlineInputBorder(),
+        prefixStyle: inputTextStyle,
         suffixIcon: widget.isObscurable
             ? IconButton(
                 onPressed: () {
@@ -128,16 +236,20 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
               )
             : null,
       ),
-      style: textStyles.bodyLarge
-          ?.copyWith(color: AppTheme.customColors.secondaryText),
+      style: inputTextStyle,
     );
   }
 }
 
 /// Standard text dropdown for WagTrack.
 class AppDropdown extends StatefulWidget {
-  /// Hint text
-  final String selectedText;
+  /// Initial selected text
+  ///
+  /// Can be empty.
+  final String? selectedText;
+
+  /// Hint widget to be displayed when no initial selection is made
+  final Widget? hint;
 
   /// Dropdown options
   final List<String> optionsList;
@@ -159,7 +271,8 @@ class AppDropdown extends StatefulWidget {
   const AppDropdown({
     super.key,
     required this.optionsList,
-    required this.selectedText,
+    this.selectedText,
+    this.hint,
     this.onChanged,
   });
 
@@ -197,12 +310,13 @@ class _AppDropdownState extends State<AppDropdown> {
       child: SizedBox(
         height: 20,
         child: DropdownButton<String>(
-          value: widget.selectedText,
+          value: widget.selectedText == '' ? null : widget.selectedText,
           icon: const Icon(Icons.expand_more),
           style: textStyles.bodyMedium
               ?.copyWith(color: AppTheme.customColors.secondaryText),
           isExpanded: true,
           onChanged: widget.onChanged,
+          hint: widget.hint,
           items:
               widget.optionsList.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(

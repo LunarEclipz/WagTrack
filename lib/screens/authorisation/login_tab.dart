@@ -36,7 +36,7 @@ class _LoginTabState extends State<LoginTab> {
               key: _loginFormKey,
               child: Column(
                 children: <Widget>[
-                  AppTextFormField(
+                  AppTextFormFieldLarge(
                     labelText: 'Email Address',
                     controller: emailController,
                     validator: (value) => !context
@@ -45,7 +45,7 @@ class _LoginTabState extends State<LoginTab> {
                         ? 'Invalid email'
                         : null,
                   ),
-                  AppTextFormField(
+                  AppTextFormFieldLarge(
                     labelText: 'Password',
                     controller: passwordController,
                     isObscurable: true,
