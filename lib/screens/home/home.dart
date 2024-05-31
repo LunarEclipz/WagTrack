@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wagtrack/screens/home/add_pet.dart';
 import 'package:wagtrack/screens/settings/app_settings.dart';
 import 'package:wagtrack/shared/components/call_to_action.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
@@ -115,7 +116,29 @@ class _HomeState extends State<Home> {
       ]),
       // Floating Action Button
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                const begin = Offset(1.0, 0.0);
+                const end = Offset.zero;
+                const curve = Curves.ease;
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+              transitionDuration:
+                  const Duration(milliseconds: 500), // Adjust the duration here
+              pageBuilder: (context, a, b) => const AddPetPage(),
+            ),
+          );
+        },
         child: const Icon(
           Icons.add,
           color: Colors.white,
