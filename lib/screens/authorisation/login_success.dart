@@ -10,11 +10,11 @@ class LoginSuccess extends StatefulWidget {
 }
 
 class _LoginSuccessState extends State<LoginSuccess> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  // final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textStyles = Theme.of(context).textTheme;
+    // final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final user = FirebaseAuth.instance.currentUser!;
