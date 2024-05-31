@@ -14,7 +14,9 @@ class AuthenticationService {
   // auth change user stream
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
-  // sign with email and password
+  /// Signs into current Firebase Auth instance with email and password.
+  ///
+  /// https://pub.dev/documentation/firebase_auth/latest/firebase_auth/FirebaseAuth/signInWithEmailAndPassword.html
   Future<String?> signInWithEmailAndPassword(
       String email, String password) async {
     try {
@@ -23,21 +25,28 @@ class AuthenticationService {
 
       return "Success";
     } on FirebaseAuthException catch (e) {
+      debugPrint('[AUTH_ERROR] Code: ${e.code}');
+      debugPrint('[AUTH_ERROR] Message: ${e.message}');
       return e.code;
     }
   }
 
-  // send password reset email
+  /// Send password reset emails to provided email.
+  ///
+  /// https://pub.dev/documentation/firebase_auth/latest/firebase_auth/FirebaseAuth/sendPasswordResetEmail.html
   Future<String?> resetPassword(String email) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
       // Password reset email sent
       return "Success";
     } on FirebaseAuthException catch (e) {
+      debugPrint('[AUTH_ERROR] Code: ${e.code}');
+      debugPrint('[AUTH_ERROR] Message: ${e.message}');
       return e.code;
     }
   }
 
+  /// Uses regex to check if provided string is a valid email address.
   bool isEmailValidEmail(String email) {
     return RegExp(r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$')
         .hasMatch(email);
@@ -48,6 +57,9 @@ class AuthenticationService {
     return password != confirmPassword;
   }
 
+  /// Registers with provided email and password.
+  ///
+  /// https://pub.dev/documentation/firebase_auth/latest/firebase_auth/FirebaseAuth/createUserWithEmailAndPassword.html
   Future<String?> registerWithEmailAndPassword(
       String name, String email, String password) async {
     try {
@@ -74,6 +86,8 @@ class AuthenticationService {
       // e.code == 'invalid-email'
       // e.code == 'weak-password'
       // e.code == 'email-already-in-use'
+      debugPrint('[AUTH_ERROR] Code: ${e.code}');
+      debugPrint('[AUTH_ERROR] Message: ${e.message}');
 
       return e.code;
     }
@@ -99,6 +113,7 @@ class AuthenticationService {
           await _firebaseAuth.signInWithCredential(credential);
       return "Success";
     } on FirebaseAuthException catch (e) {
+      debugPrint("[AUTH_ERROR] $e");
       return e.code;
     }
   }
@@ -120,7 +135,7 @@ class AuthenticationService {
         return "Success";
       }
     } on FirebaseAuthException catch (e) {
-      debugPrint("DEBUG $e");
+      debugPrint("[AUTH_ERROR] $e");
       return e.code;
     }
   }

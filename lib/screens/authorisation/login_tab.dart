@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/forgot_password.dart';
 import 'package:wagtrack/screens/authorisation/login_social_account.dart';
 import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 
 class LoginTab extends StatefulWidget {
@@ -16,6 +17,9 @@ class _LoginTabState extends State<LoginTab> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  // Form key for login form
+  final _loginFormKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
@@ -28,12 +32,26 @@ class _LoginTabState extends State<LoginTab> {
       child: Form(
         child: Column(
           children: <Widget>[
-            AppTextFormField(
-                labelText: 'Email Address', controller: emailController),
-            AppTextFormField(
-              labelText: 'Password',
-              controller: passwordController,
-              isObscurable: true,
+            Form(
+              key: _loginFormKey,
+              child: Column(
+                children: <Widget>[
+                  AppTextFormField(
+                    labelText: 'Email Address',
+                    controller: emailController,
+                    validator: (value) => !context
+                            .read<AuthenticationService>()
+                            .isEmailValidEmail(value!)
+                        ? 'Invalid email'
+                        : null,
+                  ),
+                  AppTextFormField(
+                    labelText: 'Password',
+                    controller: passwordController,
+                    isObscurable: true,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 10),
             Row(
@@ -59,44 +77,42 @@ class _LoginTabState extends State<LoginTab> {
             const SizedBox(height: 16.0),
             InkWell(
               onTap: () async {
+                // first validate
+                if (!_loginFormKey.currentState!.validate()) {
+                  // if it doesn't validate, returns and doesn't send to API
+                  return;
+                }
+
+                // sign in with API
                 String? result = await context
                     .read<AuthenticationService>()
                     .signInWithEmailAndPassword(
                       emailController.text,
                       passwordController.text,
                     );
+                // debugPrint('DEBUG $result');
                 if (result == 'invalid-email') {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Login Failed'),
-                        content: const Text('Invalid email , user not found'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Try again'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                } else if (result == 'wrong-password') {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Login Failed'),
-                        content: const Text('Invalid password'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Try again'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  // This shouldn't show up because invalid emails are pre-validated.
+                  // But still, in case I guess.
+                  showAppErrorAlertDialog(
+                      // ignore: use_build_context_synchronously
+                      context: context,
+                      titleString: 'Login Failed',
+                      contentString: 'Invalid email.');
+                } else if (result == 'invalid-credential') {
+                  // Since FirebaseAuth throws a 'channel-error' in such situations.
+                  showAppErrorAlertDialog(
+                      // ignore: use_build_context_synchronously
+                      context: context,
+                      titleString: 'Login Failed',
+                      contentString: 'Incorrect email or password.');
+                } else if (result == 'network-request-failed') {
+                  showAppErrorAlertDialog(
+                      // ignore: use_build_context_synchronously
+                      context: context,
+                      titleString: 'Login Failed',
+                      contentString:
+                          'Network error. Please check your internet connection.');
                 }
               },
               child: Container(

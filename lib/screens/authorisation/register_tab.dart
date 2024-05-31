@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/login_social_account.dart';
 import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 
 class RegisterTab extends StatefulWidget {
@@ -17,6 +18,9 @@ class _RegisterTabState extends State<RegisterTab> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
 
+  // Form key for login form
+  final _registerFormKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     // final TextTheme textStyles = Theme.of(context).textTheme;
@@ -27,63 +31,79 @@ class _RegisterTabState extends State<RegisterTab> {
       child: Form(
         child: Column(
           children: <Widget>[
-            AppTextFormField(
-              controller: usernameController,
-              labelText: 'Username',
-              validator: (value) => value!.isEmpty ? 'Invalid username' : null,
-            ),
-            AppTextFormField(
-              controller: emailController,
-              labelText: 'Email Address',
-              validator: (value) => !context
-                      .read<AuthenticationService>()
-                      .isEmailValidEmail(value!)
-                  ? 'Invalid email'
-                  : null,
-            ),
-            AppTextFormField(
-              controller: passwordController,
-              labelText: 'Password',
-              isObscurable: true,
-              validator: (value) =>
-                  value!.length < 6 ? 'Minimum of 6 characters' : null,
-            ),
-            AppTextFormField(
-              controller: confirmPasswordController,
-              labelText: 'Confirm Password',
-              isObscurable: true,
-              validator: (value) =>
-                  value!.length < 6 ? 'Minimum of 6 characters' : null,
+            Form(
+              key: _registerFormKey,
+              child: Column(
+                children: <Widget>[
+                  AppTextFormField(
+                    controller: usernameController,
+                    labelText: 'Username',
+                    validator: (value) =>
+                        value!.isEmpty ? 'Invalid username' : null,
+                  ),
+                  AppTextFormField(
+                    controller: emailController,
+                    labelText: 'Email Address',
+                    validator: (value) => !context
+                            .read<AuthenticationService>()
+                            .isEmailValidEmail(value!)
+                        ? 'Invalid email'
+                        : null,
+                  ),
+                  AppTextFormField(
+                    controller: passwordController,
+                    labelText: 'Password',
+                    isObscurable: true,
+                    validator: (value) =>
+                        value!.length < 6 ? 'Minimum of 6 characters' : null,
+                  ),
+                  AppTextFormField(
+                    controller: confirmPasswordController,
+                    labelText: 'Confirm Password',
+                    isObscurable: true,
+                    validator: (value) {
+                      if (confirmPasswordController.text !=
+                          passwordController.text) {
+                        // checks for similarity before length
+
+                        return 'Passwords not the same';
+                      } else if (value!.length < 6) {
+                        return 'Minimum of 6 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16.0),
             InkWell(
               onTap: () async {
+                // first validate
+                if (!_registerFormKey.currentState!.validate()) {
+                  // if it doesn't validate, returns and doesn't send to API
+                  return;
+                }
+
+                // sign in with API???
+                // fix the code after this pleeeassee
+
                 // email can be checked from verification , so skip
 
                 if (3 < 2) {
+                  // TODO: FIX
                   // check username
                 } else if (context
                     .read<AuthenticationService>()
                     .passwordDontMatchConfirmPassword(passwordController.text,
                         confirmPasswordController.text)) {
                   // check password != confirmPassword
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title:
-                            const Text('Re-enter password or confirm password'),
-                        content:
-                            const Text('Password not same as confirm password'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Try again'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  showAppErrorAlertDialog(
+                      // ignore: use_build_context_synchronously
+                      context: context,
+                      titleString: 'Registration Failed',
+                      contentString:
+                          'Passwords not the same. Please re-enter password.');
                 } else {
                   //after username and password checks, register the user
                   String? result = await context
@@ -95,54 +115,37 @@ class _RegisterTabState extends State<RegisterTab> {
                       );
 
                   if (result == 'invalid-email') {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Registration Failed'),
-                          content: const Text('Invalid email.'),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Try again'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                    showAppErrorAlertDialog(
+                        // ignore: use_build_context_synchronously
+                        context: context,
+                        titleString: 'Registration Failed',
+                        contentString: 'Invalid email.');
                   } else if (result == 'email-already-in-use') {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Registration Failed'),
-                          content: const Text(
-                              'The account already exists for that email.'),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Try again'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                    showAppErrorAlertDialog(
+                        // ignore: use_build_context_synchronously
+                        context: context,
+                        titleString: 'Registration Failed',
+                        contentString:
+                            'An account already exists for that email.');
                   } else if (result == 'weak-password') {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Registration Failed'),
-                          content: const Text('Password is too short'),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Try again'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                    showAppErrorAlertDialog(
+                        // ignore: use_build_context_synchronously
+                        context: context,
+                        titleString: 'Registration Failed',
+                        contentString: 'Password is too short.');
+                  } else if (result == 'network-request-failed') {
+                    showAppErrorAlertDialog(
+                        // ignore: use_build_context_synchronously
+                        context: context,
+                        titleString: 'Registration Failed',
+                        contentString:
+                            'Network error. Please check your internet connection.');
+                  } else {
+                    showAppErrorAlertDialog(
+                        // ignore: use_build_context_synchronously
+                        context: context,
+                        titleString: 'Registration Failed',
+                        contentString: 'Please check your inputs.');
                   }
                 }
               },
