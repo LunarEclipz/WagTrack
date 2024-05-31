@@ -36,7 +36,9 @@ class AppSwitch extends StatelessWidget {
 
 /// Standard text form field for WagTrack.
 ///
-/// Validates fields on user interaction by default
+/// Validates fields on user interaction by default.
+///
+/// Wrap in a `Form` and supply a `GlobalKey` for external form validation.
 class AppTextFormField extends StatefulWidget {
   /// Hint text
   final String hintText;
@@ -57,6 +59,7 @@ class AppTextFormField extends StatefulWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
 
+  /// Creates a standard text form field for WagTrack.
   const AppTextFormField({
     super.key,
     required this.controller,
@@ -152,6 +155,7 @@ class AppDropdown extends StatefulWidget {
   /// ```
   final void Function(String?)? onChanged;
 
+  /// Creates a standard text dropdown for WagTrack.
   const AppDropdown({
     super.key,
     required this.optionsList,

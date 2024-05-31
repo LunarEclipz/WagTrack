@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// App Error Alert Dialog for WagTrack with default settings
+///
 /// Creates an 'unknown error' dialog when string inputs are empty.
 ///
 /// Default button to close dialog has text 'Try Again'
