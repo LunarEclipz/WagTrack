@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/screens/home/add_pet.dart';
 import 'package:wagtrack/screens/settings/app_settings.dart';
 import 'package:wagtrack/shared/components/call_to_action.dart';
@@ -19,9 +20,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   String? name;
 
-  // final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int currentPageIndex = 0;
-
   /// Loads username - MOVE TODO:
   void getName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -39,140 +37,59 @@ class _HomeState extends State<Home> {
     final TextTheme textStyles = Theme.of(context).textTheme;
 
     getName();
-
-    return Scaffold(
-      // App Bar
-      appBar: AppBar(
-        title: Image.asset(
-          "assets/wagtrack_v1.png",
-          height: 50,
-          fit: BoxFit.fitHeight,
-        ),
-        actions: <Widget>[
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(1.0, 0.0);
-                    const end = Offset.zero;
-                    const curve = Curves.ease;
-                    var tween = Tween(begin: begin, end: end)
-                        .chain(CurveTween(curve: curve));
-
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: child,
-                    );
-                  },
-                  transitionDuration: const Duration(
-                      milliseconds: 500), // Adjust the duration here
-                  pageBuilder: (context, a, b) => const AppSettings(),
-                ),
-              );
-            }, // Transition to Application Setting Screen
-            child: const Padding(
-              padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
-              child: Icon(Icons.settings),
-            ),
-          )
-        ],
+    return AppScrollablePage(children: <Widget>[
+      Text(
+        "Welcome Back ${name ?? ''}",
+        style: textStyles.headlineMedium,
       ),
-      // Body
-      body: AppScrollablePage(children: <Widget>[
-        Text(
-          "Welcome Back ${name ?? ''}",
-          style: textStyles.headlineMedium,
-        ),
-        const SizedBoxh20(),
-        CallToActionButton(
-          icon: Icons.book_rounded,
-          title: "Pet Care Resources",
-          text:
-              "Pet Care Resources at Your Fingertips! Click to learn more ...",
-          color: AppTheme.customColors.pastelBlue,
-          onTap: () {},
-        ),
-        const SizedBoxh20(),
-        Text(
-          "My Pets",
-          style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        Text(
-          "You have not added a personal pet",
-          style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
-        ),
-        const SizedBoxh20(),
-        Text(
-          "Community Pets",
-          style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        Text(
-          "You have not added a community pet",
-          style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
-        ),
-      ]),
-      // Floating Action Button
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                const begin = Offset(1.0, 0.0);
-                const end = Offset.zero;
-                const curve = Curves.ease;
-                var tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
-
-                return SlideTransition(
-                  position: animation.drive(tween),
-                  child: child,
-                );
-              },
-              transitionDuration:
-                  const Duration(milliseconds: 500), // Adjust the duration here
-              pageBuilder: (context, a, b) => const AddPetPage(),
-            ),
-          );
-        },
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
+      const SizedBoxh20(),
+      CallToActionButton(
+        icon: Icons.book_rounded,
+        title: "Pet Care Resources",
+        text: "Pet Care Resources at Your Fingertips! Click to learn more ...",
+        color: AppTheme.customColors.pastelBlue,
+        onTap: () {},
       ),
-      // Bottom Navigation
-      bottomNavigationBar: NavigationBar(
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        selectedIndex: currentPageIndex,
-        onDestinationSelected: (int index) {
-          setState(() {
-            currentPageIndex = index;
-          });
-        },
-        destinations: const <Widget>[
-          NavigationDestination(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.newspaper_rounded),
-            icon: Icon(Icons.newspaper_outlined),
-            label: 'Reports',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.notifications),
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.explore),
-            label: 'Explore',
-          ),
-        ],
+      const SizedBoxh20(),
+      Text(
+        "My Pets",
+        style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+      ),
+      Text(
+        "You have not added a personal pet",
+        style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+      ),
+      const SizedBoxh20(),
+      Text(
+        "Community Pets",
+        style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+      ),
+      Text(
+        "You have not added a community pet",
+        style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+      ),
+    ]);
+  }
+}
+
+// Cards to display both Community and Personal pets in home
+
+class PetCard extends StatefulWidget {
+  final Pet petData;
+  const PetCard({super.key, required this.petData});
+
+  @override
+  State<PetCard> createState() => _PetCardState();
+}
+
+class _PetCardState extends State<PetCard> {
+  @override
+  Widget build(BuildContext context) {
+    Pet pet = widget.petData;
+
+    return const Card(
+      child: Row(
+        children: [],
       ),
     );
   }
