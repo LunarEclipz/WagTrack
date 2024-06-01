@@ -140,7 +140,7 @@ class _RegisterTabState extends State<RegisterTab> {
                         titleString: 'Registration Failed',
                         contentString:
                             'Network error. Please check your internet connection.');
-                  } else {
+                  } else if (result != "Success") {
                     showAppErrorAlertDialog(
                         // ignore: use_build_context_synchronously
                         context: context,

@@ -14,7 +14,7 @@ class Authenticate extends StatefulWidget {
 
 class _AuthenticateState extends State<Authenticate> {
   bool showSignIn = true;
-  bool? hasUserOnboarded = false;
+  bool hasUserOnboarded = false;
 
   void toggleView() {
     setState(() {
@@ -26,7 +26,7 @@ class _AuthenticateState extends State<Authenticate> {
   Future<bool> _checkUserOnboarded() async {
     // local data for now
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    hasUserOnboarded = prefs.getBool('user_has_onboarded');
+    hasUserOnboarded = prefs.getBool('user_has_onboarded') ?? false;
     return true;
   }
 
@@ -62,7 +62,7 @@ class _AuthenticateState extends State<Authenticate> {
               builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                 debugPrint('DEBUG: $snapshot.hasData');
                 if (snapshot.hasData) {
-                  if (!hasUserOnboarded!) {
+                  if (!hasUserOnboarded) {
                     // Onboarding screen if not yet onboarded
                     return const OnboardingScreen();
                   }
