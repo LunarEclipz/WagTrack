@@ -8,6 +8,7 @@ import 'package:wagtrack/services/auth.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
+import 'package:wagtrack/shared/dropdown_options.dart' as dropdown_options;
 import 'package:wagtrack/shared/themes.dart';
 
 class AppSettings extends StatefulWidget {
@@ -31,14 +32,7 @@ class _AppSettingsState extends State<AppSettings> {
   late String selectedLocation = '';
 
   // Temp location list
-  // TODO: Should be imported from elsewhere
-  List<String> locationList = <String>[
-    'Yishun',
-    'Jurong',
-    'Tampines',
-    'Bedok',
-    'Hougang',
-  ];
+  List<String> locationList = dropdown_options.locationList;
 
   // Form key for personal info
   final _personalInfoFormKey = GlobalKey<FormState>();
