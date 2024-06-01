@@ -3,7 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/firebase_options.dart';
+import 'package:wagtrack/screens/app_wrapper.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
+import 'package:wagtrack/screens/home/home.dart';
 import 'package:wagtrack/services/auth.dart';
 import 'package:wagtrack/shared/themes.dart';
 
@@ -35,7 +37,7 @@ class WagTrackApp extends StatelessWidget {
         debugShowCheckedModeBanner: true,
         title: 'wagtrack',
         theme: AppTheme.light,
-        home: const Authenticate(),
+        home: const AppWrapper(),
       ),
     );
   }

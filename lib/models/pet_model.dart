@@ -7,12 +7,14 @@ class Pet {
   String description;
   String sex;
   String species;
-  String petType;
+  String petType; // personal or community
   String idNumber;
   DateTime birthDate;
   String weight;
   DateTime nextAppt;
   List<Caretaker> caretakers;
+  int posts;
+  int fans;
 
   Pet({
     required this.location,
@@ -26,6 +28,8 @@ class Pet {
     required this.weight,
     required this.nextAppt,
     required this.caretakers,
+    required this.posts,
+    required this.fans,
   });
 }
 
