@@ -1,0 +1,36 @@
+name: Dart manual build (iOS)
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on manual trigger only
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Build app for iOS"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - name: Clone Repository
+      uses: actions/checkout@v4
+    # https://github.com/marketplace/actions/flutter-action
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+    - run: flutter pub get
+    
+    #This snippet that helped me was borrowed from https://gist.github.com/devhammed/617d920b7ee886591a46c22633ab0093
+    - name: Build iOS App for .ipa
+      run: flutter build ios --profile --no-codesign
+    
+    # Upload generated ipa to Github artifacts.
+    - uses: actions/upload-artifact@v2
+      with:
+        name: release-ipa
+        path: build/ios/ipa/*.ipa
