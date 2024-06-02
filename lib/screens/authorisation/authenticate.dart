@@ -60,7 +60,7 @@ class _AuthenticateState extends State<Authenticate> {
           return FutureBuilder(
               future: _checkUserOnboarded(),
               builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                debugPrint('DEBUG: $snapshot.hasData');
+                debugPrint('DEBUG: $snapshot.hasData; $hasUserOnboarded');
                 if (snapshot.hasData) {
                   if (!hasUserOnboarded) {
                     // Onboarding screen if not yet onboarded

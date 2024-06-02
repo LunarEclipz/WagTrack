@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wagtrack/screens/home/home.dart';
+import 'package:wagtrack/screens/authorisation/authenticate.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -218,7 +218,7 @@ As such, your data will persist between different accounts. and not be synced be
                 _saveAllChanges();
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const Home()),
+                  MaterialPageRoute(builder: (context) => const Authenticate()),
                   (Route<dynamic> route) => false,
                 );
               },

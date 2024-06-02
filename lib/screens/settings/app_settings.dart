@@ -75,10 +75,6 @@ class _AppSettingsState extends State<AppSettings> {
       await prefs.setString('user_email', emailController.text);
       await prefs.setString('user_phone_number', phoneNumberController.text);
       await prefs.setString('user_location', selectedLocation);
-      // await prefs.setBool('user_allow_share_data', allowShareData);
-      // await prefs.setBool('user_allow_share_contact', allowShareContact);
-      // await prefs.setBool('device_allow_camera', allowCamera);
-      // await prefs.setBool('device_allow_gallery', allowGallery);
 
       // Tell user data is saved
       // ignore: use_build_context_synchronously

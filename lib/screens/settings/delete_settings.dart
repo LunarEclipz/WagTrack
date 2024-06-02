@@ -42,6 +42,7 @@ class _DeletionSettingsState extends State<DeletionSettings> {
     await prefs.setString('user_email', '');
     await prefs.setString('user_phone_number', '');
     await prefs.setString('user_location', '');
+    await prefs.setBool('user_has_onboarded', false);
   }
 
   @override

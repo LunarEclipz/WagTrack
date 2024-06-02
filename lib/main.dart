@@ -32,7 +32,7 @@ class WagTrackApp extends StatelessWidget {
             initialData: null)
       ],
       child: MaterialApp(
-        debugShowCheckedModeBanner: true,
+        debugShowCheckedModeBanner: false,
         title: 'wagtrack',
         theme: AppTheme.light,
         home: const Authenticate(),
