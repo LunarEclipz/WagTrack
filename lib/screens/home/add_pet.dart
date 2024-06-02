@@ -3,6 +3,7 @@
 
 import 'dart:io';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wagtrack/models/pet_model.dart';
@@ -349,7 +350,7 @@ class _AddPetPageState extends State<AddPetPage> {
                           idNumber: idController.text,
                           posts: 0,
                           fans: 0);
-                      PetService().addPet(pet: pet);
+                      PetService().addPet(pet: pet, img: _imageFile);
                       Navigator.pop(context);
                     }
                   },

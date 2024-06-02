@@ -72,10 +72,11 @@ class _HomeState extends State<Home> {
         "My Pets",
         style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
-      Text(
-        "You have not added a personal pet",
-        style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
-      ),
+      if (personalPets.isEmpty)
+        Text(
+          "You have not added a personal pet",
+          style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+        ),
       // // List of Personal Pets
       Column(
         children: List.generate(
@@ -85,14 +86,17 @@ class _HomeState extends State<Home> {
                 )),
       ),
       const SizedBoxh20(),
+
       Text(
         "Community Pets",
         style: textStyles.titleMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
-      Text(
-        "You have not added a community pet",
-        style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
-      ),
+      const SizedBoxh10(),
+      if (communityPets.isEmpty)
+        Text(
+          "You have not added a community pet",
+          style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+        ),
       // List of Community Pets
       Column(
         children: List.generate(
@@ -122,6 +126,7 @@ class _PetCardState extends State<BuildPetCard> {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final CustomColors customColors = AppTheme.customColors;
 
+    // print(petData.imgPath);
     return Card(
       color: Colors.white,
       child: Padding(
@@ -129,10 +134,19 @@ class _PetCardState extends State<BuildPetCard> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CircleAvatar(
-              backgroundColor: Color.fromARGB(255, 41, 41, 41),
-              radius: 60,
-            ),
+            petData.imgPath == null
+                ? const CircleAvatar(
+                    backgroundColor: Color.fromARGB(255, 41, 41, 41),
+                    radius: 60,
+                  )
+                : CircleAvatar(
+                    backgroundImage: Image.network(
+                      petData.imgPath!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ).image,
+                    radius: 60,
+                  ),
             const SizedBox(
               width: 10,
             ),

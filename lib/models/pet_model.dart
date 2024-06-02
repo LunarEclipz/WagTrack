@@ -16,23 +16,26 @@ class Pet {
   // List<Caretaker> caretakers;
   int posts;
   int fans;
+  String? imgPath;
+  String? oid;
 
-  Pet({
-    required this.location,
-    required this.name,
-    required this.uid,
-    required this.description,
-    required this.sex,
-    required this.species,
-    required this.petType,
-    required this.idNumber,
-    // required this.birthDate,
-    // required this.weight,
-    // this.nextAppt,
-    // required this.caretakers,
-    required this.posts,
-    required this.fans,
-  });
+  Pet(
+      {required this.location,
+      required this.name,
+      required this.uid,
+      required this.description,
+      required this.sex,
+      required this.species,
+      required this.petType,
+      required this.idNumber,
+      // required this.birthDate,
+      // required this.weight,
+      // this.nextAppt,
+      // required this.caretakers,
+      required this.posts,
+      required this.fans,
+      this.imgPath,
+      this.oid});
 
   Map<String, dynamic> toJSON() {
     final petData = {
@@ -52,6 +55,7 @@ class Pet {
       // "caretakers": caretakers.map((caretaker) => caretaker.toJSON()).toList(),
       "posts": posts,
       "fans": fans,
+      "imgPath": imgPath,
     };
     return petData;
   }
@@ -71,7 +75,9 @@ class Pet {
         //     .map((caretakerData) => Caretaker.fromJson(caretakerData))
         //     .toList(),
         posts: json["posts"] as int,
-        fans: json["fans"] as int, uid: json["uid"] as String,
+        fans: json["fans"] as int,
+        uid: json["uid"] as String,
+        imgPath: json["imgPath"] as String,
       );
 }
 
