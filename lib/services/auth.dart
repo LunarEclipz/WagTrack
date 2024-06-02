@@ -21,8 +21,16 @@ class AuthenticationService {
   Future<String?> signInWithEmailAndPassword(
       String email, String password) async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
+      final UserCredential userCredential = await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
+
+      final String userId = userCredential.user!.uid;
+
+      // Add user data to local storage (for now)
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      // await prefs.setString('user_name', name);
+      await prefs.setString('user_email', email);
+      await prefs.setString('uid', userId);
 
       return "Success";
     } on FirebaseAuthException catch (e) {
@@ -86,6 +94,7 @@ class AuthenticationService {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('user_name', name);
       await prefs.setString('user_email', email);
+      await prefs.setString('uid', userId);
 
       return "Success";
     } on FirebaseAuthException catch (e) {

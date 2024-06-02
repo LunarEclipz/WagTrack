@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wagtrack/screens/app_wrapper.dart';
 import 'package:wagtrack/screens/authorisation/authorisation_frame.dart';
-import 'package:wagtrack/screens/home/home.dart';
 import 'package:wagtrack/screens/settings/onboarding.dart';
 
 class Authenticate extends StatefulWidget {
@@ -67,7 +67,7 @@ class _AuthenticateState extends State<Authenticate> {
                     return const OnboardingScreen();
                   }
                   // Home Screen if Onboarded
-                  return const Home();
+                  return const AppWrapper();
                 } else {
                   return const Scaffold(
                       body: Center(child: CircularProgressIndicator()));
