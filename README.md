@@ -4,10 +4,19 @@
 
 ## :rocket: How to Run
 
+### Android
+
 1. Go to [Releases](https://github.com/LunarEclipz/WagTrack/releases).
 2. Find the newest release.
-3. Download the install file for your OS (Android: `.apk`, iOS: `.iba`).
+3. Download the apk file (`wagtrack.apk`).
 4. Install and run on your device.
+5. If a pop-up shows up warning you of installing apps from an unverified source, press `continue`.
+
+### iOS
+
+Installing a test build for iOS is currently unavailable at this time.
+
+---
 
 If you do not want to register a new account, login using the following test account:
 
