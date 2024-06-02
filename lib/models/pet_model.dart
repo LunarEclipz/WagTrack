@@ -60,7 +60,9 @@ class Pet {
     return petData;
   }
 
-  static Pet fromJson(Map<String, dynamic> json) => Pet(
+  static Pet fromJson(Map<String, dynamic> json) {
+    try {
+      Pet pet = Pet(
         location: json["location"] as String,
         name: json["name"] as String,
         description: json["description"] as String,
@@ -79,6 +81,30 @@ class Pet {
         uid: json["uid"] as String,
         imgPath: json["imgPath"] as String,
       );
+      return pet;
+    } catch (e) {
+      Pet pet = Pet(
+        location: json["location"] as String,
+        name: json["name"] as String,
+        description: json["description"] as String,
+        sex: json["sex"] as String,
+        species: json["species"] as String,
+        petType: json["petType"] as String,
+        idNumber: json["idNumber"] as String,
+        // birthDate: DateTime.parse(json["birthDate"] as String),
+        // weight: json["weight"] as String,
+        // nextAppt: json["nextAppt"] != null ? DateTime.parse(json["nextAppt"] as String) : null,
+        // caretakers: (json["caretakers"] as List)
+        //     .map((caretakerData) => Caretaker.fromJson(caretakerData))
+        //     .toList(),
+        posts: json["posts"] as int,
+        fans: json["fans"] as int,
+        uid: json["uid"] as String,
+        imgPath: null,
+      );
+      return pet;
+    }
+  }
 }
 
 // Caretaker Model determined the role of the caretaker

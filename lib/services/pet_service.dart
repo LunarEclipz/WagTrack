@@ -11,12 +11,12 @@ class PetService {
   Reference storageRef = FirebaseStorage.instance.ref();
 
   void addPet({required Pet pet, required File? img}) {
-    if (img != null) {
+    try {
       uploadPetImage(image: img, uid: pet.uid).then((imgPath) {
         pet.imgPath = imgPath;
         db.collection("pets").add(pet.toJSON());
       });
-    } else {
+    } catch (e) {
       db.collection("pets").add(pet.toJSON());
     }
   }

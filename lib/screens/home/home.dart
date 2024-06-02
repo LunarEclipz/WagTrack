@@ -53,7 +53,6 @@ class _HomeState extends State<Home> {
 
     // TODO: Need help ensuring that when Add Pet is done, this function is called
     getInitData();
-
     return AppScrollablePage(children: <Widget>[
       Text(
         "Welcome Back ${name ?? ''}",
