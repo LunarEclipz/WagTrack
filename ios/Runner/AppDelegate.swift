@@ -1,6 +1,7 @@
 import UIKit
 import Flutter
-import FacebookCore
+// import FacebookCore
+import FBSDKCoreKit
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -13,7 +14,7 @@ import FacebookCore
   }
 
   // I have no idea if this works
-  func application(
+  override func application(
         _ app: UIApplication,
         open url: URL,
         options: [UIApplication.OpenURLOptionsKey : Any] = [:]
