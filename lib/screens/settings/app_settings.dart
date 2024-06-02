@@ -105,7 +105,7 @@ class _AppSettingsState extends State<AppSettings> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Application Settings',
+          'Settings',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: colorScheme.primary,

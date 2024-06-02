@@ -1,8 +1,12 @@
 // Adding of Personal and Community Pets
+// Breed, Birthdate, weight, Appointment Date, Caretakers, Community Pet are milestone 2 Features
 
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wagtrack/models/pet_model.dart';
+import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -18,6 +22,8 @@ class AddPetPage extends StatefulWidget {
 }
 
 class _AddPetPageState extends State<AddPetPage> {
+  late String? uid;
+
   late String petType = "";
   late String selectedLocation = "North";
   late String selectedSex = "Male";
@@ -52,6 +58,18 @@ class _AddPetPageState extends State<AddPetPage> {
         petType = pType;
       }
     });
+  }
+
+  /// Get UID
+  void getUID() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    uid = prefs.getString('uid');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUID();
   }
 
   @override
@@ -175,27 +193,27 @@ class _AddPetPageState extends State<AddPetPage> {
               ],
             ),
 
-          if (petType == "community")
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const SizedBoxh10(),
-                Text(
-                  'Has this community pet been registered?',
-                  style: textStyles.bodyMedium,
-                ),
-                const SizedBoxh10(),
-                AppDropdown(
-                  optionsList: communityPets,
-                  selectedText: selectedCPet,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedCPet = value!;
-                    });
-                  },
-                ),
-              ],
-            ),
+          // if (petType == "community")
+          //   Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: <Widget>[
+          //       const SizedBoxh10(),
+          //       Text(
+          //         'Has this community pet been registered?',
+          //         style: textStyles.bodyMedium,
+          //       ),
+          //       const SizedBoxh10(),
+          //       AppDropdown(
+          //         optionsList: communityPets,
+          //         selectedText: selectedCPet,
+          //         onChanged: (String? value) {
+          //           setState(() {
+          //             selectedCPet = value!;
+          //           });
+          //         },
+          //       ),
+          //     ],
+          //   ),
 
           // Section B : Pet Information
           if (petType != "")
@@ -231,7 +249,7 @@ class _AddPetPageState extends State<AddPetPage> {
                   prefixIcon: const Icon(Icons.person_outline),
                 ),
                 AppTextFormField(
-                  controller: nameController,
+                  controller: descController,
                   hintText: 'Description',
                   prefixIcon: const Icon(Icons.description),
                 ),
@@ -272,21 +290,21 @@ class _AddPetPageState extends State<AddPetPage> {
                   hintText: 'Microchip Number',
                   prefixIcon: const Icon(Icons.card_membership_rounded),
                 ),
-                AppTextFormField(
-                  controller: weightController,
-                  hintText: 'Weight',
-                  prefixIcon: const Icon(Icons.scale_rounded),
-                ),
-                AppTextFormField(
-                  controller: birthdateController,
-                  hintText: 'Birthdate',
-                  prefixIcon: const Icon(Icons.cake_rounded),
-                ),
-                AppTextFormField(
-                  controller: nameController,
-                  hintText: 'Next Appointment Date',
-                  prefixIcon: const Icon(Icons.date_range_rounded),
-                ),
+                // AppTextFormField(
+                //   controller: weightController,
+                //   hintText: 'Weight',
+                //   prefixIcon: const Icon(Icons.scale_rounded),
+                // ),
+                // AppTextFormField(
+                //   controller: birthdateController,
+                //   hintText: 'Birthdate',
+                //   prefixIcon: const Icon(Icons.cake_rounded),
+                // ),
+                // AppTextFormField(
+                //   controller: nameController,
+                //   hintText: 'Next Appointment Date',
+                //   prefixIcon: const Icon(Icons.date_range_rounded),
+                // ),
                 // Section C : Pet Details
                 const SizedBoxh20(),
                 Text(
@@ -313,7 +331,27 @@ class _AddPetPageState extends State<AddPetPage> {
 
                 InkWell(
                   onTap: () {
-                    Navigator.pop(context);
+                    if (nameController.text != "" &&
+                        selectedLocation != "" &&
+                        descController.text != "" &&
+                        idController.text != "" &&
+                        selectedCPet != "" &&
+                        selectedRole != "" &&
+                        selectedSpecies != "") {
+                      Pet pet = Pet(
+                          location: selectedLocation,
+                          name: nameController.text,
+                          uid: uid!,
+                          description: descController.text,
+                          sex: selectedRole,
+                          species: selectedSpecies,
+                          petType: petType,
+                          idNumber: idController.text,
+                          posts: 0,
+                          fans: 0);
+                      PetService().addPet(pet: pet);
+                      Navigator.pop(context);
+                    }
                   },
                   child: Container(
                     width: 300,

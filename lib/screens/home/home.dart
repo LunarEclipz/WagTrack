@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wagtrack/models/pet_model.dart';
-import 'package:wagtrack/screens/home/add_pet.dart';
-import 'package:wagtrack/screens/settings/app_settings.dart';
+import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/shared/components/call_to_action.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
-import 'package:wagtrack/shared/mock_data.dart';
 import 'package:wagtrack/shared/themes.dart';
 
 class Home extends StatefulWidget {
@@ -20,24 +18,42 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   String? name;
+  String? uid;
+  List<Pet> personalPets = [];
+  List<Pet> communityPets = [];
+  List<Pet>? allPets;
 
-  /// Loads username - MOVE TODO:
-  void getName() async {
+  Future<void> getInitData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     name = prefs.getString('user_name');
+    uid = prefs.getString('uid');
+
+    try {
+      final pets = await PetService().getAllPetsByUID(uid: uid!);
+      setState(() {
+        allPets = pets;
+        personalPets =
+            allPets!.where((pet) => pet.petType == "personal").toList();
+        communityPets =
+            allPets!.where((pet) => pet.petType == "community").toList();
+      });
+    } catch (e) {
+      // print("Error fetching pets: $e");
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    getName();
   }
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
 
-    getName();
+    // TODO: Need help ensuring that when Add Pet is done, this function is called
+    getInitData();
+
     return AppScrollablePage(children: <Widget>[
       Text(
         "Welcome Back ${name ?? ''}",
@@ -60,7 +76,7 @@ class _HomeState extends State<Home> {
         "You have not added a personal pet",
         style: textStyles.bodySmall?.copyWith(fontStyle: FontStyle.italic),
       ),
-      // List of Personal Pets
+      // // List of Personal Pets
       Column(
         children: List.generate(
             personalPets.length,
@@ -82,7 +98,7 @@ class _HomeState extends State<Home> {
         children: List.generate(
             communityPets.length,
             (int index) => BuildPetCard(
-                  petData: personalPets[index],
+                  petData: communityPets[index],
                 )),
       ),
     ]);
@@ -120,62 +136,74 @@ class _PetCardState extends State<BuildPetCard> {
             const SizedBox(
               width: 10,
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: [
-                    Text(
-                      petData.name,
-                      style: textStyles.bodyLarge,
-                    ),
-                    if (petData.sex == "Male") const Icon(Icons.male),
-                    if (petData.sex == "Female") const Icon(Icons.female),
-                  ],
-                ),
-                Text(
-                  petData.description,
-                  style: textStyles.bodyMedium!
-                      .copyWith(fontStyle: FontStyle.italic),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    SizedBox(
-                      width: 75,
-                      child: Card(
-                          child: Column(
-                        children: <Widget>[
-                          Text(
-                            petData.posts.toString(),
-                            style: textStyles.bodyLarge,
-                          ),
-                          Text(
-                            "Posts",
-                            style: textStyles.bodyMedium,
-                          ),
-                        ],
-                      )),
-                    ),
-                    SizedBox(
-                      width: 75,
-                      child: Card(
-                          child: Column(
-                        children: <Widget>[
-                          Text(
-                            petData.fans.toString(),
-                            style: textStyles.bodyLarge,
-                          ),
-                          Text(
-                            "Fans",
-                            style: textStyles.bodyMedium,
-                          ),
-                        ],
-                      )),
-                    )
-                  ],
-                ),
-              ],
+            SizedBox(
+              width: 180,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  // Post & Fans Row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      SizedBox(
+                        width: 90,
+                        child: Card(
+                            color: customColors.pastelOrange,
+                            child: Column(
+                              children: <Widget>[
+                                Text(
+                                  petData.posts.toString(),
+                                  style: textStyles.bodyLarge!
+                                      .copyWith(color: Colors.white),
+                                ),
+                                Text(
+                                  "Posts",
+                                  style: textStyles.bodyMedium!
+                                      .copyWith(color: Colors.white),
+                                ),
+                              ],
+                            )),
+                      ),
+                      SizedBox(
+                        width: 90,
+                        child: Card(
+                            color: customColors.pastelPurple,
+                            child: Column(
+                              children: <Widget>[
+                                Text(
+                                  petData.fans.toString(),
+                                  style: textStyles.bodyLarge!
+                                      .copyWith(color: Colors.white),
+                                ),
+                                Text(
+                                  "Fans",
+                                  style: textStyles.bodyMedium!
+                                      .copyWith(color: Colors.white),
+                                ),
+                              ],
+                            )),
+                      )
+                    ],
+                  ),
+                  // Name & Icon
+                  Row(
+                    children: [
+                      Text(
+                        petData.name,
+                        style: textStyles.bodyLarge,
+                      ),
+                      if (petData.sex == "Male") const Icon(Icons.male),
+                      if (petData.sex == "Female") const Icon(Icons.female),
+                    ],
+                  ),
+                  // Description
+                  Text(
+                    petData.description,
+                    style: textStyles.bodyMedium!
+                        .copyWith(fontStyle: FontStyle.italic),
+                  ),
+                ],
+              ),
             )
           ],
         ),

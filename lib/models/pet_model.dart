@@ -6,31 +6,73 @@ class Pet {
   String name;
   String description;
   String sex;
+  String uid;
   String species;
   String petType; // personal or community
   String idNumber;
-  DateTime birthDate;
-  String weight;
-  DateTime nextAppt;
-  List<Caretaker> caretakers;
+  // DateTime birthDate;
+  // int weight;
+  // DateTime? nextAppt;
+  // List<Caretaker> caretakers;
   int posts;
   int fans;
 
   Pet({
     required this.location,
     required this.name,
+    required this.uid,
     required this.description,
     required this.sex,
     required this.species,
     required this.petType,
     required this.idNumber,
-    required this.birthDate,
-    required this.weight,
-    required this.nextAppt,
-    required this.caretakers,
+    // required this.birthDate,
+    // required this.weight,
+    // this.nextAppt,
+    // required this.caretakers,
     required this.posts,
     required this.fans,
   });
+
+  Map<String, dynamic> toJSON() {
+    final petData = {
+      "location": location,
+      "name": name,
+      "description": description,
+      "sex": sex,
+      "species": species,
+      "petType": petType,
+      "uid": uid,
+      "idNumber": idNumber,
+      // "birthDate":
+      //     birthDate.toIso8601String(), // Convert birthDate to ISO 8601 format
+      // "weight": weight,
+      // "nextAppt": nextAppt
+      //     ?.toIso8601String(), // Convert nextAppt to ISO 8601 format (null if no appointment)
+      // "caretakers": caretakers.map((caretaker) => caretaker.toJSON()).toList(),
+      "posts": posts,
+      "fans": fans,
+    };
+    return petData;
+  }
+
+  static Pet fromJson(Map<String, dynamic> json) => Pet(
+        location: json["location"] as String,
+        name: json["name"] as String,
+        description: json["description"] as String,
+        sex: json["sex"] as String,
+        species: json["species"] as String,
+        petType: json["petType"] as String,
+        idNumber: json["idNumber"] as String,
+        // birthDate: DateTime.parse(json["birthDate"] as String),
+        // weight: json["weight"] as String,
+        // nextAppt: json["nextAppt"] != null ? DateTime.parse(json["nextAppt"] as String) : null,
+        // caretakers: (json["caretakers"] as List)
+        //     .map((caretakerData) => Caretaker.fromJson(caretakerData))
+        //     .toList(),
+        posts: json["posts"] as int,
+        fans: json["fans"] as int, uid: json["uid"] as String,
+      );
 }
 
 // Caretaker Model determined the role of the caretaker
@@ -41,4 +83,12 @@ class Caretaker {
   String role;
 
   Caretaker({required this.username, required this.uid, required this.role});
+
+  Map<String, dynamic> toJSON() {
+    return {
+      "username": username,
+      "uid": uid,
+      "role": role,
+    };
+  }
 }
