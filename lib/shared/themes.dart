@@ -75,7 +75,7 @@ class AppTheme {
       // https://m3.material.io/styles/color/static/baseline
 
       // use different seed color to check which is using material baseline colors
-      seedColor: Colors.green,
+      seedColor: Colors.red,
       brightness: Brightness.light,
       primary: const Color(0xFFB01713),
       primaryContainer: Colors.white,
