@@ -24,7 +24,14 @@ jobs:
       
       #This snippet that helped me was borrowed from https://gist.github.com/devhammed/617d920b7ee886591a46c22633ab0093
       - name: Build iOS App for .ipa
-        run: flutter build ios --profile --no-codesign
+        run: |
+          flutter build ios --profile --no-codesign
+          cd build/ios/iphoneos
+          mkdir Payload
+          cd Payload
+          ln -s ../Runner.app
+          cd ..
+          zip -r wagtrack.ipa Payload
       
       # Upload generated ipa to Github artifacts.
       - name: Upload to Github Artifacts
