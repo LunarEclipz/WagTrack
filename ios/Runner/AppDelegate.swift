@@ -14,7 +14,7 @@ import FBSDKCoreKit
   }
 
   // I have no idea if this works
-  func application(
+  override func application(
         _ app: UIApplication,
         open url: URL,
         options: [UIApplication.OpenURLOptionsKey : Any] = [:]
