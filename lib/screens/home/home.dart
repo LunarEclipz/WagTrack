@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wagtrack/models/pet_model.dart';
+import 'package:wagtrack/screens/home/pet_details_wrapper.dart';
 import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/shared/components/call_to_action.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
@@ -126,99 +127,126 @@ class _PetCardState extends State<BuildPetCard> {
     final CustomColors customColors = AppTheme.customColors;
 
     // print(petData.imgPath);
-    return Card(
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            petData.imgPath == null
-                ? const CircleAvatar(
-                    backgroundColor: Color.fromARGB(255, 41, 41, 41),
-                    radius: 60,
-                  )
-                : CircleAvatar(
-                    backgroundImage: Image.network(
-                      petData.imgPath!,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ).image,
-                    radius: 60,
-                  ),
-            const SizedBox(
-              width: 10,
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(1.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+            transitionDuration:
+                const Duration(milliseconds: 500), // Adjust the duration here
+            pageBuilder: (context, a, b) => PetDetailsWrapper(
+              petData: petData,
             ),
-            SizedBox(
-              width: 180,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  // Post & Fans Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      SizedBox(
-                        width: 90,
-                        child: Card(
-                            color: customColors.pastelOrange,
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  petData.posts.toString(),
-                                  style: textStyles.bodyLarge!
-                                      .copyWith(color: Colors.white),
-                                ),
-                                Text(
-                                  "Posts",
-                                  style: textStyles.bodyMedium!
-                                      .copyWith(color: Colors.white),
-                                ),
-                              ],
-                            )),
-                      ),
-                      SizedBox(
-                        width: 90,
-                        child: Card(
-                            color: customColors.pastelPurple,
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  petData.fans.toString(),
-                                  style: textStyles.bodyLarge!
-                                      .copyWith(color: Colors.white),
-                                ),
-                                Text(
-                                  "Fans",
-                                  style: textStyles.bodyMedium!
-                                      .copyWith(color: Colors.white),
-                                ),
-                              ],
-                            )),
-                      )
-                    ],
-                  ),
-                  // Name & Icon
-                  Row(
-                    children: [
-                      Text(
-                        petData.name,
-                        style: textStyles.bodyLarge,
-                      ),
-                      if (petData.sex == "Male") const Icon(Icons.male),
-                      if (petData.sex == "Female") const Icon(Icons.female),
-                    ],
-                  ),
-                  // Description
-                  Text(
-                    petData.description,
-                    style: textStyles.bodyMedium!
-                        .copyWith(fontStyle: FontStyle.italic),
-                  ),
-                ],
+          ),
+        );
+      },
+      child: Card(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              petData.imgPath == null
+                  ? const CircleAvatar(
+                      backgroundColor: Color.fromARGB(255, 41, 41, 41),
+                      radius: 60,
+                    )
+                  : CircleAvatar(
+                      backgroundImage: Image.network(
+                        petData.imgPath!,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ).image,
+                      radius: 60,
+                    ),
+              const SizedBox(
+                width: 10,
               ),
-            )
-          ],
+              SizedBox(
+                width: 180,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    // Post & Fans Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(
+                          width: 90,
+                          child: Card(
+                              color: customColors.pastelOrange,
+                              child: Column(
+                                children: <Widget>[
+                                  Text(
+                                    petData.posts.toString(),
+                                    style: textStyles.bodyLarge!
+                                        .copyWith(color: Colors.white),
+                                  ),
+                                  Text(
+                                    "Posts",
+                                    style: textStyles.bodyMedium!
+                                        .copyWith(color: Colors.white),
+                                  ),
+                                ],
+                              )),
+                        ),
+                        SizedBox(
+                          width: 90,
+                          child: Card(
+                              color: customColors.pastelPurple,
+                              child: Column(
+                                children: <Widget>[
+                                  Text(
+                                    petData.fans.toString(),
+                                    style: textStyles.bodyLarge!
+                                        .copyWith(color: Colors.white),
+                                  ),
+                                  Text(
+                                    "Fans",
+                                    style: textStyles.bodyMedium!
+                                        .copyWith(color: Colors.white),
+                                  ),
+                                ],
+                              )),
+                        )
+                      ],
+                    ),
+                    // Name & Icon
+                    Row(
+                      children: [
+                        Text(
+                          petData.name,
+                          style: textStyles.bodyLarge,
+                        ),
+                        if (petData.sex == "Male") const Icon(Icons.male),
+                        if (petData.sex == "Female") const Icon(Icons.female),
+                      ],
+                    ),
+                    // Description
+                    Text(
+                      petData.description,
+                      style: textStyles.bodyMedium!
+                          .copyWith(fontStyle: FontStyle.italic),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

@@ -70,7 +70,8 @@ class PetService {
       final firebaseStorage = FirebaseStorage.instance;
       var file = File(image.path);
       //Upload to Firebase
-      var snapshot = await firebaseStorage
+      // var snapshot =
+      await firebaseStorage
           .ref("petProfile/$uid/")
           .child(basename(image.path))
           .putFile(file);

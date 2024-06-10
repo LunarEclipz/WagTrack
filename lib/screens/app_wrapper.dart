@@ -1,3 +1,5 @@
+// Wraps features such as Home, Reports, Notifications, Explore
+
 import 'package:flutter/material.dart';
 import 'package:wagtrack/screens/explore/explore.dart';
 import 'package:wagtrack/screens/home/add_pet.dart';
