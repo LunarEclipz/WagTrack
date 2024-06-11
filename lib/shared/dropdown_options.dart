@@ -187,6 +187,24 @@ List<String> getSymptomsForCategory(String chosenCategory) {
       .toList();
 }
 
+String getDescByName(String chosenSymptom) {
+  if (petSymptoms.isEmpty) return ""; // Handle empty petSymptoms list
+
+  for (var category in petSymptoms) {
+    final matchingSymptom = category['symptoms'].firstWhere(
+        (symptom) => symptom['name'] == chosenSymptom,
+        orElse: () => {'name': '', 'description': ''}); // Return empty map
+    print(matchingSymptom);
+    if (matchingSymptom["description"] != '') {
+      return matchingSymptom['name'] +
+          ": " +
+          matchingSymptom['description']; // Return description
+    }
+  }
+
+  return ""; // Symptom not found
+}
+
 List<String> rolesList = <String>[
   "Owner",
   "Co-Owner",

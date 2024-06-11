@@ -329,41 +329,46 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
                 const SizedBoxh20(), const SizedBoxh20(),
 
-                InkWell(
-                  onTap: () {
-                    if (nameController.text != "" &&
-                        selectedLocation != "" &&
-                        descController.text != "" &&
-                        idController.text != "" &&
-                        selectedCPet != "" &&
-                        selectedRole != "" &&
-                        selectedSpecies != "") {
-                      Pet pet = Pet(
-                          location: selectedLocation,
-                          name: nameController.text,
-                          uid: uid!,
-                          description: descController.text,
-                          sex: selectedRole,
-                          species: selectedSpecies,
-                          petType: petType,
-                          idNumber: idController.text,
-                          posts: 0,
-                          fans: 0);
-                      PetService().addPet(pet: pet, img: _imageFile);
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Container(
-                    width: 300,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Add Pet',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Center(
+                    child: InkWell(
+                      onTap: () {
+                        if (nameController.text != "" &&
+                            selectedLocation != "" &&
+                            descController.text != "" &&
+                            idController.text != "" &&
+                            selectedCPet != "" &&
+                            selectedRole != "" &&
+                            selectedSpecies != "") {
+                          Pet pet = Pet(
+                              location: selectedLocation,
+                              name: nameController.text,
+                              uid: uid!,
+                              description: descController.text,
+                              sex: selectedRole,
+                              species: selectedSpecies,
+                              petType: petType,
+                              idNumber: idController.text,
+                              posts: 0,
+                              fans: 0);
+                          PetService().addPet(pet: pet, img: _imageFile);
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: Container(
+                        width: 300,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: colorScheme.primary,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Add Pet',
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ),
                       ),
                     ),
                   ),

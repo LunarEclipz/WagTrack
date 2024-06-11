@@ -21,6 +21,7 @@ dependencies:
   provider: ^6.1.2
   shared_preferences: ^2.2.3
   flutter_launcher_icons: "^0.13.1"
+  flutter_datetime_picker_plus: ^2.2.0
 
 # Config for Flutter launcher icons
 flutter_launcher_icons:
