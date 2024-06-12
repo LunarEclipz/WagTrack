@@ -156,122 +156,130 @@ class _AddSymptomsState extends State<AddSymptoms> {
             prefixIcon: const Icon(Icons.brush_rounded),
           ),
           const SizedBoxh20(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Start Date
-              InkWell(
-                onTap: () {
-                  DatePicker.showDateTimePicker(context,
-                      showTitleActions: true,
-                      minTime: DateTime(2024, 1, 1),
-                      maxTime: DateTime.now(), onConfirm: (date) {
-                    setState(() {
-                      startDateTime = date;
-                      startDate = "${date.hour} : ${date.minute}  "
-                          "\n${date.day} / ${date.month} / ${date.year}";
-                    });
-                  }, onCancel: () {
-                    setState(() {
-                      startDate = "";
-                    });
-                  }, currentTime: DateTime.now(), locale: LocaleType.en);
-                },
-                child: Column(
-                  children: [
-                    Card(
-                      color: Colors.white,
-                      child: SizedBox(
-                        width: 150,
-                        child: Padding(
-                          padding: const EdgeInsets.all(
-                            8,
-                          ),
-                          child: startDate == ""
-                              ? Text(
+          InkWell(
+            onTap: () {
+              DatePicker.showDateTimePicker(context,
+                  showTitleActions: true,
+                  minTime: DateTime(2024, 1, 1),
+                  maxTime: DateTime.now(), onConfirm: (date) {
+                setState(() {
+                  startDateTime = date;
+                  startDate = "${date.hour} : ${date.minute}  "
+                      "\n${date.day} / ${date.month} / ${date.year}";
+                });
+              }, onCancel: () {
+                setState(() {
+                  startDate = "";
+                });
+              }, currentTime: DateTime.now(), locale: LocaleType.en);
+            },
+            child: Column(
+              children: [
+                Card(
+                  color: Colors.white,
+                  child: SizedBox(
+                    width: 170,
+                    child: Padding(
+                      padding: const EdgeInsets.all(
+                        8,
+                      ),
+                      child: startDate == ""
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
                                   "Set Start Date",
-                                  style: textStyles.bodyMedium!
+                                  style: textStyles.bodyLarge!
                                       .copyWith(color: colorScheme.primary),
-                                )
-                              : RichText(
-                                  text: TextSpan(
-                                    text: 'Start Date\n',
-                                    style: textStyles.bodyMedium!
-                                        .copyWith(color: colorScheme.primary),
-                                    children: <TextSpan>[
-                                      TextSpan(
-                                          text: startDate,
-                                          style: textStyles.bodyMedium),
-                                    ],
-                                  ),
                                 ),
-                        ),
-                      ),
+                                Icon(Icons.date_range_rounded,
+                                    size: 20, color: colorScheme.primary),
+                              ],
+                            )
+                          : RichText(
+                              text: TextSpan(
+                                text: 'Start Date\n',
+                                style: textStyles.bodyMedium!
+                                    .copyWith(color: colorScheme.primary),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                      text: startDate,
+                                      style: textStyles.bodyMedium),
+                                ],
+                              ),
+                            ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              // End Date
-              InkWell(
-                onTap: () {
-                  DatePicker.showDateTimePicker(context,
-                      showTitleActions: true,
-                      minTime: DateTime(2024, 1, 1),
-                      maxTime: DateTime.now(), onConfirm: (date) {
-                    setState(() {
-                      endDateTime = date;
-                      endDate = "${date.hour} : ${date.minute}  "
-                          "\n${date.day} / ${date.month} / ${date.year}";
-                    });
-                  }, onCancel: () {
-                    setState(() {
-                      endDate = "";
-                    });
-                  }, currentTime: DateTime.now(), locale: LocaleType.en);
-                },
-                child: Column(
-                  children: [
-                    Card(
-                      color: Colors.white,
-                      child: SizedBox(
-                        width: 150,
-                        child: Padding(
-                          padding: const EdgeInsets.all(
-                            8,
-                          ),
-                          child: endDate == ""
-                              ? RichText(
-                                  text: TextSpan(
-                                    text: 'Set End Date\n',
-                                    style: textStyles.bodyMedium!
-                                        .copyWith(color: colorScheme.primary),
-                                    children: <TextSpan>[
-                                      TextSpan(
-                                          text: "Ongoing\n(default)",
-                                          style: textStyles.bodyMedium),
-                                    ],
-                                  ),
-                                )
-                              : RichText(
-                                  text: TextSpan(
-                                    text: 'End Date\n',
-                                    style: textStyles.bodyMedium!
-                                        .copyWith(color: colorScheme.primary),
-                                    children: <TextSpan>[
-                                      TextSpan(
-                                          text: endDate,
-                                          style: textStyles.bodyMedium),
-                                    ],
-                                  ),
+              ],
+            ),
+          ),
+          // End Date
+          InkWell(
+            onTap: () {
+              DatePicker.showDateTimePicker(context,
+                  showTitleActions: true,
+                  minTime: DateTime(2024, 1, 1),
+                  maxTime: DateTime.now(), onConfirm: (date) {
+                setState(() {
+                  endDateTime = date;
+                  endDate = "${date.hour} : ${date.minute}  "
+                      "\n${date.day} / ${date.month} / ${date.year}";
+                });
+              }, onCancel: () {
+                setState(() {
+                  endDate = "";
+                });
+              }, currentTime: DateTime.now(), locale: LocaleType.en);
+            },
+            child: Column(
+              children: [
+                Card(
+                  color: Colors.white,
+                  child: SizedBox(
+                    width: 170,
+                    child: Padding(
+                      padding: const EdgeInsets.all(
+                        8,
+                      ),
+                      child: endDate == ""
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Set End Date",
+                                      style: textStyles.bodyLarge!
+                                          .copyWith(color: colorScheme.primary),
+                                    ),
+                                    Icon(Icons.date_range_rounded,
+                                        size: 20, color: colorScheme.primary),
+                                  ],
                                 ),
-                        ),
-                      ),
+                                Text("Ongoing (default)",
+                                    style: textStyles.bodyMedium),
+                              ],
+                            )
+                          : RichText(
+                              text: TextSpan(
+                                text: 'End Date\n',
+                                style: textStyles.bodyMedium!
+                                    .copyWith(color: colorScheme.primary),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                      text: endDate,
+                                      style: textStyles.bodyMedium),
+                                ],
+                              ),
+                            ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           const SizedBoxh20(),

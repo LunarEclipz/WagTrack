@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/services/pet_service.dart';
@@ -29,6 +30,8 @@ class _AddPetPageState extends State<AddPetPage> {
   late String selectedSex = "Male";
   late String selectedSpecies = "Dog";
   late String selectedRole = "Owner";
+  late String birthday = "";
+  late DateTime birthdayDateTime;
 
   File? _imageFile;
   final _picker = ImagePicker();
@@ -290,16 +293,82 @@ class _AddPetPageState extends State<AddPetPage> {
                   hintText: 'Microchip Number',
                   prefixIcon: const Icon(Icons.card_membership_rounded),
                 ),
+                const SizedBoxh10(),
                 // AppTextFormField(
                 //   controller: weightController,
                 //   hintText: 'Weight',
                 //   prefixIcon: const Icon(Icons.scale_rounded),
                 // ),
-                // AppTextFormField(
-                //   controller: birthdateController,
-                //   hintText: 'Birthdate',
-                //   prefixIcon: const Icon(Icons.cake_rounded),
-                // ),
+                InkWell(
+                  onTap: () {
+                    DatePicker.showDateTimePicker(context,
+                        showTitleActions: true,
+                        minTime: DateTime(2024, 1, 1),
+                        maxTime: DateTime.now(), onConfirm: (date) {
+                      setState(() {
+                        birthdayDateTime = date;
+                        birthday = "${date.hour} : ${date.minute}  "
+                            "\n${date.day} / ${date.month} / ${date.year}";
+                      });
+                    }, onCancel: () {
+                      setState(() {
+                        birthday = "";
+                      });
+                    }, currentTime: DateTime.now(), locale: LocaleType.en);
+                  },
+                  child: Column(
+                    children: [
+                      Card(
+                        color: Colors.white,
+                        child: SizedBox(
+                          width: 170,
+                          child: Padding(
+                            padding: const EdgeInsets.all(
+                              8,
+                            ),
+                            child: birthday == ""
+                                ? Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Set Birthday",
+                                        style: textStyles.bodyLarge!.copyWith(
+                                            color: colorScheme.primary),
+                                      ),
+                                      Icon(Icons.cake_rounded,
+                                          size: 20, color: colorScheme.primary),
+                                    ],
+                                  )
+                                : Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Birthday",
+                                            style: textStyles.bodyLarge!
+                                                .copyWith(
+                                                    color: colorScheme.primary),
+                                          ),
+                                          Icon(Icons.cake_rounded,
+                                              size: 20,
+                                              color: colorScheme.primary),
+                                        ],
+                                      ),
+                                      Text(birthday,
+                                          style: textStyles.bodyMedium)
+                                    ],
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 // AppTextFormField(
                 //   controller: nameController,
                 //   hintText: 'Next Appointment Date',
