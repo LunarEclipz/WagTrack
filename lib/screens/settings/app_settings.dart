@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
 import 'package:wagtrack/screens/blank_page.dart';
 import 'package:wagtrack/screens/settings/delete_settings.dart';
-import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/services/auth_service.dart';
+import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -43,38 +43,48 @@ class _AppSettingsState extends State<AppSettings> {
     super.initState();
 
     /// load settings values
-    _loadSavedValues();
-  }
-
-  /// Load values from saved preferences
-  void _loadSavedValues() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      // USER VALUES - local for the time being
-      nameController.text = prefs.getString('user_name') ?? '';
-      emailController.text = prefs.getString('user_email') ?? '';
-      phoneNumberController.text = prefs.getString('user_phone_number') ?? '';
-      selectedLocation = prefs.getString('user_location') ?? '';
-      allowShareData = prefs.getBool('user_allow_share_data') ?? false;
-      allowShareContact = prefs.getBool('user_allow_share_contact') ?? false;
-
-      // DEVICE VALUES
-      allowCamera = prefs.getBool('device_allow_camera') ?? false;
-      allowGallery = prefs.getBool('device_allow_gallery') ?? false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userService = Provider.of<UserService>(context, listen: false);
+      // Load initial value if needed, e.g., from a service or API
+      _loadSavedValues(userService);
     });
   }
 
-  /// Save changes to personal info from form.
+  /// Load settings values
+  void _loadSavedValues(UserService userService) async {
+    setState(() {
+      // USER VALUES
+      nameController.text = userService.user.name ?? '';
+      emailController.text = userService.user.email ?? '';
+      phoneNumberController.text = userService.user.phoneNumber ?? '';
+      selectedLocation = userService.user.defaultLocation ?? '';
+      allowShareData = userService.user.allowShareData;
+      allowShareContact = userService.user.allowShareContact;
+
+      // DEVICE VALUES
+      allowCamera = userService.user.allowCamera;
+      allowGallery = userService.user.allowGallery;
+    });
+  }
+
+  /// Save changes that need to be saved manually (with a button press).
   ///
-  /// Saves to shared preferences
-  void _savePersonalInfoChanges() async {
+  /// To minimise repeated api whenever boolean user data is changed.
+  ///
+  /// TODO change saving of boolean to leaving the settings screen?
+  void _saveChangesManual(UserService userService) async {
     if (_personalInfoFormKey.currentState!.validate()) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
       // Save personal info values
-      await prefs.setString('user_name', nameController.text);
-      await prefs.setString('user_email', emailController.text);
-      await prefs.setString('user_phone_number', phoneNumberController.text);
-      await prefs.setString('user_location', selectedLocation);
+      userService.setParams(
+        name: nameController.text,
+        email: emailController.text,
+        phoneNumber: phoneNumberController.text,
+        defaultLocation: selectedLocation,
+        allowShareData: allowShareData,
+        allowShareContact: allowShareContact,
+      );
+
+      await userService.updateUserInDb();
 
       // Tell user data is saved
       // ignore: use_build_context_synchronously
@@ -84,19 +94,22 @@ class _AppSettingsState extends State<AppSettings> {
     }
   }
 
-  /// Save changes to boolean data
-  void _saveBooleanPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('user_allow_share_data', allowShareData);
-    await prefs.setBool('user_allow_share_contact', allowShareContact);
-    await prefs.setBool('device_allow_camera', allowCamera);
-    await prefs.setBool('device_allow_gallery', allowGallery);
+  /// Save changes to data that can be saved on every change (local)
+  void _saveChangesAuto(UserService userService) async {
+    userService.setParams(
+      allowCamera: allowCamera,
+      allowGallery: allowGallery,
+    );
+
+    await userService.updateLocalPrefs();
   }
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final UserService userService = context.watch<UserService>();
 
     return Scaffold(
       appBar: AppBar(
@@ -177,7 +190,7 @@ class _AppSettingsState extends State<AppSettings> {
           const SizedBoxh10(),
           // Save Personal Info Changes Button
           InkWell(
-            onTap: () => _savePersonalInfoChanges(),
+            onTap: () => _saveChangesManual(userService),
             child: Container(
               width: 200,
               height: 30,
@@ -215,7 +228,7 @@ class _AppSettingsState extends State<AppSettings> {
                   value: allowShareData,
                   onChanged: (value) => setState(() {
                         allowShareData = value;
-                        _saveBooleanPreferences();
+                        _saveChangesAuto(userService);
                       })),
             ],
           ),
@@ -235,7 +248,7 @@ class _AppSettingsState extends State<AppSettings> {
                   value: allowShareContact,
                   onChanged: (value) => setState(() {
                         allowShareContact = value;
-                        _saveBooleanPreferences();
+                        _saveChangesAuto(userService);
                       })),
             ],
           ),
@@ -254,7 +267,7 @@ class _AppSettingsState extends State<AppSettings> {
                   value: allowCamera,
                   onChanged: (value) => setState(() {
                         allowCamera = value;
-                        _saveBooleanPreferences();
+                        _saveChangesAuto(userService);
                       })),
             ],
           ),
@@ -267,7 +280,7 @@ class _AppSettingsState extends State<AppSettings> {
                   value: allowGallery,
                   onChanged: (value) => setState(() {
                         allowGallery = value;
-                        _saveBooleanPreferences();
+                        _saveChangesAuto(userService);
                       })),
             ],
           ),

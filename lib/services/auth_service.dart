@@ -3,14 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wagtrack/models/user_model.dart';
+import 'package:wagtrack/services/user_service.dart';
 
-// import '../models/user.dart';
-
-class AuthenticationService {
+class AuthenticationService with ChangeNotifier {
   final FirebaseAuth _firebaseAuth;
+  final UserService _userService;
 
-  AuthenticationService(this._firebaseAuth);
+  AuthenticationService(this._firebaseAuth, this._userService);
+  // AuthenticationService(this._firebaseAuth);
 
   // auth change user stream
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
@@ -24,13 +25,15 @@ class AuthenticationService {
       final UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
 
-      final String userId = userCredential.user!.uid;
+      // final String userId = userCredential.user!.uid;
 
-      // Add user data to local storage (for now)
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      // await prefs.setString('user_name', name);
-      await prefs.setString('user_email', email);
-      await prefs.setString('uid', userId);
+      // // Add user data to local storage (for now)
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // // await prefs.setString('user_name', name);
+      // await prefs.setString('user_email', email);
+      // await prefs.setString('uid', userId);
+
+      await checkAndCreateUser(userCredential: userCredential);
 
       return "Success";
     } on FirebaseAuthException catch (e) {
@@ -78,23 +81,15 @@ class AuthenticationService {
         password: password,
       );
 
-      final String userId = userCredential.user!.uid;
-
-      // await addUser(TreknTrackUser(
-      //   id: userId,
-      //   name: name,
-      //   email: email,
-      //   followers: [],
-      //   following: [],
-      //   journeysID: [],
-      //   sightingsID: [],
-      // ));
+      // final String userId = userCredential.user!.uid;
 
       // Add user data to local storage (for now)
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('user_name', name);
-      await prefs.setString('user_email', email);
-      await prefs.setString('uid', userId);
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // await prefs.setString('user_name', name);
+      // await prefs.setString('user_email', email);
+      // await prefs.setString('uid', userId);
+
+      await checkAndCreateUser(userCredential: userCredential, name: name);
 
       return "Success";
     } on FirebaseAuthException catch (e) {
@@ -126,6 +121,9 @@ class AuthenticationService {
 
       final UserCredential userCredential =
           await _firebaseAuth.signInWithCredential(credential);
+
+      await checkAndCreateUser(userCredential: userCredential);
+
       return "Success";
     } on FirebaseAuthException catch (e) {
       debugPrint("[AUTH_ERROR] $e");
@@ -147,6 +145,8 @@ class AuthenticationService {
         final UserCredential userCredential =
             await _firebaseAuth.signInWithCredential(facebookAuthCredential);
 
+        await checkAndCreateUser(userCredential: userCredential);
+
         return "Success";
       }
     } on FirebaseAuthException catch (e) {
@@ -155,7 +155,35 @@ class AuthenticationService {
     }
   }
 
-  //sign out user
+  /// Checks if uid exists in db and creates new user if it doesn't exist.
+  /// Then creates new local user.
+  ///
+  /// if `name` is empty, will check the Firebase user instance and Firestore
+  /// for a display name.
+  Future<void> checkAndCreateUser(
+      {required UserCredential userCredential, String name = ""}) async {
+    if (name.isEmpty) {
+      name = userCredential.user!.displayName ?? "";
+    }
+
+    String uid = userCredential.user!.uid;
+    String? email = userCredential.user!.email;
+
+    // check if uid exists in firestore
+    // create user; if user created is blank, then does not exis
+    await _userService.getUserFromDb(uid: uid);
+
+    if (_userService.user.isEmpty()) {
+      // user does not exist - create initial user for onboarding process
+      _userService.setUser(
+          user: AppUser.createInitialUser(uid: uid, name: name, email: email!));
+      return;
+    }
+  }
+
+  /// TODO: Update user email in FirebaseAuth
+
+  /// Sign out user
   Future<void> signOutUser() async {
     final User? firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser != null) {
@@ -163,12 +191,22 @@ class AuthenticationService {
     }
   }
 
-  // Future<void> addUser(TreknTrackUser user) async {
-  //   var db = await Db.create(
-  //       'mongodb+srv://zyonwee:Qwerty123@cluster0.5z7a9.mongodb.net/TrekNTrack?retryWrites=true&w=majority');
-  //   await db.open();
-  //   var collection = db.collection('users');
-  //   await collection.insert(user.toMap());
-  //   await db.close();
-  // }
+  /// Delete user account from Firebase Auth and Firestore.
+  Future<dynamic> deleteUser() async {
+    await _userService.deleteUser();
+
+    try {
+      final User? firebaseUser = FirebaseAuth.instance.currentUser;
+
+      await firebaseUser!.delete();
+
+      return "Success";
+    } on FirebaseAuthException catch (e) {
+      // e.code == 'requires-recent-login'
+      debugPrint('[AUTH_ERROR] Code: ${e.code}');
+      debugPrint('[AUTH_ERROR] Message: ${e.message}');
+
+      return e.code;
+    }
+  }
 }

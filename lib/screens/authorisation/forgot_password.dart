@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/services/auth_service.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();

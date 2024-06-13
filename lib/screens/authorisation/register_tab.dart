@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/login_social_account.dart';
-import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 

@@ -1,6 +1,7 @@
-// Pet Model applies to both Community and Personal Pets
-//(Until further information from AVS is given)
-
+/// Local object to represent pets
+///
+/// Pet Model applies to both Community and Personal Pets.
+/// (Until further information from AVS is given)
 class Pet {
   String location;
   String name;
@@ -8,7 +9,9 @@ class Pet {
   String sex;
   String uid;
   String species;
-  String petType; // personal or community
+
+  /// personal or community
+  String petType;
   String idNumber;
   // DateTime birthDate;
   // int weight;
@@ -37,7 +40,7 @@ class Pet {
       this.imgPath,
       this.petID});
 
-  // Converts Object to JSON for uploading into Firebase
+  /// Converts Object to JSON for uploading into Firebase
   Map<String, dynamic> toJSON() {
     final petData = {
       "location": location,
@@ -108,8 +111,7 @@ class Pet {
   }
 }
 
-// Caretaker Model determined the role of the caretaker
-
+/// Caretaker Model determined the role of the caretaker
 class Caretaker {
   String username;
   String uid;
