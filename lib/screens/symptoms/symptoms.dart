@@ -47,7 +47,7 @@ class _SymptomsPageState extends State<SymptomsPage> {
         padding: const EdgeInsets.all(20.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
-            'Current Symptoms',
+            'Ongoing Symptoms',
             style: textStyles.headlineMedium,
           ),
           const SizedBoxh10(),
