@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:wagtrack/models/pet_model.dart';
+import 'package:wagtrack/models/symptom_model.dart';
+import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/utils.dart';
 
-class AddSymptoms extends StatefulWidget {
-  const AddSymptoms({super.key});
+class AddSymptomsPage extends StatefulWidget {
+  final Pet petData;
+  const AddSymptomsPage({super.key, required this.petData});
 
   @override
-  State<AddSymptoms> createState() => _AddSymptomsState();
+  State<AddSymptomsPage> createState() => _AddSymptomsPageState();
 }
 
-class _AddSymptomsState extends State<AddSymptoms> {
+class _AddSymptomsPageState extends State<AddSymptomsPage> {
   late String selectedCategory = "General Symptoms";
   late String selectedSymptoms = "Lethargy";
   late String selectedTag = "";
@@ -320,6 +324,7 @@ class _AddSymptomsState extends State<AddSymptoms> {
                   });
                 },
                 child: Chip(
+                  side: const BorderSide(style: BorderStyle.none),
                   label: Text("#${tags[index]}"),
                 ),
               );
@@ -402,7 +407,35 @@ class _AddSymptomsState extends State<AddSymptoms> {
             child: Center(
               child: InkWell(
                 onTap: () {
-                  Navigator.pop(context);
+                  if (selectedCategory != "" &&
+                      selectedSymptoms != "" &&
+                      startDate == true) {
+                    Symptom formData = !endDate
+                        ? Symptom(
+                            petID: widget.petData.petID!,
+                            // Add symptom can only be accessed through PetID
+                            category: selectedCategory,
+                            symptom: selectedSymptoms,
+                            factors: factorsController.text,
+                            startDate: startDateTime,
+                            severity: _currentSliderValue.toInt(),
+                            tags: tags,
+                            hasEnd: endDate,
+                          )
+                        : Symptom(
+                            petID: widget.petData.petID!,
+                            // Add symptom can only be accessed through PetID
+                            category: selectedCategory,
+                            symptom: selectedSymptoms,
+                            factors: factorsController.text,
+                            startDate: startDateTime,
+                            severity: _currentSliderValue.toInt(),
+                            tags: tags,
+                            hasEnd: endDate,
+                            endDate: endDateTime);
+                    SymptomService().addSymptoms(formData: formData);
+                    Navigator.pop(context);
+                  }
                 },
                 child: Container(
                   width: 300,

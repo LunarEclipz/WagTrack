@@ -17,7 +17,7 @@ class Pet {
   int posts;
   int fans;
   String? imgPath;
-  String? oid;
+  String? petID;
 
   Pet(
       {required this.location,
@@ -35,8 +35,9 @@ class Pet {
       required this.posts,
       required this.fans,
       this.imgPath,
-      this.oid});
+      this.petID});
 
+  // Converts Object to JSON for uploading into Firebase
   Map<String, dynamic> toJSON() {
     final petData = {
       "location": location,

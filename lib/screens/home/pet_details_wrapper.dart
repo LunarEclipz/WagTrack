@@ -65,28 +65,29 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
         children: [
           if (currentPageIndex == 2)
             FloatingActionButton(
+              heroTag: "helpSymptoms",
               onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(1.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.ease;
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
+                // Navigator.push(
+                //   context,
+                //   PageRouteBuilder(
+                //     transitionsBuilder:
+                //         (context, animation, secondaryAnimation, child) {
+                //       const begin = Offset(1.0, 0.0);
+                //       const end = Offset.zero;
+                //       const curve = Curves.ease;
+                //       var tween = Tween(begin: begin, end: end)
+                //           .chain(CurveTween(curve: curve));
 
-                      return SlideTransition(
-                        position: animation.drive(tween),
-                        child: child,
-                      );
-                    },
-                    transitionDuration: const Duration(
-                        milliseconds: 500), // Adjust the duration here
-                    pageBuilder: (context, a, b) => const AddSymptoms(),
-                  ),
-                );
+                //       return SlideTransition(
+                //         position: animation.drive(tween),
+                //         child: child,
+                //       );
+                //     },
+                //     transitionDuration: const Duration(
+                //         milliseconds: 500), // Adjust the duration here
+                //     pageBuilder: (context, a, b) => const AddSymptoms(petData: pet,),
+                //   ),
+                // );
               },
               child: const Icon(
                 Icons.question_mark_rounded,
@@ -96,6 +97,7 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
           const SizedBoxh20(),
           if (currentPageIndex == 2)
             FloatingActionButton(
+              heroTag: "addSymptoms",
               onPressed: () {
                 Navigator.push(
                   context,
@@ -115,7 +117,9 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
                     },
                     transitionDuration: const Duration(
                         milliseconds: 500), // Adjust the duration here
-                    pageBuilder: (context, a, b) => const AddSymptoms(),
+                    pageBuilder: (context, a, b) => AddSymptomsPage(
+                      petData: petData,
+                    ),
                   ),
                 );
               },
@@ -127,27 +131,27 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
           if (currentPageIndex == 0)
             FloatingActionButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(1.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.ease;
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
+                // Navigator.push(
+                //   context,
+                //   PageRouteBuilder(
+                //     transitionsBuilder:
+                //         (context, animation, secondaryAnimation, child) {
+                //       const begin = Offset(1.0, 0.0);
+                //       const end = Offset.zero;
+                //       const curve = Curves.ease;
+                //       var tween = Tween(begin: begin, end: end)
+                //           .chain(CurveTween(curve: curve));
 
-                      return SlideTransition(
-                        position: animation.drive(tween),
-                        child: child,
-                      );
-                    },
-                    transitionDuration: const Duration(
-                        milliseconds: 500), // Adjust the duration here
-                    pageBuilder: (context, a, b) => const AddSymptoms(),
-                  ),
-                );
+                //       return SlideTransition(
+                //         position: animation.drive(tween),
+                //         child: child,
+                //       );
+                //     },
+                //     transitionDuration: const Duration(
+                //         milliseconds: 500), // Adjust the duration here
+                //     pageBuilder: (context, a, b) => const AddSymptoms(),
+                //   ),
+                // );
               },
               child: const Icon(
                 Icons.edit_rounded,
@@ -197,7 +201,10 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
               PetDetails(
                 petData: petData,
               ),
-            if (currentPageIndex == 2) const SymptomsPage(),
+            if (currentPageIndex == 2)
+              SymptomsPage(
+                petData: petData,
+              ),
           ],
         ),
       ),

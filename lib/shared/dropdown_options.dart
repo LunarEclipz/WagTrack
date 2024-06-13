@@ -194,7 +194,6 @@ String getDescByName(String chosenSymptom) {
     final matchingSymptom = category['symptoms'].firstWhere(
         (symptom) => symptom['name'] == chosenSymptom,
         orElse: () => {'name': '', 'description': ''}); // Return empty map
-    print(matchingSymptom);
     if (matchingSymptom["description"] != '') {
       return matchingSymptom['name'] +
           ": " +

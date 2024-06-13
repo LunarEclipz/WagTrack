@@ -15,7 +15,6 @@ class _PetDetailsState extends State<PetDetails> {
   Widget build(BuildContext context) {
     Pet petData = widget.petData;
     final TextTheme textStyles = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.all(20.0),

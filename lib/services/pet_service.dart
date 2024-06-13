@@ -32,7 +32,7 @@ class PetService {
       for (final docSnapshot in querySnapshot.docs) {
         final petData = docSnapshot.data();
         final pet = Pet.fromJson(petData);
-        pet.oid = docSnapshot.id;
+        pet.petID = docSnapshot.id;
         pets.add(pet);
       }
       return pets;
