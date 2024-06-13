@@ -1,4 +1,6 @@
-/// Pet Model applies to both Community and Personal Pets
+/// Local object to represent pets
+///
+/// Pet Model applies to both Community and Personal Pets.
 /// (Until further information from AVS is given)
 class Pet {
   String location;

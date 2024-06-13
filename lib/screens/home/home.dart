@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/screens/home/pet_details_wrapper.dart';
 import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/components/call_to_action.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -24,10 +25,9 @@ class _HomeState extends State<Home> {
   List<Pet> communityPets = [];
   List<Pet>? allPets;
 
-  Future<void> getInitData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    name = prefs.getString('user_name');
-    uid = prefs.getString('uid');
+  Future<void> getInitData(UserService userService) async {
+    name = userService.user.name;
+    uid = userService.user.uid;
 
     try {
       final pets = await PetService().getAllPetsByUID(uid: uid!);
@@ -51,9 +51,11 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
+    final UserService userService = context.watch<UserService>();
 
     // TODO: Need help ensuring that when Add Pet is done, this function is called
-    getInitData();
+    // use providers instead?
+    getInitData(userService);
     return AppScrollablePage(children: <Widget>[
       Text(
         "Welcome Back ${name ?? ''}",

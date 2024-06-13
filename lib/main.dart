@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/firebase_options.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
 import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/themes.dart';
 
 void main() async {
@@ -24,12 +25,22 @@ class WagTrackApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<AuthenticationService>(
-            create: (context) => AuthenticationService(FirebaseAuth.instance)),
+        ChangeNotifierProvider(
+          create: (context) => UserService(),
+        ),
+        // Provider<AuthenticationService>(
+        //   create: (context) => AuthenticationService(FirebaseAuth.instance),
+        // ),
+        ChangeNotifierProxyProvider<UserService, AuthenticationService>(
+          update: (context, user, auth) =>
+              AuthenticationService(FirebaseAuth.instance, user),
+          create: (BuildContext context) => AuthenticationService(
+              FirebaseAuth.instance, context.read<UserService>()),
+        ),
         StreamProvider(
             create: (context) =>
                 context.read<AuthenticationService>().authStateChanges,
-            initialData: null)
+            initialData: null),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

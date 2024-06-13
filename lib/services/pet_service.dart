@@ -1,11 +1,11 @@
-// Communication to FireStore Pet Collection
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:wagtrack/models/pet_model.dart';
 import 'package:path/path.dart';
+import 'package:wagtrack/models/pet_model.dart';
 
+/// Communication to Firebase for Pet-related data.
 class PetService {
   FirebaseFirestore db = FirebaseFirestore.instance;
   Reference storageRef = FirebaseStorage.instance.ref();
@@ -64,7 +64,7 @@ class PetService {
     }
   }
 
-  // Uploads Image to Fire Storage
+  /// Uploads Image to Firebase Storage.
   uploadPetImage({required File? image, required String uid}) async {
     if (image != null) {
       final firebaseStorage = FirebaseStorage.instance;

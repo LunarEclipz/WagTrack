@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:wagtrack/screens/authorisation/authenticate.dart';
+import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -16,33 +19,50 @@ class _DeletionSettingsState extends State<DeletionSettings> {
   ///
   /// Sets all booleans to false
   void _resetDevicePreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // Save personal info values
-    await prefs.setBool('device_allow_camera', false);
-    await prefs.setBool('device_allow_gallery', false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userService = Provider.of<UserService>(context, listen: false);
+
+      userService.setParams(
+        allowCamera: false,
+        allowGallery: false,
+      );
+
+      userService.updateLocalPrefs();
+    });
   }
 
   /// Resets user preferences
   ///
   /// Sets all booleans to false
   void _resetUserPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // Save personal info values
-    await prefs.setBool('user_allow_share_data', false);
-    await prefs.setBool('user_allow_share_contact', false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userService = Provider.of<UserService>(context, listen: false);
+
+      userService.setParams(
+        allowShareContact: false,
+        allowShareData: false,
+      );
+
+      userService.updateUserInDb();
+    });
   }
 
-  /// Deletes user data. Irreversible!
+  /// Resets user data. Irreversible!
   ///
-  /// WARNINGS?
-  void _deleteUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    // Save personal info values
-    await prefs.setString('user_name', '');
-    await prefs.setString('user_email', '');
-    await prefs.setString('user_phone_number', '');
-    await prefs.setString('user_location', '');
-    await prefs.setBool('user_has_onboarded', false);
+  /// Retains uid, name, and, email.
+  ///
+  /// Associated pets are not deleted.
+  void _resetUserData() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userService = Provider.of<UserService>(context, listen: false);
+
+      userService.setParams(
+        allowShareContact: false,
+        allowShareData: false,
+      );
+
+      userService.updateUserInDb();
+    });
   }
 
   @override
@@ -122,8 +142,8 @@ class _DeletionSettingsState extends State<DeletionSettings> {
               context: context,
               titleString: 'Confirm?',
               contentString:
-                  'Are you sure you want to delete user data? \nWarning: this action is irreversible!',
-              continueAction: () => _deleteUserData(),
+                  'Are you sure you want to reset user data? (your name and email will stil be associated with this account) \nWarning: this action is irreversible!',
+              continueAction: () => _resetUserData(),
             ),
             child: Container(
               width: 250,
@@ -140,6 +160,56 @@ class _DeletionSettingsState extends State<DeletionSettings> {
               ),
             ),
           ),
+          const SizedBoxh10(),
+          InkWell(
+            onTap: () => showAppConfirmationDialog(
+              context: context,
+              titleString: 'Confirm?',
+              contentString:
+                  'Are you sure you want to delete your account? \nWarning: this action is irreversible!',
+              continueAction: () async {
+                String? result =
+                    await context.read<AuthenticationService>().deleteUser();
+                if (result == 'requires-recent-login') {
+                  showAppErrorAlertDialog(
+                      // ignore: use_build_context_synchronously
+                      context: context,
+                      titleString: 'Deletion Failed',
+                      contentString:
+                          'You are required to re-login to your account to perform this action.');
+                } else {
+                  // Success
+                  // ignore: use_build_context_synchronously
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Account deleted!')),
+                  );
+
+                  Navigator.pushAndRemoveUntil(
+                    // ignore: use_build_context_synchronously
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Authenticate()),
+                    (Route<dynamic> route) => false,
+                  );
+                }
+              },
+            ),
+            child: Container(
+              width: 250,
+              height: 30,
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: const Center(
+                child: Text(
+                  'Delete Account',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+          const SizedBoxh10(),
         ]),
       ),
     );

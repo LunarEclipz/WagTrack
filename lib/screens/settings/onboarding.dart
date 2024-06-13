@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:wagtrack/models/user_model.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
+import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -15,9 +17,6 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  // username, to be displayed.
-  String? name;
-
   // Text controllers
   TextEditingController phoneNumberController = TextEditingController(text: '');
 
@@ -34,41 +33,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // Form key for personal info
   final _personalInfoFormKey = GlobalKey<FormState>();
 
-  /// Initialise state
-  // @override
-  // void initState() {
-  //   super.initState();
-  // }
-
   /// Saves all changes from the onboarding form
-  ///
-  /// Saves to shared preferences
-  void _saveAllChanges() async {
-    if (_personalInfoFormKey.currentState!.validate()) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      // Save personal info values
-      await prefs.setString('user_phone_number', phoneNumberController.text);
-      await prefs.setString('user_location', selectedLocation);
-      await prefs.setBool('user_allow_share_data', allowShareData);
-      await prefs.setBool('user_allow_share_contact', allowShareContact);
-      await prefs.setBool('device_allow_camera', allowCamera);
-      await prefs.setBool('device_allow_gallery', allowGallery);
+  void _saveAllChanges(UserService userService) async {
+    // validation is not done here.
+    userService.user.onboard(
+      phoneNumber: phoneNumberController.text,
+      defaultLocation: selectedLocation,
+      allowShareData: allowShareData,
+      allowShareContact: allowShareContact,
+      allowCamera: allowCamera,
+      allowGallery: allowGallery,
+    );
 
-      // and set hasOnboarded to true!
-      await prefs.setBool('user_has_onboarded', true);
-    }
-  }
-
-  /// Loads username - MOVE TODO:
-  void getName() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    name = prefs.getString('user_name');
+    await userService.updateUserInDb();
   }
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final UserService userService = context.watch<UserService>();
+    final AppUser user = userService.user;
 
     return Scaffold(
       appBar: AppBar(
@@ -83,12 +69,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         style: textStyles.bodyLarge,
         child: AppScrollablePage(children: [
           Text(
-              '''Note: WagTrack data is currently stored locally on your device. 
+              '''[REMOVE] Note: WagTrack data is currently stored locally on your device. 
 As such, your data will persist between different accounts. and not be synced between different devices. 
           ''',
               style: textStyles.bodySmall),
           const SizedBoxh10(),
-          Text('Hello, ${name ?? ''}!'),
+          Text('Hello, ${user.name ?? ''}!'),
           const SizedBoxh10(),
           // SECTION: PERSONAL INFORMATION
           Text(
@@ -215,12 +201,19 @@ As such, your data will persist between different accounts. and not be synced be
           Center(
             child: InkWell(
               onTap: () {
-                _saveAllChanges();
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Authenticate()),
-                  (Route<dynamic> route) => false,
-                );
+                if (_personalInfoFormKey.currentState!.validate()) {
+                  _saveAllChanges(userService);
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Authenticate()),
+                    (Route<dynamic> route) => false,
+                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => const Authenticate()),
+                  // );
+                }
               },
               child: Container(
                 width: 300,
