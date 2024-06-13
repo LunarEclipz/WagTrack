@@ -4,6 +4,7 @@ import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/dropdown_options.dart';
+import 'package:wagtrack/shared/utils.dart';
 
 class AddSymptoms extends StatefulWidget {
   const AddSymptoms({super.key});
@@ -15,8 +16,11 @@ class AddSymptoms extends StatefulWidget {
 class _AddSymptomsState extends State<AddSymptoms> {
   late String selectedCategory = "General Symptoms";
   late String selectedSymptoms = "Lethargy";
-  late String startDate = "";
-  late String endDate = "";
+  late String selectedTag = "";
+  late List<String> tags = [];
+
+  late bool startDate = false;
+  late bool endDate = false;
   late DateTime startDateTime;
   late DateTime endDateTime;
 
@@ -82,12 +86,280 @@ class _AddSymptomsState extends State<AddSymptoms> {
             filteredSymptomsDesc,
             style: textStyles.bodyMedium,
           ),
+
+          const SizedBoxh10(),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                flex: 1,
+                child: InkWell(
+                  onTap: () {
+                    DatePicker.showDateTimePicker(context,
+                        showTitleActions: true,
+                        minTime: DateTime(2024, 1, 1),
+                        maxTime: DateTime.now(), onConfirm: (date) {
+                      setState(() {
+                        startDateTime = date;
+                        startDate = true;
+                      });
+                    }, onCancel: () {
+                      setState(() {
+                        startDate = false;
+                      });
+                    }, currentTime: DateTime.now(), locale: LocaleType.en);
+                  },
+                  child: Column(
+                    children: [
+                      Card(
+                        color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.all(
+                            8,
+                          ),
+                          child: startDate == false
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Set Start",
+                                          style: textStyles.bodyLarge!.copyWith(
+                                              color: colorScheme.primary),
+                                        ),
+                                        Icon(Icons.date_range_rounded,
+                                            size: 20,
+                                            color: colorScheme.primary),
+                                      ],
+                                    ),
+                                    Text("Mandatory*",
+                                        style: textStyles.bodyMedium!.copyWith(
+                                            color: colorScheme.primary)),
+                                  ],
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Started On",
+                                          style: textStyles.bodyLarge!.copyWith(
+                                              color: colorScheme.primary),
+                                        ),
+                                        Icon(Icons.date_range_rounded,
+                                            size: 20,
+                                            color: colorScheme.primary),
+                                      ],
+                                    ),
+                                    Text(formatDateTime(startDateTime).time,
+                                        style: textStyles.bodyLarge),
+                                    Text(formatDateTime(startDateTime).date,
+                                        style: textStyles.labelLarge),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ), // End Date
+              Flexible(
+                flex: 1,
+                child: InkWell(
+                  onTap: () {
+                    DatePicker.showDateTimePicker(context,
+                        showTitleActions: true,
+                        minTime: DateTime(2024, 1, 1),
+                        maxTime: DateTime.now(), onConfirm: (date) {
+                      setState(() {
+                        endDateTime = date;
+                        endDate = true;
+                      });
+                    }, onCancel: () {
+                      setState(() {
+                        endDate = false;
+                      });
+                    }, currentTime: DateTime.now(), locale: LocaleType.en);
+                  },
+                  child: Column(
+                    children: [
+                      Card(
+                        color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.all(
+                            8,
+                          ),
+                          child: endDate == false
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Set End",
+                                          style: textStyles.bodyLarge!.copyWith(
+                                              color: colorScheme.primary),
+                                        ),
+                                        Icon(Icons.date_range_rounded,
+                                            size: 20,
+                                            color: colorScheme.primary),
+                                      ],
+                                    ),
+                                    Text("Ongoing (default)",
+                                        style: textStyles.bodyMedium),
+                                  ],
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Ended On",
+                                          style: textStyles.bodyLarge!.copyWith(
+                                              color: colorScheme.primary),
+                                        ),
+                                        Icon(Icons.date_range_rounded,
+                                            size: 20,
+                                            color: colorScheme.primary),
+                                      ],
+                                    ),
+                                    Text(formatDateTime(endDateTime).time,
+                                        style: textStyles.bodyLarge),
+                                    Text(formatDateTime(endDateTime).date,
+                                        style: textStyles.labelLarge),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBoxh20(),
+          Text(
+            'Notes',
+            style: textStyles.headlineMedium,
+          ),
+
+          AppTextFormField(
+            controller: factorsController,
+            hintText: 'Possible Factors',
+            prefixIcon: const Icon(Icons.brush_rounded),
+          ),
+          const SizedBoxh10(),
+          InkWell(
+            onTap: () {
+              // Dropdown Options
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Possible Factors"),
+                      content: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          children:
+                              List.generate(tagFactorsList.length, (index) {
+                            return InkWell(
+                              onTap: () {
+                                if (!tags.contains(tagFactorsList[index])) {
+                                  setState(() {
+                                    tags.add(tagFactorsList[index]);
+                                  });
+                                }
+                                Navigator.of(context).pop();
+                              },
+                              child: DropdownMenuItem(
+                                  child: Text(tagFactorsList[index])),
+                            );
+                          }),
+                        ),
+                      ),
+                    );
+                  });
+            },
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Add a Tag ',
+                    style: textStyles.bodyMedium!
+                        .copyWith(color: colorScheme.primary),
+                  ),
+                ),
+                Icon(
+                  Icons.add_circle_rounded,
+                  color: colorScheme.primary,
+                  size: 15,
+                )
+              ],
+            ),
+          ),
+          Wrap(
+            spacing: 10,
+            children: List.generate(tags.length, (index) {
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    tags.removeAt(index);
+                  });
+                },
+                child: Chip(
+                  label: Text("#${tags[index]}"),
+                ),
+              );
+            }),
+          ),
           const SizedBoxh20(),
           Text(
             'Severity',
             style: textStyles.headlineMedium,
           ),
           const SizedBoxh10(),
+
+          // Video By AVS START
+          Card(
+            color: Colors.black54,
+            child: SizedBox(
+              height: 200,
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: colorScheme.primary,
+                      child: Text(
+                        _currentSliderValue.toInt().toString(),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    const SizedBoxh20(),
+                    const Text(
+                      "Pending Video of different symptoms severity from AVS",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           Row(
             children: [
               Flexible(
@@ -121,167 +393,7 @@ class _AddSymptomsState extends State<AddSymptoms> {
             ],
           ),
 
-          // Video By AVS START
-          Card(
-            color: Colors.black54,
-            child: SizedBox(
-              height: 200,
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: colorScheme.primary,
-                      child: Text(
-                        _currentSliderValue.toInt().toString(),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    const SizedBoxh20(),
-                    const Text(
-                      "Pending Video of different symptoms severity from AVS",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
           // Video By AVS END
-          AppTextFormField(
-            controller: factorsController,
-            hintText: 'Possible Factors',
-            prefixIcon: const Icon(Icons.brush_rounded),
-          ),
-          const SizedBoxh20(),
-          InkWell(
-            onTap: () {
-              DatePicker.showDateTimePicker(context,
-                  showTitleActions: true,
-                  minTime: DateTime(2024, 1, 1),
-                  maxTime: DateTime.now(), onConfirm: (date) {
-                setState(() {
-                  startDateTime = date;
-                  startDate = "${date.hour} : ${date.minute}  "
-                      "\n${date.day} / ${date.month} / ${date.year}";
-                });
-              }, onCancel: () {
-                setState(() {
-                  startDate = "";
-                });
-              }, currentTime: DateTime.now(), locale: LocaleType.en);
-            },
-            child: Column(
-              children: [
-                Card(
-                  color: Colors.white,
-                  child: SizedBox(
-                    width: 170,
-                    child: Padding(
-                      padding: const EdgeInsets.all(
-                        8,
-                      ),
-                      child: startDate == ""
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Set Start Date",
-                                  style: textStyles.bodyLarge!
-                                      .copyWith(color: colorScheme.primary),
-                                ),
-                                Icon(Icons.date_range_rounded,
-                                    size: 20, color: colorScheme.primary),
-                              ],
-                            )
-                          : RichText(
-                              text: TextSpan(
-                                text: 'Start Date\n',
-                                style: textStyles.bodyMedium!
-                                    .copyWith(color: colorScheme.primary),
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: startDate,
-                                      style: textStyles.bodyMedium),
-                                ],
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // End Date
-          InkWell(
-            onTap: () {
-              DatePicker.showDateTimePicker(context,
-                  showTitleActions: true,
-                  minTime: DateTime(2024, 1, 1),
-                  maxTime: DateTime.now(), onConfirm: (date) {
-                setState(() {
-                  endDateTime = date;
-                  endDate = "${date.hour} : ${date.minute}  "
-                      "\n${date.day} / ${date.month} / ${date.year}";
-                });
-              }, onCancel: () {
-                setState(() {
-                  endDate = "";
-                });
-              }, currentTime: DateTime.now(), locale: LocaleType.en);
-            },
-            child: Column(
-              children: [
-                Card(
-                  color: Colors.white,
-                  child: SizedBox(
-                    width: 170,
-                    child: Padding(
-                      padding: const EdgeInsets.all(
-                        8,
-                      ),
-                      child: endDate == ""
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Set End Date",
-                                      style: textStyles.bodyLarge!
-                                          .copyWith(color: colorScheme.primary),
-                                    ),
-                                    Icon(Icons.date_range_rounded,
-                                        size: 20, color: colorScheme.primary),
-                                  ],
-                                ),
-                                Text("Ongoing (default)",
-                                    style: textStyles.bodyMedium),
-                              ],
-                            )
-                          : RichText(
-                              text: TextSpan(
-                                text: 'End Date\n',
-                                style: textStyles.bodyMedium!
-                                    .copyWith(color: colorScheme.primary),
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: endDate,
-                                      style: textStyles.bodyMedium),
-                                ],
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
           const SizedBoxh20(),
           const SizedBoxh20(),
 

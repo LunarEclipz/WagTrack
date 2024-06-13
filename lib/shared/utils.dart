@@ -1,6 +1,14 @@
 import 'package:intl/intl.dart';
 
-Map<String, String> formatDateTime(DateTime dateTime) {
+class DateTimeObj {
+  late final DateTime dateTime;
+  late final String date;
+  late final String time;
+
+  DateTimeObj({required this.dateTime, required this.date, required this.time});
+}
+
+DateTimeObj formatDateTime(DateTime dateTime) {
   // Format the date to "d MMM yyyy"
   String formattedDate = DateFormat('d MMM yyyy').format(dateTime);
 
@@ -8,8 +16,6 @@ Map<String, String> formatDateTime(DateTime dateTime) {
   String formattedTime = DateFormat('h.mm a').format(dateTime);
 
   // Return the formatted date and time in a map
-  return {
-    'Date': formattedDate,
-    'Time': formattedTime,
-  };
+  return DateTimeObj(
+      date: formattedDate, dateTime: dateTime, time: formattedTime);
 }

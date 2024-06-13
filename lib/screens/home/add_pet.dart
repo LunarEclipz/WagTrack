@@ -14,6 +14,7 @@ import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/themes.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:wagtrack/shared/utils.dart';
 
 class AddPetPage extends StatefulWidget {
   const AddPetPage({super.key});
@@ -24,14 +25,17 @@ class AddPetPage extends StatefulWidget {
 
 class _AddPetPageState extends State<AddPetPage> {
   late String? uid;
+  late String? username;
 
   late String petType = "";
   late String selectedLocation = "North";
   late String selectedSex = "Male";
   late String selectedSpecies = "Dog";
-  late String selectedRole = "Owner";
-  late String birthday = "";
+  late bool birthday = false;
   late DateTime birthdayDateTime;
+
+  late bool apptDate = false;
+  late DateTime apptDateTime;
 
   File? _imageFile;
   final _picker = ImagePicker();
@@ -40,10 +44,8 @@ class _AddPetPageState extends State<AddPetPage> {
   TextEditingController descController = TextEditingController(text: null);
   TextEditingController idController = TextEditingController(text: null);
   TextEditingController weightController = TextEditingController(text: null);
-  TextEditingController birthdateController = TextEditingController(text: null);
 
-  TextEditingController ownersController =
-      TextEditingController(text: "Damien");
+  TextEditingController ownersController = TextEditingController(text: "");
 
   // Placeholder. By milestone 2, this will be in backend.
   late String selectedCPet = "Pet 1 in Region X";
@@ -67,6 +69,7 @@ class _AddPetPageState extends State<AddPetPage> {
   void getUID() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     uid = prefs.getString('uid');
+    username = prefs.getString('user_name');
   }
 
   @override
@@ -294,108 +297,210 @@ class _AddPetPageState extends State<AddPetPage> {
                   prefixIcon: const Icon(Icons.card_membership_rounded),
                 ),
                 const SizedBoxh10(),
-                // AppTextFormField(
-                //   controller: weightController,
-                //   hintText: 'Weight',
-                //   prefixIcon: const Icon(Icons.scale_rounded),
-                // ),
-                InkWell(
-                  onTap: () {
-                    DatePicker.showDateTimePicker(context,
-                        showTitleActions: true,
-                        minTime: DateTime(2024, 1, 1),
-                        maxTime: DateTime.now(), onConfirm: (date) {
-                      setState(() {
-                        birthdayDateTime = date;
-                        birthday = "${date.hour} : ${date.minute}  "
-                            "\n${date.day} / ${date.month} / ${date.year}";
-                      });
-                    }, onCancel: () {
-                      setState(() {
-                        birthday = "";
-                      });
-                    }, currentTime: DateTime.now(), locale: LocaleType.en);
-                  },
-                  child: Column(
-                    children: [
-                      Card(
-                        color: Colors.white,
-                        child: SizedBox(
-                          width: 170,
-                          child: Padding(
-                            padding: const EdgeInsets.all(
-                              8,
-                            ),
-                            child: birthday == ""
-                                ? Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Set Birthday",
-                                        style: textStyles.bodyLarge!.copyWith(
-                                            color: colorScheme.primary),
-                                      ),
-                                      Icon(Icons.cake_rounded,
-                                          size: 20, color: colorScheme.primary),
-                                    ],
-                                  )
-                                : Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            "Birthday",
-                                            style: textStyles.bodyLarge!
-                                                .copyWith(
-                                                    color: colorScheme.primary),
-                                          ),
-                                          Icon(Icons.cake_rounded,
-                                              size: 20,
-                                              color: colorScheme.primary),
-                                        ],
-                                      ),
-                                      Text(birthday,
-                                          style: textStyles.bodyMedium)
-                                    ],
+                AppTextFormField(
+                  controller: weightController,
+                  hintText: 'Weight',
+                  prefixIcon: const Icon(Icons.scale_rounded),
+                ),
+                const SizedBoxh10(),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Birthday
+                    Flexible(
+                      flex: 1,
+                      child: InkWell(
+                        onTap: () {
+                          DatePicker.showDatePicker(context,
+                              showTitleActions: true,
+                              minTime: DateTime(2024, 1, 1),
+                              maxTime: DateTime.now(), onConfirm: (date) {
+                            setState(() {
+                              birthdayDateTime = date;
+                              birthday = true;
+                            });
+                          }, onCancel: () {
+                            setState(() {
+                              birthday = false;
+                            });
+                          },
+                              currentTime: DateTime.now(),
+                              locale: LocaleType.en);
+                        },
+                        child: Column(
+                          children: [
+                            Card(
+                              color: Colors.white,
+                              child: SizedBox(
+                                width: 170,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(
+                                    8,
                                   ),
-                          ),
+                                  child: birthday == false
+                                      ? Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Set Birthday",
+                                              style: textStyles.bodyLarge!
+                                                  .copyWith(
+                                                      color:
+                                                          colorScheme.primary),
+                                            ),
+                                            Icon(Icons.cake_rounded,
+                                                size: 20,
+                                                color: colorScheme.primary),
+                                          ],
+                                        )
+                                      : Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Birthday",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(Icons.cake_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
+                                            ),
+                                            Text(
+                                                formatDateTime(birthdayDateTime)
+                                                    .date,
+                                                style: textStyles.labelLarge),
+                                          ],
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    // Next Appointment
+                    Flexible(
+                      flex: 1,
+                      child: InkWell(
+                        onTap: () {
+                          DatePicker.showDatePicker(context,
+                              showTitleActions: true,
+                              minTime: DateTime(2024, 1, 1),
+                              maxTime: DateTime(2040, 1, 1), onConfirm: (date) {
+                            setState(() {
+                              apptDateTime = date;
+                              apptDate = true;
+                            });
+                          }, onCancel: () {
+                            setState(() {
+                              apptDate = false;
+                            });
+                          },
+                              currentTime: DateTime.now(),
+                              locale: LocaleType.en);
+                        },
+                        child: Column(
+                          children: [
+                            Card(
+                              color: Colors.white,
+                              child: SizedBox(
+                                width: 170,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(
+                                    8,
+                                  ),
+                                  child: apptDate == false
+                                      ? Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Check Up",
+                                              style: textStyles.bodyLarge!
+                                                  .copyWith(
+                                                      color:
+                                                          colorScheme.primary),
+                                            ),
+                                            Icon(Icons.calendar_month_rounded,
+                                                size: 20,
+                                                color: colorScheme.primary),
+                                          ],
+                                        )
+                                      : Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Check Up",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(
+                                                    Icons
+                                                        .calendar_month_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
+                                            ),
+                                            Text(
+                                                formatDateTime(apptDateTime)
+                                                    .date,
+                                                style: textStyles.labelLarge),
+                                            Text(
+                                                formatDateTime(apptDateTime)
+                                                    .time,
+                                                style: textStyles.labelLarge),
+                                          ],
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                // AppTextFormField(
-                //   controller: nameController,
-                //   hintText: 'Next Appointment Date',
-                //   prefixIcon: const Icon(Icons.date_range_rounded),
-                // ),
                 // Section C : Pet Details
                 const SizedBoxh20(),
                 Text(
                   'Owners',
                   style: textStyles.headlineMedium,
                 ),
+                if (petType == "personal")
+                  Text(
+                    'If this pet has already been added by someone, request role from them.',
+                    style: textStyles.bodyMedium,
+                  ),
+
                 AppTextFormField(
                   controller: ownersController,
-                  hintText: 'Owner Username',
+                  hintText: 'Username',
                   prefixIcon: const Icon(Icons.person),
                 ),
                 const SizedBoxh20(),
+                // if (username != null)
+                //   RoleRow(
+                //       username: username!, popUser: () {}, role: "Caretaker"),
 
-                AppDropdown(
-                  optionsList: rolesList,
-                  selectedText: selectedRole,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedRole = value!;
-                    });
-                  },
-                ),
                 const SizedBoxh20(), const SizedBoxh20(),
 
                 SizedBox(
@@ -408,19 +513,21 @@ class _AddPetPageState extends State<AddPetPage> {
                             descController.text != "" &&
                             idController.text != "" &&
                             selectedCPet != "" &&
-                            selectedRole != "" &&
                             selectedSpecies != "") {
                           Pet pet = Pet(
-                              location: selectedLocation,
-                              name: nameController.text,
-                              uid: uid!,
-                              description: descController.text,
-                              sex: selectedRole,
-                              species: selectedSpecies,
-                              petType: petType,
-                              idNumber: idController.text,
-                              posts: 0,
-                              fans: 0);
+                            location: selectedLocation,
+                            name: nameController.text,
+                            uid: uid!,
+                            description: descController.text,
+                            sex: selectedSex,
+                            species: selectedSpecies,
+                            petType: petType,
+                            idNumber: idController.text,
+                            posts: 0,
+                            fans: 0,
+                            // birthDate: birthdayDateTime,
+                            // weight: int.parse(weightController.text),
+                          );
                           PetService().addPet(pet: pet, img: _imageFile);
                           Navigator.pop(context);
                         }
@@ -462,4 +569,63 @@ class _AddPetPageState extends State<AddPetPage> {
   //     setState(() => _imageFile = File(pickedFile.path));
   //   }
   // }
+}
+
+class RoleRow extends StatefulWidget {
+  final String username;
+  final String role;
+  final Function popUser;
+  const RoleRow({
+    super.key,
+    required this.username,
+    required this.popUser,
+    required this.role,
+  });
+
+  @override
+  State<RoleRow> createState() => _RoleListSRow();
+}
+
+class _RoleListSRow extends State<RoleRow> {
+  late String selectedRole = "Caretaker";
+
+  @override
+  void initState() {
+    super.initState();
+    selectedRole = widget.role;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textStyles = Theme.of(context).textTheme;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Flexible(
+            flex: 2, child: Text(widget.username, style: textStyles.bodyLarge)),
+        Flexible(
+          flex: 2,
+          child: AppDropdown(
+            optionsList: rolesList,
+            selectedText: selectedRole,
+            onChanged: (String? value) {
+              setState(() {
+                selectedRole = value!;
+              });
+            },
+          ),
+        ),
+        Flexible(
+            flex: 1,
+            child: InkWell(
+              onTap: () {},
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.close_rounded),
+              ),
+            )),
+      ],
+    );
+  }
 }

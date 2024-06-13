@@ -206,7 +206,25 @@ String getDescByName(String chosenSymptom) {
 }
 
 List<String> rolesList = <String>[
-  "Owner",
-  "Co-Owner",
   "Caretaker",
+  "Co-Owner",
+  "Owner",
+];
+
+List<String> tagFactorsList = [
+  "Diet",
+  "Exposure to Toxins",
+  "Infectious Disease",
+  "Parasites",
+  "Stress",
+  "Underlying Medical Condition",
+  "Vaccinations",
+  "Medications",
+  "Age-related Changes",
+  "Genetics",
+  "Injury",
+  "Foreign Object Ingestion",
+  "Reproductive Issues",
+  "Behavioral Problems",
+  "Others",
 ];
