@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
 import 'package:wagtrack/screens/blank_page.dart';
 import 'package:wagtrack/screens/settings/delete_settings.dart';
-import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';

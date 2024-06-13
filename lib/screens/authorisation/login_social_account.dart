@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wagtrack/services/auth.dart';
+import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/shared/components/dialogs.dart';
 
 class LoginSocial extends StatefulWidget {
