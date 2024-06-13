@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/services/pet_service.dart';
@@ -13,7 +14,6 @@ import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/themes.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:wagtrack/shared/utils.dart';
 
 class AddPetPage extends StatefulWidget {
@@ -28,7 +28,7 @@ class _AddPetPageState extends State<AddPetPage> {
   late String? username;
 
   late String petType = "";
-  late String selectedLocation = "North";
+  late String selectedLocation = "";
   late String selectedSex = "Male";
   late String selectedSpecies = "Dog";
   late bool birthday = false;
