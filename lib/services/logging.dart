@@ -36,6 +36,9 @@ import 'package:logger/logger.dart';
 /// Detailed logging. May use to trace through every step of a **complex**
 /// operation.
 class AppLogger {
+  // Set logging level
+  static const Level logLevel = Level.trace;
+
   /// Main `Logger` instance
   static final Logger _logger = Logger(
     printer: PrettyPrinter(
@@ -46,6 +49,7 @@ class AppLogger {
       printEmojis: true, // Print an emoji for each log message
       printTime: true, // Should each log print contain a timestamp
     ),
+    level: logLevel,
   );
 
   /// Log a messsage at level [Level.debug].
