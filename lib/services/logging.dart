@@ -40,9 +40,13 @@ class AppLogger {
   static const Level logLevel = Level.trace;
 
   /// Main `Logger` instance
+  ///
+  /// TODO changes:
+  /// - change method count - only include for warning and error??
+  /// - change print time to debug only?
   static final Logger _logger = Logger(
     printer: PrettyPrinter(
-      methodCount: 2, // Number of method calls to be displayed
+      methodCount: 1, // Number of method calls to be displayed
       errorMethodCount: 8, // Number of method calls if stacktrace is provided
       lineLength: 120, // Width of the output
       colors: true, // Colorful log messages

@@ -27,14 +27,6 @@ class AuthenticationService with ChangeNotifier {
       final UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
 
-      // final String userId = userCredential.user!.uid;
-
-      // // Add user data to local storage (for now)
-      // SharedPreferences prefs = await SharedPreferences.getInstance();
-      // // await prefs.setString('user_name', name);
-      // await prefs.setString('user_email', email);
-      // await prefs.setString('uid', userId);
-
       await checkAndCreateUser(userCredential: userCredential);
 
       AppLogger.i("Sign in successful");
@@ -53,7 +45,7 @@ class AuthenticationService with ChangeNotifier {
   ///
   /// https://pub.dev/documentation/firebase_auth/latest/firebase_auth/FirebaseAuth/sendPasswordResetEmail.html
   Future<String?> resetPassword(String email) async {
-    AppLogger.i("Sending password reset email successful");
+    AppLogger.i("Sending password reset email");
 
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
