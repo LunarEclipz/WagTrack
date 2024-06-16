@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wagtrack/models/user_model.dart';
+import 'package:wagtrack/services/logging.dart';
 
 /// Communication to Firestore and local preferences for user-related data.
 ///
@@ -80,9 +81,10 @@ class UserService with ChangeNotifier {
   ///
   /// (And local preferences for local settings)
   Future<void> updateUserInDb() async {
+    AppLogger.d("Updating local user in db");
     if (_user.isEmpty()) {
       // user does not exist
-      debugPrint("[INFO]: User, DB: Local user does not exist");
+      AppLogger.w("Local user does not exist");
       return;
     }
 
@@ -96,16 +98,18 @@ class UserService with ChangeNotifier {
       });
 
       await db.collection("users").doc(uid).set(_user.toJson());
+      AppLogger.e("Successfully updated local user params in Firestore");
     } catch (e) {
-      debugPrint("[ERROR]: User, DB: $e");
+      AppLogger.e("Error updating local user in db: $e");
     }
   }
 
   /// Updates local preferences.
   Future<void> updateLocalPrefs() async {
+    AppLogger.d("Updating local preferences");
     if (_user.isEmpty()) {
       // user does not exist
-      debugPrint("[INFO]: User, DB: Local user does not exist");
+      AppLogger.w("Local user does not exist");
       return;
     }
 
@@ -119,13 +123,15 @@ class UserService with ChangeNotifier {
       });
 
       await db.collection("users").doc(uid).set(_user.toJson());
+      AppLogger.i("Successfully updated local preferences");
     } catch (e) {
-      debugPrint("[ERROR]: User, DB: $e");
+      AppLogger.e("Error updating local preferences: $e");
     }
   }
 
   /// Sets current user from an `AppUser` object.
   void setUser({required AppUser user}) {
+    AppLogger.d("Setting current user");
     _user = user;
     notifyListeners();
   }
@@ -142,6 +148,7 @@ class UserService with ChangeNotifier {
     bool? allowCamera,
     bool? allowGallery,
   }) {
+    AppLogger.d("Setting parameters of current user");
     _user.updateParams(
       uid: uid,
       name: name,
@@ -163,6 +170,8 @@ class UserService with ChangeNotifier {
   ///
   /// https://firebase.google.com/docs/firestore/query-data/get-data
   Future<void> getUserFromDb({required String uid}) async {
+    AppLogger.d("Getting user from Firestore");
+
     final docRef = db.collection("users").doc(uid);
     docRef.get().then((DocumentSnapshot doc) {
       if (!doc.exists) {
@@ -175,15 +184,16 @@ class UserService with ChangeNotifier {
       _user.uid = uid;
       _user.updateFromJson(data);
       notifyListeners();
-    },
-        onError: (e) =>
-            {debugPrint("[ERROR]: User, DB: Error getting document: $e")});
+    }, onError: (e) => {AppLogger.e("Error getting user from Firestore: $e")});
 
     // get local prefs
+    AppLogger.t("Getting local preferences");
     SharedPreferences.getInstance().then((prefs) {
       _user.allowCamera = prefs.getBool('device_allow_camera') ?? false;
       _user.allowGallery = prefs.getBool('device_allow_gallery') ?? false;
     });
+
+    AppLogger.i("User data obtained successfully");
   }
 
   /// Resets user data.
@@ -192,6 +202,7 @@ class UserService with ChangeNotifier {
   ///
   /// Does not delete user from FireStore.
   Future<void> resetUserData() async {
+    AppLogger.d("resetting user data");
     _user.resetData();
     String uid = _user.uid;
 
@@ -211,13 +222,15 @@ class UserService with ChangeNotifier {
     });
 
     docRef.set(overwriteData).onError(
-        (e, _) => debugPrint("[ERROR]: User, DB: Error overwriting data: $e"));
+        (e, _) => AppLogger.e("Error resetting user data in Firestore: $e"));
 
     notifyListeners();
+    AppLogger.i("User data reset successfully");
   }
 
   /// Checks firestore db if a document exists under the given uid.
   Future<bool> doesUserExist(String uid) async {
+    AppLogger.t("Checking if user exists");
     final docRef = db.collection("users").doc(uid);
     DocumentSnapshot doc = await docRef.get();
 
@@ -232,10 +245,11 @@ class UserService with ChangeNotifier {
   ///
   /// https://firebase.google.com/docs/firestore/manage-data/delete-data
   Future<void> deleteUser() async {
+    AppLogger.d("Deleting user");
     await db.collection("users").doc(_user.uid).delete().then(
-        (doc) => debugPrint("[INFO]: User $_user.uid deleted from Firestore."),
+        (doc) => AppLogger.i("User deleted from Firestore"),
         onError: (e, _) =>
-            debugPrint("[ERROR]: User, DB: Error deleting user: $e"));
+            AppLogger.e("Error deleting user from Firestore: $e"));
 
     _user = AppUser.createEmptyUser();
   }

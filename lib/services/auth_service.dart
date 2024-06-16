@@ -22,7 +22,7 @@ class AuthenticationService with ChangeNotifier {
   /// https://pub.dev/documentation/firebase_auth/latest/firebase_auth/FirebaseAuth/signInWithEmailAndPassword.html
   Future<String?> signInWithEmailAndPassword(
       String email, String password) async {
-    AppLogger.i("Signing in with email and password");
+    AppLogger.d("Signing in with email and password");
     try {
       final UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
@@ -45,7 +45,7 @@ class AuthenticationService with ChangeNotifier {
   ///
   /// https://pub.dev/documentation/firebase_auth/latest/firebase_auth/FirebaseAuth/sendPasswordResetEmail.html
   Future<String?> resetPassword(String email) async {
-    AppLogger.i("Sending password reset email");
+    AppLogger.d("Sending password reset email");
 
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
@@ -79,7 +79,7 @@ class AuthenticationService with ChangeNotifier {
   /// https://pub.dev/documentation/firebase_auth/latest/firebase_auth/FirebaseAuth/createUserWithEmailAndPassword.html
   Future<String?> registerWithEmailAndPassword(
       String name, String email, String password) async {
-    AppLogger.i("Registering with email and password");
+    AppLogger.d("Registering with email and password");
 
     try {
       final UserCredential userCredential =
@@ -116,7 +116,7 @@ class AuthenticationService with ChangeNotifier {
 
   //Google auths
   Future<dynamic> signInWithGoogle() async {
-    AppLogger.i("Signing in with Google");
+    AppLogger.d("Signing in with Google");
 
     try {
       // Trigger the authentication flow
@@ -149,7 +149,7 @@ class AuthenticationService with ChangeNotifier {
   }
 
   Future<dynamic> signInWithFacebook() async {
-    AppLogger.i("Signing in with Facebook");
+    AppLogger.d("Signing in with Facebook");
     try {
       // Trigger the sign-in flow
       final LoginResult result = await FacebookAuth.instance.login();
@@ -184,7 +184,7 @@ class AuthenticationService with ChangeNotifier {
   /// for a display name.
   Future<void> checkAndCreateUser(
       {required UserCredential userCredential, String name = ""}) async {
-    AppLogger.i("Checking user against Firestore db");
+    AppLogger.d("Checking user against Firestore db");
 
     if (name.isEmpty) {
       name = userCredential.user!.displayName ?? "";
@@ -210,7 +210,7 @@ class AuthenticationService with ChangeNotifier {
 
   /// Sign out user
   Future<void> signOutUser() async {
-    AppLogger.i("Signing out user");
+    AppLogger.d("Signing out user");
     try {
       final User? firebaseUser = FirebaseAuth.instance.currentUser;
       if (firebaseUser != null) {
@@ -226,7 +226,7 @@ class AuthenticationService with ChangeNotifier {
 
   /// Delete user account from Firebase Auth and Firestore.
   Future<dynamic> deleteUser() async {
-    AppLogger.i("Deleting user");
+    AppLogger.d("Deleting user");
     await _userService.deleteUser();
 
     try {
