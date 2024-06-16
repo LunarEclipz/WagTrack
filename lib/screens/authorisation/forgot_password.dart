@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/services/auth_service.dart';
+import 'package:wagtrack/shared/components/dialogs.dart';
+import 'package:wagtrack/shared/components/input_components.dart';
+import 'package:wagtrack/shared/components/text_components.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -36,7 +39,7 @@ class ForgotPasswordPage extends StatelessWidget {
                 labelText: 'Email',
               ),
             ),
-            const SizedBox(height: 20.0),
+            const SizedBoxh20(),
             ElevatedButton(
               onPressed: () async {
                 String? result = await context
@@ -49,20 +52,11 @@ class ForgotPasswordPage extends StatelessWidget {
                   // return to login
                   Navigator.pop(context);
 
-                  showDialog(
+                  showAppConfirmationDialog(
                     context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Reset password email sent'),
-                        content: const Text('Please check your email.'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Ok'),
-                          ),
-                        ],
-                      );
-                    },
+                    titleString: 'Reset password email sent',
+                    contentString: 'Please check your email.',
+                    continueString: "Ok",
                   );
                 } else {
                   showDialog(
