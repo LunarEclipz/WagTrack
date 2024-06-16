@@ -100,7 +100,7 @@ class UserService with ChangeNotifier {
       await db.collection("users").doc(uid).set(_user.toJson());
       AppLogger.e("Successfully updated local user params in Firestore");
     } catch (e) {
-      AppLogger.e("Error updating local user in db: $e");
+      AppLogger.e("Error updating local user in db: $e", e);
     }
   }
 
@@ -125,7 +125,7 @@ class UserService with ChangeNotifier {
       await db.collection("users").doc(uid).set(_user.toJson());
       AppLogger.i("Successfully updated local preferences");
     } catch (e) {
-      AppLogger.e("Error updating local preferences: $e");
+      AppLogger.e("Error updating local preferences: $e", e);
     }
   }
 
@@ -184,7 +184,9 @@ class UserService with ChangeNotifier {
       _user.uid = uid;
       _user.updateFromJson(data);
       notifyListeners();
-    }, onError: (e) => {AppLogger.e("Error getting user from Firestore: $e")});
+    },
+        onError: (e) =>
+            {AppLogger.e("Error getting user from Firestore: $e", e)});
 
     // get local prefs
     AppLogger.t("Getting local preferences");
@@ -222,7 +224,7 @@ class UserService with ChangeNotifier {
     });
 
     docRef.set(overwriteData).onError(
-        (e, _) => AppLogger.e("Error resetting user data in Firestore: $e"));
+        (e, _) => AppLogger.e("Error resetting user data in Firestore: $e", e));
 
     notifyListeners();
     AppLogger.i("User data reset successfully");
@@ -249,7 +251,7 @@ class UserService with ChangeNotifier {
     await db.collection("users").doc(_user.uid).delete().then(
         (doc) => AppLogger.i("User deleted from Firestore"),
         onError: (e, _) =>
-            AppLogger.e("Error deleting user from Firestore: $e"));
+            AppLogger.e("Error deleting user from Firestore: $e", e));
 
     _user = AppUser.createEmptyUser();
   }
