@@ -4,6 +4,11 @@ import 'package:logger/logger.dart';
 ///
 /// https://pub.dev/packages/logger
 ///
+/// ## Formatting
+/// Boxing is enabled only for levels `error` and `warning`.
+///
+/// ---
+///
 /// ## Levels
 ///
 /// In Order of severity:
@@ -53,12 +58,25 @@ class AppLogger {
   /// - change print time to debug only?
   static final Logger _logger = Logger(
     printer: PrettyPrinter(
-      methodCount: 1, // Number of method calls to be displayed
-      errorMethodCount: 8, // Number of method calls if stacktrace is provided
-      lineLength: 120, // Width of the output
-      colors: true, // Colorful log messages
-      printEmojis: true, // Print an emoji for each log message
-      printTime: true, // Should each log print contain a timestamp
+      // Number of method calls to be displayed
+      methodCount: 1,
+      // Number of method calls if stacktrace is provided
+      errorMethodCount: 8,
+      // Width of the output
+      lineLength: 120,
+      // Colorful log messages
+      colors: true,
+      // Print an emoji for each log message
+      printEmojis: true,
+      // Should each log print contain a timestamp
+      printTime: true,
+      // whether boxing of logs is enabled by default
+      noBoxingByDefault: true,
+      // boxing logs for each level
+      excludeBox: {
+        Level.warning: true,
+        Level.error: true,
+      },
     ),
     level: logLevel,
   );
