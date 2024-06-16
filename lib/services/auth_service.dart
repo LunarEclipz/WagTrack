@@ -33,7 +33,7 @@ class AuthenticationService with ChangeNotifier {
 
       return "Success";
     } on FirebaseAuthException catch (e) {
-      AppLogger.i("FirebaseAuthException $e.code", e);
+      AppLogger.i("Sign in FirebaseAuthException $e.code", e);
       return e.code;
     } on Exception catch (e, stackTrace) {
       AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
@@ -55,7 +55,7 @@ class AuthenticationService with ChangeNotifier {
 
       return "Success";
     } on FirebaseAuthException catch (e) {
-      AppLogger.i("FirebaseAuthException $e.code", e);
+      AppLogger.i("Password reset FirebaseAuthException $e.code", e);
       return e.code;
     } on Exception catch (e, stackTrace) {
       AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
@@ -105,7 +105,7 @@ class AuthenticationService with ChangeNotifier {
       // e.code == 'invalid-email'
       // e.code == 'weak-password'
       // e.code == 'email-already-in-use'
-      AppLogger.i("FirebaseAuthException $e.code", e);
+      AppLogger.i("Registration FirebaseAuthException $e.code", e);
 
       return e.code;
     } on Exception catch (e, stackTrace) {
@@ -141,7 +141,7 @@ class AuthenticationService with ChangeNotifier {
 
       return "Success";
     } on FirebaseAuthException catch (e) {
-      AppLogger.i("FirebaseAuthException $e.code", e);
+      AppLogger.i("Google sign in FirebaseAuthException $e.code", e);
       return '${e.code}:  \n ${e.message}';
     } on Exception catch (e, stackTrace) {
       AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
@@ -170,7 +170,7 @@ class AuthenticationService with ChangeNotifier {
         return "Success";
       }
     } on FirebaseAuthException catch (e) {
-      AppLogger.i("FirebaseAuthException $e.code", e);
+      AppLogger.i("Facebook sign in FirebaseAuthException $e.code", e);
       return '${e.code}:  \n ${e.message}';
     } on Exception catch (e, stackTrace) {
       AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
@@ -218,7 +218,7 @@ class AuthenticationService with ChangeNotifier {
       }
       AppLogger.i("User sign out successful");
     } on FirebaseAuthException catch (e) {
-      AppLogger.i("FirebaseAuthException $e.code", e);
+      AppLogger.i("Sign out FirebaseAuthException $e.code", e);
     } on Exception catch (e, stackTrace) {
       AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
     }
@@ -238,7 +238,7 @@ class AuthenticationService with ChangeNotifier {
       return "Success";
     } on FirebaseAuthException catch (e) {
       // e.code == 'requires-recent-login'
-      AppLogger.i("FirebaseAuthException $e.code", e);
+      AppLogger.i("User delete FirebaseAuthException $e.code", e);
 
       return e.code;
     } on Exception catch (e, stackTrace) {
