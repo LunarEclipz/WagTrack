@@ -29,15 +29,18 @@ class ForgotPasswordPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-                'Please provide your Email Address and we will send you a reset password request. ',
-                style: textStyles.bodyMedium
-                    ?.copyWith(fontStyle: FontStyle.italic)),
-            TextField(
+              'Please provide your Email Address and we will send you a reset password request. ',
+              style:
+                  textStyles.bodyMedium?.copyWith(fontStyle: FontStyle.italic),
+            ),
+            AppTextFormFieldLarge(
               controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-              ),
+              labelText: 'Email Address',
+              validator: (value) => !context
+                      .read<AuthenticationService>()
+                      .isEmailValidEmail(value!)
+                  ? 'Invalid email'
+                  : null,
             ),
             const SizedBoxh20(),
             ElevatedButton(
@@ -45,8 +48,6 @@ class ForgotPasswordPage extends StatelessWidget {
                 String? result = await context
                     .read<AuthenticationService>()
                     .resetPassword(_emailController.text);
-
-                // debugPrint('DEBUG: password reset: $result');
 
                 if (result == "Success") {
                   // return to login
@@ -58,22 +59,17 @@ class ForgotPasswordPage extends StatelessWidget {
                     contentString: 'Please check your email.',
                     continueString: "Ok",
                   );
-                } else {
-                  showDialog(
+                } else if (result == 'network-request-failed') {
+                  showAppErrorAlertDialog(
                     context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title:
-                            const Text('Reset password email cannot be sent'),
-                        content: const Text('Invalid email or email not found'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Try again'),
-                          ),
-                        ],
-                      );
-                    },
+                    titleString: 'Network Error',
+                    contentString: 'Please check your internet connection.',
+                  );
+                } else {
+                  showAppErrorAlertDialog(
+                    context: context,
+                    titleString: 'Reset password email cannot be sent',
+                    contentString: 'Invalid email or email not found',
                   );
                 }
               },
