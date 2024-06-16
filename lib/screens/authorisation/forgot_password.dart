@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/services/auth_service.dart';
+import 'package:wagtrack/shared/components/dialogs.dart';
+import 'package:wagtrack/shared/components/input_components.dart';
+import 'package:wagtrack/shared/components/text_components.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -26,60 +29,47 @@ class ForgotPasswordPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-                'Please provide your Email Address and we will send you a reset password request. ',
-                style: textStyles.bodyMedium
-                    ?.copyWith(fontStyle: FontStyle.italic)),
-            TextField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-              ),
+              'Please provide your Email Address and we will send you a reset password request. ',
+              style:
+                  textStyles.bodyMedium?.copyWith(fontStyle: FontStyle.italic),
             ),
-            const SizedBox(height: 20.0),
+            AppTextFormFieldLarge(
+              controller: _emailController,
+              labelText: 'Email Address',
+              validator: (value) => !context
+                      .read<AuthenticationService>()
+                      .isEmailValidEmail(value!)
+                  ? 'Invalid email'
+                  : null,
+            ),
+            const SizedBoxh20(),
             ElevatedButton(
               onPressed: () async {
                 String? result = await context
                     .read<AuthenticationService>()
                     .resetPassword(_emailController.text);
 
-                // debugPrint('DEBUG: password reset: $result');
-
                 if (result == "Success") {
                   // return to login
                   Navigator.pop(context);
 
-                  showDialog(
+                  showAppConfirmationDialog(
                     context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Reset password email sent'),
-                        content: const Text('Please check your email.'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Ok'),
-                          ),
-                        ],
-                      );
-                    },
+                    titleString: 'Reset password email sent',
+                    contentString: 'Please check your email.',
+                    continueString: "Ok",
+                  );
+                } else if (result == 'network-request-failed') {
+                  showAppErrorAlertDialog(
+                    context: context,
+                    titleString: 'Network Error',
+                    contentString: 'Please check your internet connection.',
                   );
                 } else {
-                  showDialog(
+                  showAppErrorAlertDialog(
                     context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title:
-                            const Text('Reset password email cannot be sent'),
-                        content: const Text('Invalid email or email not found'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Try again'),
-                          ),
-                        ],
-                      );
-                    },
+                    titleString: 'Reset password email cannot be sent',
+                    contentString: 'Invalid email or email not found',
                   );
                 }
               },
