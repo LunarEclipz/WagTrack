@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/firebase_options.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
 import 'package:wagtrack/services/auth_service.dart';
+import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/themes.dart';
 
@@ -23,6 +24,8 @@ class WagTrackApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    AppLogger.i("Building main app");
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(

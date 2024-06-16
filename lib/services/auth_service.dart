@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:wagtrack/models/user_model.dart';
+import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/user_service.dart';
 
 class AuthenticationService with ChangeNotifier {
@@ -21,25 +22,22 @@ class AuthenticationService with ChangeNotifier {
   /// https://pub.dev/documentation/firebase_auth/latest/firebase_auth/FirebaseAuth/signInWithEmailAndPassword.html
   Future<String?> signInWithEmailAndPassword(
       String email, String password) async {
+    AppLogger.d("Signing in with email and password");
     try {
       final UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
 
-      // final String userId = userCredential.user!.uid;
-
-      // // Add user data to local storage (for now)
-      // SharedPreferences prefs = await SharedPreferences.getInstance();
-      // // await prefs.setString('user_name', name);
-      // await prefs.setString('user_email', email);
-      // await prefs.setString('uid', userId);
-
       await checkAndCreateUser(userCredential: userCredential);
+
+      AppLogger.i("Sign in successful");
 
       return "Success";
     } on FirebaseAuthException catch (e) {
-      debugPrint('[AUTH_ERROR] Code: ${e.code}');
-      debugPrint('[AUTH_ERROR] Message: ${e.message}');
+      AppLogger.i("Sign in FirebaseAuthException $e.code", e);
       return e.code;
+    } on Exception catch (e, stackTrace) {
+      AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
+      return null;
     }
   }
 
@@ -47,14 +45,21 @@ class AuthenticationService with ChangeNotifier {
   ///
   /// https://pub.dev/documentation/firebase_auth/latest/firebase_auth/FirebaseAuth/sendPasswordResetEmail.html
   Future<String?> resetPassword(String email) async {
+    AppLogger.d("Sending password reset email");
+
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
       // Password reset email sent
+
+      AppLogger.i("Password reset email sent successfully");
+
       return "Success";
     } on FirebaseAuthException catch (e) {
-      debugPrint('[AUTH_ERROR] Code: ${e.code}');
-      debugPrint('[AUTH_ERROR] Message: ${e.message}');
+      AppLogger.i("Password reset FirebaseAuthException $e.code", e);
       return e.code;
+    } on Exception catch (e, stackTrace) {
+      AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
+      return null;
     }
   }
 
@@ -74,6 +79,8 @@ class AuthenticationService with ChangeNotifier {
   /// https://pub.dev/documentation/firebase_auth/latest/firebase_auth/FirebaseAuth/createUserWithEmailAndPassword.html
   Future<String?> registerWithEmailAndPassword(
       String name, String email, String password) async {
+    AppLogger.d("Registering with email and password");
+
     try {
       final UserCredential userCredential =
           await _firebaseAuth.createUserWithEmailAndPassword(
@@ -91,20 +98,26 @@ class AuthenticationService with ChangeNotifier {
 
       await checkAndCreateUser(userCredential: userCredential, name: name);
 
+      AppLogger.i("Registration successful");
+
       return "Success";
     } on FirebaseAuthException catch (e) {
       // e.code == 'invalid-email'
       // e.code == 'weak-password'
       // e.code == 'email-already-in-use'
-      debugPrint('[AUTH_ERROR] Code: ${e.code}');
-      debugPrint('[AUTH_ERROR] Message: ${e.message}');
+      AppLogger.i("Registration FirebaseAuthException $e.code", e);
 
       return e.code;
+    } on Exception catch (e, stackTrace) {
+      AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
+      return null;
     }
   }
 
   //Google auths
   Future<dynamic> signInWithGoogle() async {
+    AppLogger.d("Signing in with Google");
+
     try {
       // Trigger the authentication flow
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -124,14 +137,19 @@ class AuthenticationService with ChangeNotifier {
 
       await checkAndCreateUser(userCredential: userCredential);
 
+      AppLogger.i("Google sign in successful");
+
       return "Success";
     } on FirebaseAuthException catch (e) {
-      debugPrint("[AUTH_ERROR] $e");
+      AppLogger.i("Google sign in FirebaseAuthException $e.code", e);
       return '${e.code}:  \n ${e.message}';
+    } on Exception catch (e, stackTrace) {
+      AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
     }
   }
 
   Future<dynamic> signInWithFacebook() async {
+    AppLogger.d("Signing in with Facebook");
     try {
       // Trigger the sign-in flow
       final LoginResult result = await FacebookAuth.instance.login();
@@ -147,11 +165,15 @@ class AuthenticationService with ChangeNotifier {
 
         await checkAndCreateUser(userCredential: userCredential);
 
+        AppLogger.i("Facebook sign in successful");
+
         return "Success";
       }
     } on FirebaseAuthException catch (e) {
-      debugPrint("[AUTH_ERROR] $e");
+      AppLogger.i("Facebook sign in FirebaseAuthException $e.code", e);
       return '${e.code}:  \n ${e.message}';
+    } on Exception catch (e, stackTrace) {
+      AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
     }
   }
 
@@ -162,6 +184,8 @@ class AuthenticationService with ChangeNotifier {
   /// for a display name.
   Future<void> checkAndCreateUser(
       {required UserCredential userCredential, String name = ""}) async {
+    AppLogger.d("Checking user against Firestore db");
+
     if (name.isEmpty) {
       name = userCredential.user!.displayName ?? "";
     }
@@ -174,6 +198,7 @@ class AuthenticationService with ChangeNotifier {
     await _userService.getUserFromDb(uid: uid);
 
     if (_userService.user.isEmpty()) {
+      AppLogger.i("User does not exist in Firestore");
       // user does not exist - create initial user for onboarding process
       _userService.setUser(
           user: AppUser.createInitialUser(uid: uid, name: name, email: email!));
@@ -185,28 +210,39 @@ class AuthenticationService with ChangeNotifier {
 
   /// Sign out user
   Future<void> signOutUser() async {
-    final User? firebaseUser = FirebaseAuth.instance.currentUser;
-    if (firebaseUser != null) {
-      await FirebaseAuth.instance.signOut();
+    AppLogger.d("Signing out user");
+    try {
+      final User? firebaseUser = FirebaseAuth.instance.currentUser;
+      if (firebaseUser != null) {
+        await FirebaseAuth.instance.signOut();
+      }
+      AppLogger.i("User sign out successful");
+    } on FirebaseAuthException catch (e) {
+      AppLogger.i("Sign out FirebaseAuthException $e.code", e);
+    } on Exception catch (e, stackTrace) {
+      AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
     }
   }
 
   /// Delete user account from Firebase Auth and Firestore.
   Future<dynamic> deleteUser() async {
+    AppLogger.d("Deleting user");
     await _userService.deleteUser();
 
     try {
       final User? firebaseUser = FirebaseAuth.instance.currentUser;
 
       await firebaseUser!.delete();
+      AppLogger.i("User deletion successful");
 
       return "Success";
     } on FirebaseAuthException catch (e) {
       // e.code == 'requires-recent-login'
-      debugPrint('[AUTH_ERROR] Code: ${e.code}');
-      debugPrint('[AUTH_ERROR] Message: ${e.message}');
+      AppLogger.i("User delete FirebaseAuthException $e.code", e);
 
       return e.code;
+    } on Exception catch (e, stackTrace) {
+      AppLogger.e("AUTH - non-FirebaseAuth exception", e, stackTrace);
     }
   }
 }
