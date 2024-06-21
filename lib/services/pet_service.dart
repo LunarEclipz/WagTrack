@@ -41,7 +41,7 @@ class PetService {
         pet.petID = docSnapshot.id;
         pets.add(pet);
       }
-      AppLogger.i("pets fetched (by uid) successfully");
+      AppLogger.i("Pets fetched (by uid) successfully");
       return pets;
     } catch (e) {
       AppLogger.e("Error fetching pets for uid $uid: $e", e);
