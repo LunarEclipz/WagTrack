@@ -69,7 +69,7 @@ class AppLogger {
       // Print an emoji for each log message
       printEmojis: true,
       // Should each log print contain a timestamp
-      printTime: true,
+      printTime: false,
       // whether boxing of logs is enabled by default
       noBoxingByDefault: true,
       // boxing logs for each level

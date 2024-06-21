@@ -1,3 +1,5 @@
+import 'package:wagtrack/services/logging.dart';
+
 /// Local object to represent users.
 class AppUser {
   String uid;
@@ -7,9 +9,9 @@ class AppUser {
   String? phoneNumber;
   bool allowShareContact = false;
   bool allowShareData = false;
-  bool hasOnboarded = false;
   bool allowCamera = false;
   bool allowGallery = false;
+  // bool hasOnboarded = false;
 
   AppUser({
     required this.uid,
@@ -22,6 +24,14 @@ class AppUser {
     this.allowCamera = false,
     this.allowGallery = false,
   });
+
+  /// Whether a user has onboarded.
+  /// If phone number and default location are null, user has not onboarded
+  ///
+  /// (Jank solution)
+  bool get hasOnboarded =>
+      (defaultLocation?.isNotEmpty ?? false) ||
+      (phoneNumber?.isNotEmpty ?? false);
 
   /// Create initial unboarded user.
   ///
@@ -44,12 +54,13 @@ class AppUser {
   ///
   /// Static method.
   static AppUser createFromJson(String uid, Map<String, dynamic> json) {
+    AppLogger.t("Creating AppUser from Map (Firebase json)");
     AppUser user = AppUser(
       uid: uid,
-      name: json["name"] as String,
-      email: json["email"] as String,
-      defaultLocation: json["defaultLocation"] as String,
-      phoneNumber: json["phoneNumber"] as String,
+      name: json["name"] as String?,
+      email: json["email"] as String?,
+      defaultLocation: json["defaultLocation"] as String?,
+      phoneNumber: json["phoneNumber"] as String?,
       allowShareContact: json["allowShareContact"] as bool,
       allowShareData: json["allowShareData"] as bool,
     );
@@ -81,10 +92,11 @@ class AppUser {
 
   /// Updates data of AppUser object from and Firebase JSON (map).
   void updateFromJson(Map<String, dynamic> json) {
-    name = json["name"] as String;
-    email = json["email"] as String;
-    defaultLocation = json["defaultLocation"] as String;
-    phoneNumber = json["phoneNumber"] as String;
+    AppLogger.t("Updating AppUser data from Map (Firebase json)");
+    name = json["name"] as String?;
+    email = json["email"] as String?;
+    defaultLocation = json["defaultLocation"] as String?;
+    phoneNumber = json["phoneNumber"] as String?;
     allowShareContact = json["allowShareContact"] as bool;
     allowShareData = json["allowShareData"] as bool;
   }
@@ -102,7 +114,7 @@ class AppUser {
     this.defaultLocation = defaultLocation;
     this.allowShareContact = allowShareContact;
     this.allowShareData = allowShareData;
-    hasOnboarded = true;
+    // hasOnboarded = true;
   }
 
   /// Resets user data.
@@ -113,7 +125,7 @@ class AppUser {
     phoneNumber = null;
     allowShareContact = false;
     allowShareData = false;
-    hasOnboarded = false;
+    // hasOnboarded = false;
   }
 
   /// Converts user object to JSON for uploading into Firebase.
@@ -134,5 +146,15 @@ class AppUser {
   /// Returns whether this user is an empty user by checking whether uid is empty.
   bool isEmpty() {
     return uid.isEmpty;
+  }
+
+  @override
+  String toString() {
+    return """┍━━━ USER ━━━
+│ $uid
+│ $name
+│ $email | $phoneNumber
+│ Onboarded: $hasOnboarded
+┕━━━━━━━━""";
   }
 }

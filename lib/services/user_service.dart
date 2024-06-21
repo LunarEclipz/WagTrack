@@ -173,7 +173,7 @@ class UserService with ChangeNotifier {
     AppLogger.d("Getting user from Firestore");
 
     final docRef = db.collection("users").doc(uid);
-    docRef.get().then((DocumentSnapshot doc) {
+    await docRef.get().then((DocumentSnapshot doc) {
       if (!doc.exists) {
         // doc does not exist - no changes
         return;

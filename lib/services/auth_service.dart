@@ -14,8 +14,34 @@ class AuthenticationService with ChangeNotifier {
   AuthenticationService(this._firebaseAuth, this._userService);
   // AuthenticationService(this._firebaseAuth);
 
-  // auth change user stream
+  // Get Auth change user stream.
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
+
+  /// Get uid of current user.
+  String get uid => FirebaseAuth.instance.currentUser!.uid;
+
+  /// Updates local user based on current uid
+  ///
+  /// Does nothing if uid is not available.
+  ///
+  /// returns whether the user has onboarded.
+  Future<bool> updateCurrentLocalUserFromAuth() async {
+    AppLogger.d("Updating local user from Firebase Auth");
+    String? uid = this.uid;
+
+    if (uid.isEmpty) {
+      AppLogger.i("Local auth user does not exist");
+      return false;
+    }
+
+    await _userService.getUserFromDb(uid: uid);
+
+    final user = _userService.user;
+    // AppLogger.i("$user");
+
+    AppLogger.i("Local user updated successfully.");
+    return user.hasOnboarded;
+  }
 
   /// Signs into current Firebase Auth instance with email and password.
   ///
