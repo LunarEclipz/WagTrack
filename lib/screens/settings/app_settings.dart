@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
-import 'package:wagtrack/screens/blank_page.dart';
+import 'package:wagtrack/screens/misc_pages.dart';
 import 'package:wagtrack/screens/settings/delete_settings.dart';
 import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/services/user_service.dart';

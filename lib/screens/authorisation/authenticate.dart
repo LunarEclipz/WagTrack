@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/app_wrapper.dart';
 import 'package:wagtrack/screens/authorisation/authorisation_frame.dart';
+import 'package:wagtrack/screens/misc_pages.dart';
 import 'package:wagtrack/screens/settings/onboarding.dart';
 import 'package:wagtrack/services/auth_service.dart';
 
@@ -37,9 +38,7 @@ class _AuthenticateState extends State<Authenticate> {
         if (!snapshot.hasData) {
           return LoginPage(toggleView: toggleView);
         } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-              // not currently shown
-              body: Center(child: CircularProgressIndicator()));
+          return const LoadingPage();
         } else {
           // loading complete - now check for onboarding status
 
@@ -59,8 +58,7 @@ class _AuthenticateState extends State<Authenticate> {
                     return const AppWrapper();
                   }
                 } else {
-                  return const Scaffold(
-                      body: Center(child: CircularProgressIndicator()));
+                  return const LoadingPage();
                 }
               });
 

@@ -19,3 +19,19 @@ class BlankPage extends StatelessWidget {
     );
   }
 }
+
+/// Full-screen loading page.
+class LoadingPage extends StatelessWidget {
+  const LoadingPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return Scaffold(
+        body: Center(
+            child: CircularProgressIndicator(
+      color: colorScheme.primary,
+    )));
+  }
+}
