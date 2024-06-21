@@ -98,7 +98,7 @@ class UserService with ChangeNotifier {
       });
 
       await db.collection("users").doc(uid).set(_user.toJson());
-      AppLogger.e("Successfully updated local user params in Firestore");
+      AppLogger.i("Successfully updated local user params in Firestore");
     } catch (e) {
       AppLogger.e("Error updating local user in db: $e", e);
     }
