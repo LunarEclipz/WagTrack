@@ -17,6 +17,7 @@ class AppWrapper extends StatefulWidget {
 
 class _AppWrapperState extends State<AppWrapper> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   int currentPageIndex = 0;
 
   List<Widget> screens = [
@@ -28,6 +29,8 @@ class _AppWrapperState extends State<AppWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       // App Bar
       appBar: AppBar(
@@ -56,14 +59,17 @@ class _AppWrapperState extends State<AppWrapper> {
                     );
                   },
                   transitionDuration: const Duration(
-                      milliseconds: 500), // Adjust the duration here
+                      milliseconds: 300), // Adjust the duration here
                   pageBuilder: (context, a, b) => const AppSettings(),
                 ),
               );
             }, // Transition to Application Setting Screen
             child: const Padding(
               padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
-              child: Icon(Icons.settings),
+              child: Icon(
+                Icons.settings,
+                // color: colorScheme.tertiary,
+              ),
             ),
           )
         ],
@@ -129,6 +135,9 @@ class _AppWrapperState extends State<AppWrapper> {
             label: 'Explore',
           ),
         ],
+        backgroundColor: colorScheme.surface,
+        shadowColor: Colors.transparent,
+        elevation: 0.0,
       ),
     );
   }

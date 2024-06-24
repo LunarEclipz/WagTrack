@@ -91,7 +91,6 @@ class _AddPetPageState extends State<AddPetPage> {
           'Add Pet',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: colorScheme.primary,
       ),
       body: DefaultTextStyle.merge(
         style: textStyles.bodyLarge,

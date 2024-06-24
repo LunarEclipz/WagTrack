@@ -22,6 +22,9 @@ class ForgotPasswordPage extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: colorScheme.primary,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
       body: Container(
         padding: const EdgeInsets.all(20.0),

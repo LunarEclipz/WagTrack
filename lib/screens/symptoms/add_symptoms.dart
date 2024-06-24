@@ -55,7 +55,9 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
             ),
           ],
         ),
-        actions: const <Widget>[],
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
       body: AppScrollablePage(
         children: [

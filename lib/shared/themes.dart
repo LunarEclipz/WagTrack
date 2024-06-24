@@ -73,17 +73,24 @@ class AppTheme {
     colorScheme: ColorScheme.fromSeed(
       // https://api.flutter.dev/flutter/material/ColorScheme-class.html
       // https://m3.material.io/styles/color/static/baseline
+      // https://m3.material.io/component
 
       // use different seed color to check which is using material baseline colors
-      seedColor: Colors.red,
+      seedColor: Colors.blue,
       brightness: Brightness.light,
       primary: const Color(0xFFB01713),
       primaryContainer: Colors.white,
       primaryFixed: Colors.white,
       secondary: const Color(0xFF7B0300),
-      secondaryContainer: Colors.white,
+      secondaryContainer: const Color(0xFFfdfcfa),
       secondaryFixed: Colors.white,
       tertiary: const Color(0xFFE15216),
+
+      // used for navBar
+      surface: const Color(0xFFfdfcfa),
+      // onSurface: const Color(0xFFB01713),
+      onSecondaryContainer: const Color(0xFFB01713),
+      onSurfaceVariant: const Color(0xFF575A88),
     ),
     textTheme: TextTheme(
       headlineMedium: GoogleFonts.rubik(
