@@ -15,6 +15,9 @@ class BlankPage extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: colorScheme.primary,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
     );
   }

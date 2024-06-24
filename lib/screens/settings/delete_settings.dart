@@ -79,6 +79,9 @@ class _DeletionSettingsState extends State<DeletionSettings> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: colorScheme.primary,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
       body: DefaultTextStyle.merge(
         style: textStyles.bodyLarge,
