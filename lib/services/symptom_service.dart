@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:wagtrack/models/symptom_model.dart';
+import 'package:wagtrack/services/logging.dart';
 
 /// Communication to Firebase for Symptom-related data.
-
 class SymptomService {
   // Instance of Firebase Firestore for interacting with the database
   final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -42,7 +42,7 @@ class SymptomService {
       return symptoms;
     } catch (e) {
       // **Bold Error Message**
-      print("**Error fetching symptoms for pet ID $petID: $e**");
+      AppLogger.e("**Error fetching symptoms for pet ID $petID: $e**");
       return []; // Return an empty list on error
     }
   }

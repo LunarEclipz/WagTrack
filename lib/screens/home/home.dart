@@ -129,7 +129,7 @@ class _PetCardState extends State<BuildPetCard> {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final CustomColors customColors = AppTheme.customColors;
 
-    print(petData.toJSON());
+    // print(petData.toJSON());
     return InkWell(
       onTap: () {
         Navigator.push(
