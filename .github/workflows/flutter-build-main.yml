@@ -1,8 +1,7 @@
-# runs when pushed/merged (via pull request) into main
-
-name: Flutter CI
+name: Flutter Build CI
 
 # This workflow is triggered on pushes to the repository.
+# runs when pushed/merged (via pull request) into main
 
 on:
   push:
