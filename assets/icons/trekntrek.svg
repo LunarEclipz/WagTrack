@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" shape-rendering="geometricPrecision">
+  <rect x="0" y="0" width="64" height="64" rx="8" fill="#0B7B2B"/>
+  <circle cx="32" cy="32" r="24" fill="#FFF"/>
+  <rect x="8" y="32" width="9" height="24" rx="2" ry="2" fill="#FF8C00"/>
+  <rect x="50" y="10" width="9" height="14" rx="2" ry="2" fill="#FF8C00"/>
+  <circle cx="32" cy="32" r="12" fill="#0B7B2B"/>
+  <text x="32" y="32" text-anchor="middle" alignment-baseline="central" font-size="20" font-weight="bold" fill="#FF8C00">T</text> 
+</svg>

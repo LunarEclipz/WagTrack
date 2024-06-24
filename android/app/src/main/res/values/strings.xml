@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="app_name">WagTrack</string>
+    <string name="facebook_app_id">478405051349512</string>
+    <string name="fb_login_protocol_scheme">fb478405051349512</string>
+    <string name="facebook_client_token">63434ab8573f05aa7fc78309c7974856</string>
+</resources>
