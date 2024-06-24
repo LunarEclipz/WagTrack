@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "52208771369",
+    "project_id": "wagtrack-41427",
+    "storage_bucket": "wagtrack-41427.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:52208771369:android:ac5688c409e03d3de81738",
+        "android_client_info": {
+          "package_name": "com.example.wagtrack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsWb0dY0FPfN64drF1t2IEf0AnBqrkgnM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
