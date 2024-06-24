@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -254,5 +255,34 @@ class UserService with ChangeNotifier {
             AppLogger.e("Error deleting user from Firestore: $e", e));
 
     _user = AppUser.createEmptyUser();
+  }
+
+  /// Get user from user id by User's name, ignores current user's doc. Gets data from Firestore.
+  ///
+  /// Does nothing if there is an error.
+  ///
+  /// https://firebase.google.com/docs/firestore/query-data/get-data
+  Future<List<AppUser>> getUsersFromDbByName(
+      {required uid, required String email}) async {
+    AppLogger.d("Getting users from Firestore");
+
+    try {
+      final querySnapshot =
+          await db.collection("users").where("email", isEqualTo: email).get();
+
+      final List<AppUser> users = [];
+      for (final docSnapshot in querySnapshot.docs) {
+        final userData = docSnapshot.data();
+        final user = AppUser.createFromJson(docSnapshot.id, userData);
+        if (docSnapshot.id != uid) {
+          users.add(user);
+        }
+      }
+      AppLogger.i("Users fetched (by uid) successfully");
+      return users;
+    } catch (e) {
+      AppLogger.e("Error fetching users for email $email: $e", e);
+      return []; // Return an empty list on error
+    }
   }
 }

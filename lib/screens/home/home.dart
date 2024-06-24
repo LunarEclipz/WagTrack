@@ -23,39 +23,40 @@ class _HomeState extends State<Home> {
   String? uid;
   List<Pet> personalPets = [];
   List<Pet> communityPets = [];
-  List<Pet>? allPets;
-
-  Future<void> getInitData(UserService userService) async {
-    name = userService.user.name;
-    uid = userService.user.uid;
-
-    try {
-      final pets = await PetService().getAllPetsByUID(uid: uid!);
-      setState(() {
-        allPets = pets;
-        personalPets =
-            allPets!.where((pet) => pet.petType == "personal").toList();
-        communityPets =
-            allPets!.where((pet) => pet.petType == "community").toList();
-      });
-    } catch (e) {
-      // print("Error fetching pets: $e");
-    }
-  }
+  bool loaded = false;
 
   @override
   void initState() {
     super.initState();
   }
 
+  void getAllPets() async {
+    final UserService userService = context.watch<UserService>();
+    uid = userService.user.uid;
+    final PetService petService = context.watch<PetService>();
+    List<Pet> pets = await PetService().getAllPetsByUID(uid: uid!);
+    petService.setPersonalCommunityPets(pets: pets);
+    personalPets = petService.personalPets;
+    communityPets = petService.communityPets;
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final UserService userService = context.watch<UserService>();
+    final PetService petService = context.watch<PetService>();
 
-    // TODO: Need help ensuring that when Add Pet is done, this function is called
-    // use providers instead?
-    getInitData(userService);
+    name = userService.user.name;
+    uid = userService.user.uid;
+    if (!loaded) {
+      getAllPets();
+      setState(() {
+        loaded = true;
+      });
+    }
+    personalPets = petService.personalPets;
+    communityPets = petService.communityPets;
+
     return AppScrollablePage(children: <Widget>[
       Text(
         "Welcome Back ${name ?? ''}",
@@ -128,7 +129,7 @@ class _PetCardState extends State<BuildPetCard> {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final CustomColors customColors = AppTheme.customColors;
 
-    // print(petData.imgPath);
+    print(petData.toJSON());
     return InkWell(
       onTap: () {
         Navigator.push(

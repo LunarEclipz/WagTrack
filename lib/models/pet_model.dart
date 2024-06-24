@@ -9,14 +9,15 @@ class Pet {
   String sex;
   String uid;
   String species;
+  String? breed;
 
   /// personal or community
   String petType;
   String idNumber;
-  // DateTime birthDate;
-  // int weight;
-  // DateTime? nextAppt;
-  // List<Caretaker> caretakers;
+  DateTime birthDate;
+  int weight;
+  DateTime? nextAppt;
+  List<Caretaker> caretakers;
   int posts;
   int fans;
   String? imgPath;
@@ -31,13 +32,14 @@ class Pet {
       required this.species,
       required this.petType,
       required this.idNumber,
-      // required this.birthDate,
-      // required this.weight,
-      // this.nextAppt,
-      // required this.caretakers,
+      required this.birthDate,
+      required this.weight,
+      this.nextAppt,
+      required this.caretakers,
       required this.posts,
       required this.fans,
       this.imgPath,
+      this.breed,
       this.petID});
 
   /// Converts Object to JSON for uploading into Firebase
@@ -51,20 +53,20 @@ class Pet {
       "petType": petType,
       "uid": uid,
       "idNumber": idNumber,
-      // "birthDate":
-      //     birthDate.toIso8601String(), // Convert birthDate to ISO 8601 format
-      // "weight": weight,
-      // "nextAppt": nextAppt
-      //     ?.toIso8601String(), // Convert nextAppt to ISO 8601 format (null if no appointment)
-      // "caretakers": caretakers.map((caretaker) => caretaker.toJSON()).toList(),
+      "birthDate": birthDate.millisecondsSinceEpoch,
+      "weight": weight,
+      "nextAppt": nextAppt?.millisecondsSinceEpoch,
+      "caretakers": caretakers.map((caretaker) => caretaker.toJSON()).toList(),
       "posts": posts,
       "fans": fans,
       "imgPath": imgPath,
+      "breed": breed,
     };
     return petData;
   }
 
   static Pet fromJson(Map<String, dynamic> json) {
+    // TODO: 4am brain did this random ass try catch and idk whats the difference
     try {
       Pet pet = Pet(
         location: json["location"] as String,
@@ -74,16 +76,20 @@ class Pet {
         species: json["species"] as String,
         petType: json["petType"] as String,
         idNumber: json["idNumber"] as String,
-        // birthDate: DateTime.parse(json["birthDate"] as String),
-        // weight: json["weight"] as String,
-        // nextAppt: json["nextAppt"] != null ? DateTime.parse(json["nextAppt"] as String) : null,
-        // caretakers: (json["caretakers"] as List)
-        //     .map((caretakerData) => Caretaker.fromJson(caretakerData))
-        //     .toList(),
+        birthDate:
+            DateTime.fromMillisecondsSinceEpoch(json["birthDate"] as int),
+        weight: json["weight"] as int,
+        nextAppt: json["nextAppt"] != null
+            ? DateTime.fromMillisecondsSinceEpoch(json["nextAppt"] as int)
+            : null,
+        caretakers: (json["caretakers"] as List)
+            .map((caretakerData) => Caretaker.fromJson(caretakerData))
+            .toList(),
         posts: json["posts"] as int,
         fans: json["fans"] as int,
         uid: json["uid"] as String,
         imgPath: json["imgPath"] as String,
+        breed: json["breed"] as String,
       );
       return pet;
     } catch (e) {
@@ -95,17 +101,23 @@ class Pet {
         species: json["species"] as String,
         petType: json["petType"] as String,
         idNumber: json["idNumber"] as String,
-        // birthDate: DateTime.parse(json["birthDate"] as String),
-        // weight: json["weight"] as String,
-        // nextAppt: json["nextAppt"] != null ? DateTime.parse(json["nextAppt"] as String) : null,
-        // caretakers: (json["caretakers"] as List)
-        //     .map((caretakerData) => Caretaker.fromJson(caretakerData))
-        //     .toList(),
+        birthDate:
+            DateTime.fromMillisecondsSinceEpoch(json["birthDate"] as int),
+        weight: json["weight"] as int,
+        nextAppt: json["nextAppt"] != null
+            ? DateTime.fromMillisecondsSinceEpoch(json["nextAppt"] as int)
+            : null,
+        caretakers: (json["caretakers"] as List)
+            .map((caretakerData) => Caretaker.fromJson(caretakerData))
+            .toList(),
         posts: json["posts"] as int,
         fans: json["fans"] as int,
         uid: json["uid"] as String,
         imgPath: null,
+        breed: json["breed"] as String,
       );
+      print(e);
+
       return pet;
     }
   }
@@ -125,5 +137,13 @@ class Caretaker {
       "uid": uid,
       "role": role,
     };
+  }
+
+  static Caretaker fromJson(Map<String, dynamic> json) {
+    return Caretaker(
+      username: json["username"] as String,
+      uid: json["uid"] as String,
+      role: json["role"] as String,
+    );
   }
 }

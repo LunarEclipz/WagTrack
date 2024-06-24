@@ -207,7 +207,6 @@ String getDescByName(String chosenSymptom) {
 List<String> rolesList = <String>[
   "Caretaker",
   "Co-Owner",
-  "Owner",
 ];
 
 List<String> tagFactorsList = [

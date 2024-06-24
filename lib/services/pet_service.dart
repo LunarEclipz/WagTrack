@@ -2,16 +2,23 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/services/logging.dart';
 
 /// Communication to Firebase for Pet-related data.
-class PetService {
+class PetService with ChangeNotifier {
   FirebaseFirestore db = FirebaseFirestore.instance;
   Reference storageRef = FirebaseStorage.instance.ref();
+  List<Pet> _communityPets = [];
+  List<Pet> _personalPets = [];
 
-  void addPet({required Pet pet, required File? img}) {
+  List<Pet> get communityPets => _communityPets;
+  List<Pet> get personalPets => _personalPets;
+
+  void addPet(
+      {required Pet pet, required File? img, required String uid}) async {
     AppLogger.d("Adding pet");
     try {
       uploadPetImage(image: img, uid: pet.uid).then((imgPath) {
@@ -19,11 +26,21 @@ class PetService {
         db.collection("pets").add(pet.toJSON());
       });
       AppLogger.i("Pet added");
+      List<Pet> pets = await PetService().getAllPetsByUID(uid: uid);
+      setPersonalCommunityPets(pets: pets);
     } catch (e) {
       // TODO is there a specific error that you want to catch?
       db.collection("pets").add(pet.toJSON());
       AppLogger.d("Error adding pet: $e", e);
     }
+  }
+
+  /// Sets List of Personal and Community Pets.
+  void setPersonalCommunityPets({required List<Pet> pets}) async {
+    AppLogger.d("Setting Personal and Community Pets");
+    _personalPets = pets.where((pet) => pet.petType == "personal").toList();
+    _communityPets = pets.where((pet) => pet.petType == "community").toList();
+    notifyListeners();
   }
 
   Future<List<Pet>> getAllPetsByUID({required String uid}) async {
