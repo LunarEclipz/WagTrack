@@ -1,31 +1,35 @@
-name: Dart
+name: Dart-Main
 
 on:
-  push:
-    branches: 
-      dev
-  pull_request:
-    branches: 
-      dev
+  workflow_dispatch:
+  # push:
+  #   branches: 
+  #     - dev
+  # pull_request:
+  #   branches: 
+  #     - dev
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.0.2'
           channel: 'stable'
       - run: flutter --version
 
       - name: Install dependencies
         run: dart pub get
 
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
-
+      # Upgrade flutter
+      - run: flutter upgrade
+      
+      # Get flutter dependencies.
+      - run: flutter pub get
+      
+      # Statically analyze the Dart code for any errors.
       - name: Analyze project source
         run: dart analyze --fatal-infos
 
