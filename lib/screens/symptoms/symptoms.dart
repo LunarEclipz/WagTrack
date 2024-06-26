@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/services/symptom_service.dart';
@@ -15,19 +16,19 @@ class SymptomsPage extends StatefulWidget {
 }
 
 class _SymptomsPageState extends State<SymptomsPage> {
-  List<Symptom> symptoms = [];
+  List<Symptom> pastSymptoms = [];
+  List<Symptom> currentSymptoms = [];
 
-  // TODO: Split by current & past
-  Future<void> getInitData() async {
-    try {
-      final retrivedSymptoms =
-          await SymptomService().getAllPetsByUID(petID: widget.petData.petID!);
-      setState(() {
-        symptoms = retrivedSymptoms;
-      });
-    } catch (e) {
-      // print("Error fetching pets: $e");
-    }
+  bool loaded = false;
+
+  void getAllSymptoms() async {
+    final SymptomService symptomService = context.watch<SymptomService>();
+    List<Symptom> symptoms = await symptomService.getAllSymptomsByPetID(
+        // The only way to access a Pet Page is if the Pet has an ID
+        petID: widget.petData.petID!);
+    symptomService.setPastCurrentSymptoms(symptoms: symptoms);
+    pastSymptoms = symptomService.pastSymptoms;
+    currentSymptoms = symptomService.currentSymptoms;
   }
 
   @override
@@ -38,37 +39,50 @@ class _SymptomsPageState extends State<SymptomsPage> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
-    // TODO: Need help ensuring that when Add Symptom is done, this function is called
-    getInitData();
+    if (!loaded) {
+      getAllSymptoms();
+      setState(() {
+        loaded = true;
+      });
+    }
+    final SymptomService symptomService = context.watch<SymptomService>();
+    pastSymptoms = symptomService.pastSymptoms;
+    currentSymptoms = symptomService.currentSymptoms;
+    print("Hiii $pastSymptoms");
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-            'Ongoing Symptoms',
-            style: textStyles.headlineMedium,
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(
+          'Ongoing Symptoms',
+          style: textStyles.headlineMedium,
+        ),
+        const SizedBoxh10(),
+        if (currentSymptoms.isNotEmpty)
+          Column(
+            children: List.generate(currentSymptoms.length, (index) {
+              return SymptomsCard(
+                symptom: currentSymptoms[index],
+              );
+            }),
           ),
-          const SizedBoxh10(),
-          if (symptoms.isNotEmpty)
-            Column(
-              children: List.generate(symptoms.length, (index) {
-                return SymptomsCard(
-                  symptom: symptoms[index],
-                );
-              }),
-            ),
-          const SizedBoxh20(),
-          const Divider(),
-          const SizedBoxh20(),
-          Text(
-            'Past Symptoms',
-            style: textStyles.headlineMedium,
+        const SizedBoxh20(),
+        const Divider(),
+        const SizedBoxh20(),
+        Text(
+          'Past Symptoms',
+          style: textStyles.headlineMedium,
+        ),
+        const SizedBoxh10(),
+        if (pastSymptoms.isNotEmpty)
+          Column(
+            children: List.generate(pastSymptoms.length, (index) {
+              return SymptomsCard(
+                symptom: pastSymptoms[index],
+              );
+            }),
           ),
-          const SizedBoxh10(),
-        ]),
-      ),
+      ]),
     );
   }
 }
@@ -139,7 +153,7 @@ class _SymptomsCardState extends State<SymptomsCard> {
                           ),
                         if (symptom.hasEnd)
                           Text(
-                            "${formatDateTime(symptom.startDate).date} (${formatDateTime(symptom.startDate).time}) to \n${symptom.endDate})",
+                            "${formatDateTime(symptom.startDate).date} (${formatDateTime(symptom.startDate).time}) to \n${formatDateTime(symptom.startDate).date} (${formatDateTime(symptom.endDate!).time})",
                             style: textStyles.bodyMedium,
                           ),
                         const Icon(Icons.expand_more_rounded)

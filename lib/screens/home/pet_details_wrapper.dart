@@ -162,50 +162,53 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
       ),
       // Screens
       body: BackgroundImageWrapper(
-        child: Column(
-          children: [
-            NavigationBar(
-              labelBehavior:
-                  NavigationDestinationLabelBehavior.onlyShowSelected,
-              selectedIndex: currentPageIndex,
-              onDestinationSelected: (int index) {
-                setState(() {
-                  currentPageIndex = index;
-                });
-              },
-              destinations: const <Widget>[
-                NavigationDestination(
-                  icon: Icon(Icons.pets),
-                  label: 'Details',
-                ),
-                NavigationDestination(
-                  selectedIcon: Icon(Icons.feed_rounded),
-                  icon: Icon(Icons.feed_rounded),
-                  label: 'Posts',
-                ),
-                NavigationDestination(
-                  selectedIcon: Icon(Icons.thermostat_rounded),
-                  icon: Icon(Icons.thermostat_rounded),
-                  label: 'Symptoms',
-                ),
-                NavigationDestination(
-                  selectedIcon: Icon(Icons.medical_information_rounded),
-                  icon: Icon(Icons.medical_information_rounded),
-                  label: 'Medications',
-                ),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              NavigationBar(
+                labelBehavior:
+                    NavigationDestinationLabelBehavior.onlyShowSelected,
+                selectedIndex: currentPageIndex,
+                onDestinationSelected: (int index) {
+                  setState(() {
+                    currentPageIndex = index;
+                  });
+                },
+                destinations: const <Widget>[
+                  NavigationDestination(
+                    icon: Icon(Icons.pets),
+                    label: 'Details',
+                  ),
+                  NavigationDestination(
+                    selectedIcon: Icon(Icons.feed_rounded),
+                    icon: Icon(Icons.feed_rounded),
+                    label: 'Posts',
+                  ),
+                  NavigationDestination(
+                    selectedIcon: Icon(Icons.thermostat_rounded),
+                    icon: Icon(Icons.thermostat_rounded),
+                    label: 'Symptoms',
+                  ),
+                  NavigationDestination(
+                    selectedIcon: Icon(Icons.medical_information_rounded),
+                    icon: Icon(Icons.medical_information_rounded),
+                    label: 'Medications',
+                  ),
 
-                // Bottom Navigation
-              ],
-            ),
-            if (currentPageIndex == 0)
-              PetDetails(
-                petData: petData,
+                  // Bottom Navigation
+                ],
               ),
-            if (currentPageIndex == 2)
-              SymptomsPage(
-                petData: petData,
-              ),
-          ],
+              if (currentPageIndex == 0)
+                PetDetails(
+                  petData: petData,
+                ),
+              if (currentPageIndex == 2)
+                SymptomsPage(
+                  petData: petData,
+                ),
+            ],
+          ),
         ),
       ),
     );

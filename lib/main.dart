@@ -7,6 +7,7 @@ import 'package:wagtrack/screens/authorisation/authenticate.dart';
 import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/themes.dart';
 
@@ -34,6 +35,9 @@ class WagTrackApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => PetService(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => SymptomService(),
         ),
         // Provider<AuthenticationService>(
         //   create: (context) => AuthenticationService(FirebaseAuth.instance),
