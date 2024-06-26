@@ -83,7 +83,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
             onChanged: (String? value) {
               setState(() {
                 selectedSymptoms = value!;
-                filteredSymptomsDesc = getDescByName(selectedSymptoms);
+                filteredSymptomsDesc = getDescBySymptomName(selectedSymptoms);
               });
             },
           ),

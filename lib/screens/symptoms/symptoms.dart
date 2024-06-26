@@ -4,6 +4,7 @@ import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
+import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/themes.dart';
 import 'package:wagtrack/shared/utils.dart';
 
@@ -96,6 +97,14 @@ class SymptomsCard extends StatefulWidget {
 }
 
 class _SymptomsCardState extends State<SymptomsCard> {
+  bool _isExpanded = false;
+
+  void _toggleExpansion() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
@@ -105,7 +114,7 @@ class _SymptomsCardState extends State<SymptomsCard> {
     final symptom = widget.symptom;
 
     return InkWell(
-        onTap: () {},
+        onTap: _toggleExpansion,
         child: Card(
           color: Colors.white,
           child: SizedBox(
@@ -156,8 +165,47 @@ class _SymptomsCardState extends State<SymptomsCard> {
                             "${formatDateTime(symptom.startDate).date} (${formatDateTime(symptom.startDate).time}) to \n${formatDateTime(symptom.startDate).date} (${formatDateTime(symptom.endDate!).time})",
                             style: textStyles.bodyMedium,
                           ),
-                        const Icon(Icons.expand_more_rounded)
+                        _isExpanded
+                            ? const Icon(Icons.expand_less)
+                            : const Icon(Icons.expand_more)
                       ],
+                    ),
+                    AnimatedCrossFade(
+                      firstChild: const SizedBox.shrink(),
+                      secondChild: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBoxh10(),
+                          Text(
+                            getShortDescBySymptomName(symptom.symptom),
+                            style: textStyles.bodyMedium!
+                                .copyWith(fontStyle: FontStyle.italic),
+                          ),
+                          Wrap(
+                            spacing: 10,
+                            children:
+                                List.generate(symptom.tags.length, (index) {
+                              return Chip(
+                                side: const BorderSide(style: BorderStyle.none),
+                                label: Text("#${symptom.tags[index]}"),
+                              );
+                            }),
+                          ),
+                          // const SizedBoxh10(),
+                          // SizedBox(
+                          //   width: double.infinity,
+                          //   child: Text(
+                          //     "hold for more options ...",
+                          //     style: textStyles.bodySmall!
+                          //         .copyWith(fontStyle: FontStyle.italic),
+                          //   ),
+                          // )
+                        ],
+                      ),
+                      crossFadeState: _isExpanded
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
+                      duration: const Duration(milliseconds: 200),
                     ),
                   ]),
             ),
