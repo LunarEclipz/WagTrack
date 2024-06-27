@@ -1,11 +1,15 @@
 // import 'package:wagtrack/services/logging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:wagtrack/models/notiification_model.dart';
 
 /// Service that handles notifications
-class NotificationService {
+///
+/// **EVERYTHING** HERE (THE NOTIFICATIONS CONFIG) IS A BLOODY MESS PLEASE
+/// FIX WHEN ABLE :pray:
+class NotificationService with ChangeNotifier {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
