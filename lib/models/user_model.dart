@@ -95,7 +95,7 @@ class AppUser {
     AppLogger.t("Updating AppUser data from Map (Firebase json)");
     name = json["name"] as String?;
     email = json["email"] as String?;
-    defaultLocation = json["defaultLocation"] as String?;
+    defaultLocation = json["location"] as String?;
     phoneNumber = json["phoneNumber"] as String?;
     allowShareContact = json["allowShareContact"] as bool;
     allowShareData = json["allowShareData"] as bool;
