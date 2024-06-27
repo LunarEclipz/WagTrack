@@ -4,6 +4,10 @@ import 'package:flutter/widgets.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/screens/authorisation/login_tab.dart';
 import 'package:wagtrack/screens/authorisation/register_tab.dart';
+import 'package:wagtrack/screens/medication/meds_overview_page.dart';
+import 'package:wagtrack/screens/medication/meds_routine_page.dart';
+import 'package:wagtrack/screens/medication/meds_sessions_page.dart';
+import 'package:wagtrack/shared/components/text_components.dart';
 
 class MedicationFrame extends StatefulWidget {
   final Pet petData;
@@ -35,6 +39,8 @@ class _MedicationFrameState extends State<MedicationFrame>
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    Pet petData = widget.petData;
 
     return Column(
       children: [
@@ -60,6 +66,32 @@ class _MedicationFrameState extends State<MedicationFrame>
               style: TextStyle(fontSize: 20),
             ))
           ],
+        ),
+        const SizedBoxh10(),
+        SizedBox(
+          height: screenHeight,
+          width: screenWidth,
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: MedsOverviewPage(
+                  petData: petData,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: MedsSessionsPage(
+                  petData: petData,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: MedsRoutinePage(),
+              ),
+            ],
+          ),
         ),
       ],
     );

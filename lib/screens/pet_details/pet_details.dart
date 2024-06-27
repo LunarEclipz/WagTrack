@@ -155,19 +155,7 @@ class _PetDetailsState extends State<PetDetails> {
               ),
             ],
           ),
-          // Temp Weight
-          Wrap(
-            spacing: 20,
-            children: [
-              const Icon(
-                Icons.monitor_weight_rounded,
-              ),
-              Text(
-                "${petData.weight.toString()} KG",
-                style: textStyles.bodyLarge,
-              ),
-            ],
-          ),
+
           const SizedBoxh20(),
           Text(
             'Ownership',
@@ -177,6 +165,7 @@ class _PetDetailsState extends State<PetDetails> {
           // Posts
           // TODO: Zyon to redo caretake list, include MAIN, form as well
           Wrap(
+            spacing: 20,
             children: List.generate(petData.caretakers.length, (index) {
               return Chip(
                 backgroundColor: customColors.pastelPurple,
@@ -200,12 +189,28 @@ class _PetDetailsState extends State<PetDetails> {
             }),
           ),
 
-          // TODO :Future Implementation Weight Log
-          // const SizedBoxh20(),
-          // Text(
-          //   'Weight Log',
-          //   style: textStyles.headlineMedium,
-          // ),
+          const SizedBoxh20(),
+          Text(
+            'Weight Log',
+            style: textStyles.headlineMedium,
+          ),
+          const SizedBoxh10(),
+          Column(
+            children: List.generate(petData.weight.length, (index) {
+              return Wrap(
+                spacing: 20,
+                children: [
+                  const Icon(
+                    Icons.monitor_weight_rounded,
+                  ),
+                  Text(
+                    "${petData.weight[index].value.toString()} KG     (${formatDateTime(petData.weight[index].dateTime).date})",
+                    style: textStyles.bodyLarge,
+                  ),
+                ],
+              );
+            }),
+          )
         ],
       ),
     );

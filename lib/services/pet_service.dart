@@ -21,7 +21,7 @@ class PetService with ChangeNotifier {
       {required Pet pet, required File? img, required String uid}) async {
     AppLogger.d("Adding pet");
     try {
-      uploadPetImage(image: img, uid: pet.uid).then((imgPath) {
+      uploadPetImage(image: img, uid: pet.caretakers[0].uid).then((imgPath) {
         pet.imgPath = imgPath;
         db.collection("pets").add(pet.toJSON());
       });
@@ -48,7 +48,7 @@ class PetService with ChangeNotifier {
     try {
       final querySnapshot = await FirebaseFirestore.instance
           .collection("pets")
-          .where("uid", isEqualTo: uid)
+          .where("caretakerIDs", arrayContains: uid)
           .get();
 
       final List<Pet> pets = [];

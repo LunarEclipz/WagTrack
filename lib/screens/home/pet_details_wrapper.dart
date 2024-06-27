@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/screens/medication/medication_frame.dart';
 import 'package:wagtrack/screens/pet_details/pet_details.dart';
+import 'package:wagtrack/screens/posts/pet_posts_page.dart';
 import 'package:wagtrack/screens/symptoms/add_symptoms.dart';
 import 'package:wagtrack/screens/symptoms/symptoms.dart';
 import 'package:wagtrack/shared/background_img.dart';
@@ -202,6 +203,10 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
               ),
               if (currentPageIndex == 0)
                 PetDetails(
+                  petData: petData,
+                ),
+              if (currentPageIndex == 1)
+                PetPostsPage(
                   petData: petData,
                 ),
               if (currentPageIndex == 2)

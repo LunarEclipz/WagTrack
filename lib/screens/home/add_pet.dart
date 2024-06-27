@@ -717,7 +717,7 @@ class _AddPetPageState extends State<AddPetPage> {
                       RoleRow(
                           username: userService.user.name!,
                           popUser: () {},
-                          role: "Owner"),
+                          role: "Main"),
                       Column(
                         children: List.generate(caretakers.length, (index) {
                           return Column(
@@ -750,25 +750,48 @@ class _AddPetPageState extends State<AddPetPage> {
                             idController.text != "" &&
                             birthday &&
                             selectedSpecies != "") {
+                          if (petType == "Personal" || caretakerMode == null) {
+                            caretakers.add(Caretaker(
+                                username: userService.user.name!,
+                                uid: userService.user.uid,
+                                role: "Main"));
+                          }
+                          List<String> caretakerIDs = caretakers
+                              .map((caretaker) => caretaker.uid)
+                              .toList();
+
                           Pet pet = Pet(
                             location: selectedLocation,
                             name: nameController.text,
-                            uid: uid!,
                             description: descController.text,
                             sex: selectedSex,
                             species: selectedSpecies,
                             petType: petType,
                             idNumber: idController.text,
                             breed: breedController.text,
-                            nextAppt:
-                                apptDate ? apptDateTime : DateTime(1, 1, 1),
                             posts: 0,
                             fans: 0,
                             birthDate: birthdayDateTime,
                             weight: weightController.text == ""
-                                ? 0
-                                : int.parse(weightController.text),
+                                ? [
+                                    DateTimeStringPair(
+                                        dateTime: DateTime.now(), value: "0")
+                                  ]
+                                : [
+                                    DateTimeStringPair(
+                                        dateTime: DateTime.now(),
+                                        value: weightController.text)
+                                  ],
                             caretakers: caretakers,
+                            caretakerIDs: caretakerIDs,
+                            vaccineRecords: [],
+                            sessionRecords: apptDate
+                                ? [
+                                    DateTimeStringPair(
+                                        dateTime: apptDateTime,
+                                        value: "Next Appointment")
+                                  ]
+                                : [],
                           );
                           PetService().addPet(
                               pet: pet,
@@ -854,7 +877,7 @@ class _RoleListSRow extends State<RoleRow> {
             flex: 2, child: Text(widget.username, style: textStyles.bodyLarge)),
         Flexible(
           flex: 2,
-          child: widget.role == "Owner"
+          child: widget.role == "Main"
               ? const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: SizedBox(),
@@ -870,10 +893,10 @@ class _RoleListSRow extends State<RoleRow> {
                 ),
         ),
         Flexible(
-            flex: widget.role == "Owner" ? 2 : 1,
-            child: widget.role == "Owner"
+            flex: widget.role == "Main" ? 2 : 1,
+            child: widget.role == "Main"
                 ? AppDropdown(
-                    optionsList: const ["Owner"],
+                    optionsList: const ["Main"],
                     selectedText: selectedRole,
                     onChanged: (String? value) {
                       setState(() {
