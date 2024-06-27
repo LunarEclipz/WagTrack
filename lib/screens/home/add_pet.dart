@@ -457,7 +457,7 @@ class _AddPetPageState extends State<AddPetPage> {
                         onTap: () {
                           DatePicker.showDatePicker(context,
                               showTitleActions: true,
-                              minTime: DateTime(2024, 1, 1),
+                              minTime: DateTime(1999, 1, 1),
                               maxTime: DateTime.now(), onConfirm: (date) {
                             setState(() {
                               birthdayDateTime = date;
