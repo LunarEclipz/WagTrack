@@ -71,11 +71,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: DefaultTextStyle.merge(
         style: textStyles.bodyLarge,
         child: AppScrollablePage(children: [
-          Text(
-              '''[REMOVE] Note: WagTrack data is currently stored locally on your device. 
-As such, your data will persist between different accounts. and not be synced between different devices. 
-          ''',
-              style: textStyles.bodySmall),
           const SizedBoxh10(),
           Text('Hello, ${user.name ?? ''}!'),
           const SizedBoxh10(),
