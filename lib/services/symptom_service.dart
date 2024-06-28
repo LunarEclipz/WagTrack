@@ -52,7 +52,12 @@ class SymptomService with ChangeNotifier {
       for (final docSnapshot in querySnapshot.docs) {
         // Extract data from the document
         final symptomData = docSnapshot.data();
-
+        if (symptomData["mid"] == null) {
+          symptomData["mid"] = [];
+        }
+        if (symptomData["mName"] == null) {
+          symptomData["mName"] = [];
+        }
         // Convert the data to a Symptom object
         final symptom = Symptom.fromJson(symptomData);
 
@@ -68,5 +73,18 @@ class SymptomService with ChangeNotifier {
       AppLogger.e("**Error fetching symptoms for pet ID $petID: $e**");
       return []; // Return an empty list on error
     }
+  }
+
+  /// Update Medication Routines
+  void updateMID(
+      {required String symptomID, required String mID, required String mName}) {
+    AppLogger.d("Updating Session Records");
+    final symptomRef = db.collection("symptoms").doc(symptomID);
+
+    symptomRef.update({
+      "mid": FieldValue.arrayUnion([mID]),
+      "mName": FieldValue.arrayUnion([mName]),
+    }).then((value) => AppLogger.d("Successfully Updated Session Records"),
+        onError: (e) => AppLogger.d("Error Updating Session Records: $e"));
   }
 }

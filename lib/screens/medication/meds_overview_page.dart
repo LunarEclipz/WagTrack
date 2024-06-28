@@ -153,17 +153,28 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
           if (petData.vaccineRecords.isNotEmpty)
             Column(
               children: List.generate(petData.vaccineRecords.length, (index) {
-                return Wrap(
-                  spacing: 20,
-                  children: [
-                    const Icon(
-                      Icons.vaccines_rounded,
+                return Card(
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.vaccines_rounded,
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          child: Text(
+                            "${petData.vaccineRecords[index].value.toString()}\n${formatDateTime(petData.vaccineRecords[index].dateTime).date}",
+                            style: textStyles.bodyLarge,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      "${petData.vaccineRecords[index].value.toString()}     (${formatDateTime(petData.vaccineRecords[index].dateTime).date})",
-                      style: textStyles.bodyLarge,
-                    ),
-                  ],
+                  ),
                 );
               }),
             )
