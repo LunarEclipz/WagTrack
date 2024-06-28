@@ -537,7 +537,7 @@ class _AddPetPageState extends State<AddPetPage> {
                       flex: 1,
                       child: InkWell(
                         onTap: () {
-                          DatePicker.showDatePicker(context,
+                          DatePicker.showDateTimePicker(context,
                               showTitleActions: true,
                               minTime: DateTime(2024, 1, 1),
                               maxTime: DateTime(2040, 1, 1), onConfirm: (date) {

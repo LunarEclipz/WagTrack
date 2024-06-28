@@ -191,6 +191,14 @@ class _SymptomsCardState extends State<SymptomsCard> {
                               );
                             }),
                           ),
+                          if (symptom.factors != "")
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.8,
+                              child: Text(
+                                '\n"${symptom.factors}"',
+                                style: textStyles.bodyMedium,
+                              ),
+                            ),
                           // const SizedBoxh10(),
                           // SizedBox(
                           //   width: double.infinity,

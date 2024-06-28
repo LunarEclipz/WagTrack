@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
+import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
 import 'package:wagtrack/shared/utils.dart';
@@ -13,6 +16,8 @@ class PetDetails extends StatefulWidget {
 }
 
 class _PetDetailsState extends State<PetDetails> {
+  late TextEditingController weightController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     Pet petData = widget.petData;
@@ -21,6 +26,8 @@ class _PetDetailsState extends State<PetDetails> {
         ? "${DateTime.now().month - petData.birthDate.month} Months"
         : "${DateTime.now().year - petData.birthDate.year} Years";
     final CustomColors customColors = AppTheme.customColors;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final PetService petService = context.watch<PetService>();
 
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -195,6 +202,46 @@ class _PetDetailsState extends State<PetDetails> {
             style: textStyles.headlineMedium,
           ),
           const SizedBoxh10(),
+          AppTextFormField(
+            controller: weightController,
+            hintText: 'Weight',
+            prefixIcon: const Icon(Icons.scale_rounded),
+          ),
+          const SizedBoxh10(),
+          InkWell(
+            onTap: () async {
+              if (weightController.text != "") {
+                List<DateTimeStringPair> newWeight = petData.weight;
+                newWeight.add(DateTimeStringPair(
+                    dateTime: DateTime.now(), value: weightController.text));
+                petService.updateWeightLog(
+                    petData: petData, weightLog: newWeight);
+                setState(() {
+                  petData.weight = newWeight;
+                  weightController.text = "";
+                });
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.add_rounded,
+                    color: colorScheme.primary,
+                  ),
+                  Text(
+                    ' Add Weight',
+                    style: textStyles.bodyMedium!
+                        .copyWith(color: colorScheme.primary),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBoxh10(),
+
           Column(
             children: List.generate(petData.weight.length, (index) {
               return Wrap(

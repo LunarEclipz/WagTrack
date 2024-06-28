@@ -117,4 +117,46 @@ class PetService with ChangeNotifier {
       AppLogger.w("Pet image is null");
     }
   }
+
+  /// Update weight log
+  void updateWeightLog(
+      {required Pet petData, required List<DateTimeStringPair> weightLog}) {
+    AppLogger.d("Updating Weight Log");
+    final petRef = db.collection("pets").doc(petData.petID);
+
+    petRef.update({
+      "weight": weightLog.map((weight) => weight.toJSON()).toList(),
+    }).then((value) => AppLogger.d("Successfully Updated Weight Log"),
+        onError: (e) => AppLogger.d("Error Updating Weight Log: $e"));
+  }
+
+  /// Update Vaccine Records
+  void updateVaccineRecords(
+      {required Pet petData,
+      required List<DateTimeStringPair> vaccineRecords}) {
+    AppLogger.d("Updating Vaccine Records");
+    final petRef = db.collection("pets").doc(petData.petID);
+
+    petRef.update({
+      "vaccineRecords": vaccineRecords
+          .map((vaccineRecord) => vaccineRecord.toJSON())
+          .toList(),
+    }).then((value) => AppLogger.d("Successfully Updated Vaccine Records"),
+        onError: (e) => AppLogger.d("Error Updating Vaccine Records: $e"));
+  }
+
+  /// Update Session Records
+  void updateSessionRecords(
+      {required Pet petData,
+      required List<DateTimeStringPair> sessionRecords}) {
+    AppLogger.d("Updating Session Records");
+    final petRef = db.collection("pets").doc(petData.petID);
+
+    petRef.update({
+      "sessionRecords": sessionRecords
+          .map((sessionRecord) => sessionRecord.toJSON())
+          .toList(),
+    }).then((value) => AppLogger.d("Successfully Updated Session Records"),
+        onError: (e) => AppLogger.d("Error Updating Session Records: $e"));
+  }
 }
