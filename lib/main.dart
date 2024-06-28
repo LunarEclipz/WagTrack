@@ -6,6 +6,7 @@ import 'package:wagtrack/firebase_options.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
 import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/services/logging.dart';
+import 'package:wagtrack/services/notification_service.dart';
 import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/services/user_service.dart';
@@ -31,6 +32,9 @@ class WagTrackApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
+          create: (context) => NotificationService(),
+        ),
+        ChangeNotifierProvider(
           create: (context) => UserService(),
         ),
         ChangeNotifierProvider(
@@ -39,14 +43,24 @@ class WagTrackApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => SymptomService(),
         ),
-        // Provider<AuthenticationService>(
-        //   create: (context) => AuthenticationService(FirebaseAuth.instance),
+        // ChangeNotifierProxyProvider<UserService, AuthenticationService>(
+        //   update: (context, user, auth) =>
+        //       AuthenticationService(FirebaseAuth.instance, user),
+        //   create: (BuildContext context) => AuthenticationService(
+        //       FirebaseAuth.instance, context.read<UserService>()),
         // ),
-        ChangeNotifierProxyProvider<UserService, AuthenticationService>(
-          update: (context, user, auth) =>
-              AuthenticationService(FirebaseAuth.instance, user),
-          create: (BuildContext context) => AuthenticationService(
-              FirebaseAuth.instance, context.read<UserService>()),
+
+        // writing it like this using `ChangeNotifierProvider` rather than using
+        // `ChangeNotifierProxyProvider`,
+        // Since updates UserService don't need to change AuthenticationService
+        // and in turn call a ChangeNotifier
+        ChangeNotifierProvider(
+          create: (context) => AuthenticationService(
+              FirebaseAuth.instance,
+              Provider.of<UserService>(
+                context,
+                listen: false,
+              )),
         ),
         StreamProvider(
             create: (context) =>
