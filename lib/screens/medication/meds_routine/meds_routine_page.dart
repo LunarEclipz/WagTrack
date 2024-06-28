@@ -29,6 +29,8 @@ class _MedsRoutinePageState extends State<MedsRoutinePage> {
             first: false,
             // The only way to access a Pet Page is if the Pet has an ID
             petID: widget.petData.petID!);
+    medicationService.setMedicationRoutines(
+        medicationRoutines: medicationRoutine);
   }
 
   @override
@@ -43,7 +45,7 @@ class _MedsRoutinePageState extends State<MedsRoutinePage> {
     final MedicationService medicationService =
         context.watch<MedicationService>();
     medicationRoutine = medicationService.medicationRoutines;
-
+    print(medicationRoutine);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
