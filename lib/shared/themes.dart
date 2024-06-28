@@ -76,7 +76,7 @@ class AppTheme {
       // https://m3.material.io/component
 
       // use different seed color to check which is using material baseline colors
-      seedColor: Colors.blue,
+      seedColor: Colors.red,
       brightness: Brightness.light,
       primary: const Color(0xFFB01713),
       primaryContainer: Colors.white,
@@ -86,7 +86,7 @@ class AppTheme {
       secondaryFixed: Colors.white,
       tertiary: const Color(0xFFE15216),
 
-      // used for navBar
+      // used for various bars
       surface: const Color(0xFFfdfcfa),
       // onSurface: const Color(0xFFB01713),
       onSecondaryContainer: const Color(0xFFB01713),
