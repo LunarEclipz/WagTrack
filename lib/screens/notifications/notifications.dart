@@ -60,12 +60,13 @@ class _NotificationsState extends State<Notifications> {
     return AppScrollablePage(
       children: <Widget>[
         Text(
-          "Notifications",
+          'Notifications',
           style: textStyles.headlineMedium,
         ),
         const SizedBoxh10(),
         Text(
-          "Maximum of $maxNotifCount notifications shown.",
+          '''Placeholder page. All notifications will be placeholders. 
+Maximum of $maxNotifCount notifications shown.''',
           style: textStyles.bodySmall,
         ),
 
