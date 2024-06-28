@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:wagtrack/models/notification_params.dart';
 import 'package:wagtrack/services/logging.dart';
 
 class AppNotification {
@@ -19,7 +20,7 @@ class AppNotification {
   String? body;
 
   // Type of the notification.
-  String? type;
+  NotificationType type;
 
   AppNotification({
     required this.id,
@@ -27,13 +28,18 @@ class AppNotification {
     required this.notificationTime,
     this.title,
     this.body,
-    this.type,
+    this.type = NotificationType.noType,
   });
 
-  // Whether this is the empty notification.
+  /// Whether this is the empty notification.
   bool get isEmpty => id == -1;
 
-  // Empty notification
+  /// Whether this notification is a future notification, i.e. whether the time
+  /// scheduled for it to be notified is in the future
+  bool get isFutureNotification =>
+      DateTime.now().compareTo(notificationTime) < 0;
+
+  /// Empty notification
   static final _emptyNotification = AppNotification(
     id: -1,
     createdTime: DateTime.fromMillisecondsSinceEpoch(0),
@@ -47,17 +53,23 @@ class AppNotification {
     try {
       final data = jsonDecode(json) as Map<String, dynamic>;
 
+      // first handle the type
+      final type = NotificationType.fromString(data["type"]);
+
+      // create the notification and return
       return AppNotification(
         id: data["id"],
-        createdTime: data["createdTime"],
-        notificationTime: data["notificationTime"],
+        // DateTimes are stored as ISO8601 Strings
+        createdTime: DateTime.parse(data["createdTime"]),
+        notificationTime: DateTime.parse(data["notificationTime"]),
         title: data["title"],
         body: data["body"],
-        type: data["type"],
+        type: type,
       );
     } on Exception catch (e) {
       AppLogger.w(
-          "Couldn't create AppNotification object from json string: $e");
+          "[NOTIF] Couldn't create AppNotification object from json string: $e",
+          e);
     }
 
     // returns empty Application
@@ -71,16 +83,18 @@ class AppNotification {
     try {
       final data = {
         "id": id,
-        "createdTime": createdTime,
-        "notificationTime": notificationTime,
+        // DateTimes are stored as ISO8601 Strings
+        "createdTime": createdTime.toIso8601String(),
+        "notificationTime": notificationTime.toIso8601String(),
         "title": title,
         "body": body,
-        "type": type,
+        // NotificationType needs to be converted to the string
+        "type": type.string,
       };
 
       return jsonEncode(data);
     } on Exception catch (e) {
-      AppLogger.w("Couldn't convert AppNotification object to json string: $e");
+      AppLogger.w("[NOTIF] Couldn't convert $toString() to json string: $e", e);
     }
 
     // return empty string if errors.

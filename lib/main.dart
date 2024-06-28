@@ -31,8 +31,17 @@ class WagTrackApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (context) => NotificationService(),
+        // ChangeNotifierProvider(
+        //   create: (context) => NotificationService(),
+        // ),
+        FutureProvider(
+          // does this work?
+          create: (_) async {
+            final notifService = NotificationService();
+            await notifService.initialize();
+            return notifService;
+          },
+          initialData: NotificationService(),
         ),
         ChangeNotifierProvider(
           create: (context) => UserService(),
