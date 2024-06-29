@@ -42,6 +42,9 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
             ),
           ],
         ),
+
+        // to remove the change of color when scrolling
+        forceMaterialTransparency: true,
         actions: <Widget>[
           petData.imgPath == null
               ? const Padding(
