@@ -5,22 +5,22 @@ import 'package:wagtrack/services/logging.dart';
 
 class AppNotification {
   // id of notification
-  int id;
+  final int id;
 
   // When the notification was created.
-  DateTime createdTime;
+  final DateTime createdTime;
 
   // When the notification is scheduled to be shown.
-  DateTime notificationTime;
+  final DateTime notificationTime;
 
   // Title to be displayed in the notification.
-  String? title;
+  final String? title;
 
   // Text to be displayed in the notification.
-  String? body;
+  final String? body;
 
   // Type of the notification.
-  NotificationType type;
+  final NotificationType type;
 
   AppNotification({
     required this.id,
@@ -39,8 +39,10 @@ class AppNotification {
   bool get isFutureNotification =>
       DateTime.now().compareTo(notificationTime) < 0;
 
+  static AppNotification get getEmptyNotification => _emptyNotification;
+
   /// Empty notification
-  static final _emptyNotification = AppNotification(
+  static final AppNotification _emptyNotification = AppNotification(
     id: -1,
     createdTime: DateTime.fromMillisecondsSinceEpoch(0),
     notificationTime: DateTime.fromMillisecondsSinceEpoch(0),
@@ -108,4 +110,25 @@ class AppNotification {
     }
     return "AppNotification[id: $id]";
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AppNotification &&
+        id == other.id &&
+        createdTime.compareTo(other.createdTime) == 0 &&
+        notificationTime.compareTo(other.notificationTime) == 0 &&
+        title == title &&
+        body == body &&
+        type == type;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        createdTime,
+        notificationTime,
+        title,
+        body,
+        type,
+      );
 }

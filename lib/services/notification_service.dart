@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:wagtrack/models/notification_model.dart';
 import 'package:wagtrack/models/notification_params.dart';
-import 'package:wagtrack/models/notiification_model.dart';
 import 'package:wagtrack/services/logging.dart';
 
 /// Modes to sort notifications by.
@@ -23,7 +24,8 @@ enum NotificationSortingMode {
 /// inefficient, but we aren't storing that much so ¯\_(ツ)_/¯
 class NotificationService with ChangeNotifier {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+      GetIt.I<FlutterLocalNotificationsPlugin>();
+  final SharedPreferences _prefs = GetIt.I<SharedPreferences>();
 
   // Keys for storing in shared preferences
   final String _notificationsListKey = 'notificationsList';
@@ -75,10 +77,19 @@ class NotificationService with ChangeNotifier {
         importance: Importance.high,
       );
 
-      await _flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
+      // TODO This whole part just doesn't cooperate with stubbing in testing
+      // So fuck it
+      // Off to Gulag with you
+      final androidFlutterLocalNotificationsPlugin =
+          _flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin>();
+
+      await androidFlutterLocalNotificationsPlugin
           ?.createNotificationChannel(mainChannel);
+
+      // init flutter local notifs
+      await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
       // Setup notification details
       const AndroidNotificationDetails androidNotificationDetails =
@@ -91,9 +102,6 @@ class NotificationService with ChangeNotifier {
 
       mainNotificationDetails =
           const NotificationDetails(android: androidNotificationDetails);
-
-      // init flutter local notifs
-      await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
       // load notifications from local storage
       await loadNotifications();
@@ -224,11 +232,13 @@ class NotificationService with ChangeNotifier {
   }
 
   /// Saves one specified notification to device storage (shared preferences).
-  Future<void> saveNotification(AppNotification notification) async {
-    // loads currently saved notifications in shared prefs
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+  Future<void> saveNotification(AppNotification notification,
+      {bool limitNotifs = true}) async {
+    AppLogger.d("[NOTIF] Saving notification");
+
+    // loads currently saved notifications in shared _prefs
     List<String> notifications =
-        prefs.getStringList(_notificationsListKey) ?? <String>[];
+        _prefs.getStringList(_notificationsListKey) ?? <String>[];
 
     // only add and save notification if it is nonEmpty.
     if (!notification.isEmpty) {
@@ -236,11 +246,17 @@ class NotificationService with ChangeNotifier {
       notificationsMaxId++;
       notificationList.add(notification);
       notifications.add(notification.toJSONString());
-      await prefs.setStringList(_notificationsListKey, notifications);
-      await prefs.setInt(_notificationsMaxIdKey, notificationsMaxId);
+      await _prefs.setStringList(_notificationsListKey, notifications);
+      await _prefs.setInt(_notificationsMaxIdKey, notificationsMaxId);
+
+      // final test = notification.body;
 
       // makes sure notifications is under the limit.
-      limitNotifications();
+      if (limitNotifs) {
+        limitNotifications();
+      }
+    } else {
+      AppLogger.t("[NOTIF] Empty notification");
     }
   }
 
@@ -248,24 +264,20 @@ class NotificationService with ChangeNotifier {
   ///
   /// Also updates maxId
   Future<void> saveAllNotificationsToDevice() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
     final notificationsJsonString =
         notificationList.map((notif) => notif.toJSONString()).toList();
 
-    await prefs.setStringList(_notificationsListKey, notificationsJsonString);
-    await prefs.setInt(_notificationsMaxIdKey, notificationsMaxId);
+    await _prefs.setStringList(_notificationsListKey, notificationsJsonString);
+    await _prefs.setInt(_notificationsMaxIdKey, notificationsMaxId);
   }
 
   /// loads notifications from shared preferences.
   Future<void> loadNotifications() async {
     AppLogger.t("[NOTIF] Loading notifications");
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-
       // Get list of notifications as strings
       List<String> notificationStrings =
-          prefs.getStringList(_notificationsListKey) ?? <String>[];
+          _prefs.getStringList(_notificationsListKey) ?? <String>[];
 
       // Convert to `AppNotification`
       notificationList = notificationStrings.map((notificationString) {
@@ -273,7 +285,7 @@ class NotificationService with ChangeNotifier {
       }).toList();
 
       // loads maxId
-      notificationsMaxId = prefs.getInt(_notificationsMaxIdKey) ?? 0;
+      notificationsMaxId = _prefs.getInt(_notificationsMaxIdKey) ?? 0;
       AppLogger.t("[NOTIF] Succesfully loaded notifications");
     } catch (e) {
       AppLogger.e("[NOTIF] Error loading notifications: $e", e);
@@ -293,7 +305,7 @@ class NotificationService with ChangeNotifier {
     }
 
     // first sort
-    sortnotifications(sortingMode: sortingMode, reversed: reversed);
+    sortNotifications(sortingMode: sortingMode, reversed: reversed);
 
     return notificationList.where((notif) {
       // The notification is not a future notification
@@ -306,7 +318,7 @@ class NotificationService with ChangeNotifier {
   /// Should run everytime:
   /// - a notification is added
   /// - a `getNotifications()` call is made
-  void sortnotifications({
+  void sortNotifications({
     NotificationSortingMode sortingMode = NotificationSortingMode.timeNotified,
     bool reversed = true,
   }) {
@@ -369,7 +381,7 @@ class NotificationService with ChangeNotifier {
   /// it's called for and the numbers of notifications aren't large
   Future<void> limitNotifications({bool updateStorage = true}) async {
     // First sort notifications
-    sortnotifications(
+    sortNotifications(
       sortingMode: NotificationSortingMode.timeNotified,
       reversed: false,
     );

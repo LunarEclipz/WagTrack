@@ -1,16 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:get_it/get_it.dart';
 import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/services/logging.dart';
 
 /// Communication to Firebase for Symptom-related data.
 class SymptomService with ChangeNotifier {
   // Instance of Firebase Firestore for interacting with the database
-  final FirebaseFirestore db = FirebaseFirestore.instance;
+  static FirebaseFirestore db = GetIt.I<FirebaseFirestore>();
 
   // Reference to Firebase Storage for potential future storage needs
-  final Reference storageRef = FirebaseStorage.instance.ref();
+  static Reference storageRef = GetIt.I<FirebaseStorage>().ref();
 
   List<Symptom> _currentSymptoms = [];
   List<Symptom> _pastSymptoms = [];

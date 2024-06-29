@@ -3,14 +3,17 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:path/path.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/services/logging.dart';
 
 /// Communication to Firebase for Pet-related data.
 class PetService with ChangeNotifier {
-  FirebaseFirestore db = FirebaseFirestore.instance;
-  Reference storageRef = FirebaseStorage.instance.ref();
+  static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
+  static final FirebaseStorage _firebaseStorage = GetIt.I<FirebaseStorage>();
+  static final Reference _storageRef = _firebaseStorage.ref();
+
   List<Pet> _communityPets = [];
   List<Pet> _personalPets = [];
 
@@ -23,14 +26,14 @@ class PetService with ChangeNotifier {
     try {
       uploadPetImage(image: img, uid: pet.caretakers[0].uid).then((imgPath) {
         pet.imgPath = imgPath;
-        db.collection("pets").add(pet.toJSON());
+        _db.collection("pets").add(pet.toJSON());
       });
       AppLogger.i("Pet added");
       List<Pet> pets = await PetService().getAllPetsByUID(uid: uid);
       setPersonalCommunityPets(pets: pets);
     } catch (e) {
       // TODO is there a specific error that you want to catch?
-      db.collection("pets").add(pet.toJSON());
+      _db.collection("pets").add(pet.toJSON());
       AppLogger.d("Error adding pet: $e", e);
     }
   }
@@ -46,7 +49,7 @@ class PetService with ChangeNotifier {
   Future<List<Pet>> getAllPetsByUID({required String uid}) async {
     AppLogger.d("Getting all pets by uid");
     try {
-      final querySnapshot = await FirebaseFirestore.instance
+      final querySnapshot = await _db
           .collection("pets")
           .where("caretakerIDs", arrayContains: uid)
           .get();
@@ -70,7 +73,7 @@ class PetService with ChangeNotifier {
       {required String location}) async {
     AppLogger.d("Getting all community pets by location");
     try {
-      final querySnapshot = await FirebaseFirestore.instance
+      final querySnapshot = await _db
           .collection("pets")
           .where("location", isEqualTo: location)
           .where("petType", isEqualTo: "community")
@@ -95,17 +98,16 @@ class PetService with ChangeNotifier {
     AppLogger.d("Uploading pet image");
     if (image != null) {
       try {
-        final firebaseStorage = FirebaseStorage.instance;
         var file = File(image.path);
 
         //Upload to Firebase
         // var snapshot =
-        await firebaseStorage
+        await _firebaseStorage
             .ref("petProfile/$uid/")
             .child(basename(image.path))
             .putFile(file);
         AppLogger.t("File uploaded to Firebase storage");
-        final imageUrl = await storageRef
+        final imageUrl = await _storageRef
             .child("petProfile/$uid/${basename(image.path)}")
             .getDownloadURL();
         AppLogger.i("Pet image added succesfully");
@@ -122,7 +124,7 @@ class PetService with ChangeNotifier {
   void updateWeightLog(
       {required Pet petData, required List<DateTimeStringPair> weightLog}) {
     AppLogger.d("Updating Weight Log");
-    final petRef = db.collection("pets").doc(petData.petID);
+    final petRef = _db.collection("pets").doc(petData.petID);
 
     petRef.update({
       "weight": weightLog.map((weight) => weight.toJSON()).toList(),
@@ -135,7 +137,7 @@ class PetService with ChangeNotifier {
       {required Pet petData,
       required List<DateTimeStringPair> vaccineRecords}) {
     AppLogger.d("Updating Vaccine Records");
-    final petRef = db.collection("pets").doc(petData.petID);
+    final petRef = _db.collection("pets").doc(petData.petID);
 
     petRef.update({
       "vaccineRecords": vaccineRecords
@@ -150,7 +152,7 @@ class PetService with ChangeNotifier {
       {required Pet petData,
       required List<DateTimeStringPair> sessionRecords}) {
     AppLogger.d("Updating Session Records");
-    final petRef = db.collection("pets").doc(petData.petID);
+    final petRef = _db.collection("pets").doc(petData.petID);
 
     petRef.update({
       "sessionRecords": sessionRecords

@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/firebase_options.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
 import 'package:wagtrack/services/auth_service.dart';
+import 'package:wagtrack/services/injection_service.dart';
 import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/notification_service.dart';
 import 'package:wagtrack/services/pet_service.dart';
@@ -17,6 +17,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // now wait for dependency injection
+  await InjectionService.injectAll();
 
   runApp(const WagTrackApp());
 }
@@ -55,12 +58,10 @@ class WagTrackApp extends StatelessWidget {
         // Since updates UserService don't need to change AuthenticationService
         // and in turn call a ChangeNotifier
         ChangeNotifierProvider(
-          create: (context) => AuthenticationService(
-              FirebaseAuth.instance,
-              Provider.of<UserService>(
-                context,
-                listen: false,
-              )),
+          create: (context) => AuthenticationService(Provider.of<UserService>(
+            context,
+            listen: false,
+          )),
         ),
         StreamProvider(
             create: (context) =>

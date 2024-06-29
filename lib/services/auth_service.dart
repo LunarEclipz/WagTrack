@@ -2,23 +2,26 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:wagtrack/models/user_model.dart';
 import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/user_service.dart';
 
 class AuthenticationService with ChangeNotifier {
-  final FirebaseAuth _firebaseAuth;
+  final FirebaseAuth _firebaseAuth = GetIt.I<FirebaseAuth>();
   final UserService _userService;
+  final GoogleSignIn _googleSignIn = GetIt.I<GoogleSignIn>();
+  final FacebookAuth _facebookAuth = GetIt.I<FacebookAuth>();
 
-  AuthenticationService(this._firebaseAuth, this._userService);
+  AuthenticationService(this._userService);
   // AuthenticationService(this._firebaseAuth);
 
   // Get Auth change user stream.
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
   /// Get uid of current user.
-  String get uid => FirebaseAuth.instance.currentUser!.uid;
+  String get uid => _firebaseAuth.currentUser!.uid;
 
   /// Updates local user based on current uid
   ///
@@ -146,7 +149,7 @@ class AuthenticationService with ChangeNotifier {
 
     try {
       // Trigger the authentication flow
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       // Obtain the auth details from the request
       final GoogleSignInAuthentication? googleAuth =
@@ -179,7 +182,7 @@ class AuthenticationService with ChangeNotifier {
     AppLogger.d("[AUTH] Signing in with Facebook");
     try {
       // Trigger the sign-in flow
-      final LoginResult result = await FacebookAuth.instance.login();
+      final LoginResult result = await _facebookAuth.login();
 
       if (result.status == LoginStatus.success) {
         // Create a credential from the access token
@@ -240,9 +243,9 @@ class AuthenticationService with ChangeNotifier {
   Future<void> signOutUser() async {
     AppLogger.d("[AUTH] Signing out user");
     try {
-      final User? firebaseUser = FirebaseAuth.instance.currentUser;
+      final User? firebaseUser = _firebaseAuth.currentUser;
       if (firebaseUser != null) {
-        await FirebaseAuth.instance.signOut();
+        await _firebaseAuth.signOut();
       }
       AppLogger.i("[AUTH] User sign out successful");
     } on FirebaseAuthException catch (e) {
@@ -258,7 +261,7 @@ class AuthenticationService with ChangeNotifier {
     await _userService.deleteUser();
 
     try {
-      final User? firebaseUser = FirebaseAuth.instance.currentUser;
+      final User? firebaseUser = _firebaseAuth.currentUser;
 
       await firebaseUser!.delete();
       AppLogger.i("[AUTH] User deletion successful");
