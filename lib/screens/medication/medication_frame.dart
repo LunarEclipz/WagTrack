@@ -5,7 +5,7 @@ import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/screens/authorisation/login_tab.dart';
 import 'package:wagtrack/screens/authorisation/register_tab.dart';
 import 'package:wagtrack/screens/medication/meds_overview_page.dart';
-import 'package:wagtrack/screens/medication/meds_routine_page.dart';
+import 'package:wagtrack/screens/medication/meds_routine/meds_routine_page.dart';
 import 'package:wagtrack/screens/medication/meds_sessions_page.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 
@@ -86,9 +86,11 @@ class _MedicationFrameState extends State<MedicationFrame>
                   petData: petData,
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: MedsRoutinePage(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: MedsRoutinePage(
+                  petData: petData,
+                ),
               ),
             ],
           ),

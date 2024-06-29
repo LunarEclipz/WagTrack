@@ -27,6 +27,7 @@ class _SymptomsPageState extends State<SymptomsPage> {
     List<Symptom> symptoms = await symptomService.getAllSymptomsByPetID(
         // The only way to access a Pet Page is if the Pet has an ID
         petID: widget.petData.petID!);
+
     symptomService.setPastCurrentSymptoms(symptoms: symptoms);
     pastSymptoms = symptomService.pastSymptoms;
     currentSymptoms = symptomService.currentSymptoms;
@@ -49,7 +50,6 @@ class _SymptomsPageState extends State<SymptomsPage> {
     final SymptomService symptomService = context.watch<SymptomService>();
     pastSymptoms = symptomService.pastSymptoms;
     currentSymptoms = symptomService.currentSymptoms;
-    print("Hiii $pastSymptoms");
 
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -90,7 +90,11 @@ class _SymptomsPageState extends State<SymptomsPage> {
 
 class SymptomsCard extends StatefulWidget {
   final Symptom symptom;
-  const SymptomsCard({super.key, required this.symptom});
+  final Function? buttonFn;
+  final String? buttonText;
+
+  const SymptomsCard(
+      {super.key, required this.symptom, this.buttonFn, this.buttonText});
 
   @override
   State<SymptomsCard> createState() => _SymptomsCardState();
@@ -112,7 +116,7 @@ class _SymptomsCardState extends State<SymptomsCard> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final symptom = widget.symptom;
-
+    print(symptom.mid);
     return InkWell(
         onTap: _toggleExpansion,
         child: Card(
@@ -127,16 +131,22 @@ class _SymptomsCardState extends State<SymptomsCard> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Chip(
-                          side: const BorderSide(style: BorderStyle.none),
-                          avatar: CircleAvatar(
-                            backgroundColor: customColors.green,
+                        if (symptom.mid!.isNotEmpty)
+                          Wrap(
+                            children:
+                                List.generate(symptom.mid!.length, (index) {
+                              return Chip(
+                                side: const BorderSide(style: BorderStyle.none),
+                                avatar: CircleAvatar(
+                                  backgroundColor: customColors.green,
+                                ),
+                                label: Text(
+                                  '#${symptom.mName![index]}',
+                                  style: textStyles.bodyMedium,
+                                ),
+                              );
+                            }),
                           ),
-                          label: Text(
-                            '#Medication378',
-                            style: textStyles.bodyMedium,
-                          ),
-                        ),
                         CircleAvatar(
                           radius: 15,
                           backgroundColor: colorScheme.primary,
@@ -215,6 +225,29 @@ class _SymptomsCardState extends State<SymptomsCard> {
                           : CrossFadeState.showFirst,
                       duration: const Duration(milliseconds: 200),
                     ),
+                    const SizedBoxh10(),
+                    if (widget.buttonFn != null)
+                      Center(
+                        child: InkWell(
+                          onTap: () {
+                            widget.buttonFn!();
+                          },
+                          child: Container(
+                            width: 300,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Center(
+                              child: Text(
+                                widget.buttonText!,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                   ]),
             ),
           ),

@@ -16,6 +16,8 @@ class Symptom {
   late DateTime? endDate;
   late String petID;
   String? oid;
+  List<String>? mid = [];
+  List<String>? mName = [];
 
   Symptom(
       {required this.category,
@@ -27,6 +29,8 @@ class Symptom {
       required this.petID,
       this.endDate,
       this.oid,
+      this.mid,
+      this.mName,
       required this.hasEnd});
 
 // Converts Object to JSON for uploading into Firebase
@@ -60,6 +64,9 @@ class Symptom {
           ? DateTime.fromMillisecondsSinceEpoch(json['endDate'] as int)
           : null,
       petID: json['petID'] as String,
+      mid: (json['mid'] as List).cast<String>(), // Convert tags to String list
+      mName:
+          (json['mName'] as List).cast<String>(), // Convert tags to String list
     );
   }
 }
