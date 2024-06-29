@@ -232,7 +232,8 @@ class AuthenticationService with ChangeNotifier {
       AppLogger.i("[AUTH] User does not exist in Firestore");
       // user does not exist - create initial user for onboarding process
       _userService.setUser(
-          user: AppUser.createInitialUser(uid: uid, name: name, email: email!));
+          user: AppUser.createInitialUser(
+              uid: uid, name: name, email: email ?? ''));
       return;
     }
   }

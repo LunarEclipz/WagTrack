@@ -122,7 +122,6 @@ void main() {
         MockAndroidFlutterLocalNotificationsPlugin();
   });
 
-  // Set up code for ALL tests
   setUp(() async {
     setDependencyInstances();
     await reInjectDepedencyInstances();
