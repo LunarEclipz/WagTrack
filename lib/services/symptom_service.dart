@@ -8,10 +8,10 @@ import 'package:wagtrack/services/logging.dart';
 /// Communication to Firebase for Symptom-related data.
 class SymptomService with ChangeNotifier {
   // Instance of Firebase Firestore for interacting with the database
-  static FirebaseFirestore db = GetIt.I<FirebaseFirestore>();
+  static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
 
   // Reference to Firebase Storage for potential future storage needs
-  static Reference storageRef = GetIt.I<FirebaseStorage>().ref();
+  static final Reference _storageRef = GetIt.I<FirebaseStorage>().ref();
 
   List<Symptom> _currentSymptoms = [];
   List<Symptom> _pastSymptoms = [];
@@ -21,7 +21,7 @@ class SymptomService with ChangeNotifier {
 
   /// Adds a new symptom document to the "symptoms" collection in Firestore
   void addSymptoms({required Symptom formData}) {
-    db.collection("symptoms").add(formData.toJSON());
+    _db.collection("symptoms").add(formData.toJSON());
     List<Symptom> symptoms = [
       ...currentSymptoms,
       ...pastSymptoms,
@@ -44,7 +44,7 @@ class SymptomService with ChangeNotifier {
   Future<List<Symptom>> getAllSymptomsByPetID({required String petID}) async {
     try {
       // Query Firestore for documents in the "symptoms" collection where "petID" field matches the provided petID
-      final querySnapshot = await db
+      final querySnapshot = await _db
           .collection("symptoms")
           .where("petID", isEqualTo: petID)
           .get();
@@ -80,7 +80,7 @@ class SymptomService with ChangeNotifier {
   void updateMID(
       {required String symptomID, required String mID, required String mName}) {
     AppLogger.d("Updating Session Records");
-    final symptomRef = db.collection("symptoms").doc(symptomID);
+    final symptomRef = _db.collection("symptoms").doc(symptomID);
 
     symptomRef.update({
       "mid": FieldValue.arrayUnion([mID]),
