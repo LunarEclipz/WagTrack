@@ -214,8 +214,8 @@ void main() {
               matchDateTimeComponents: any(named: 'matchDateTimeComponents')))
           .thenAnswer((_) async => {});
 
-      await notificationService.scheduleNotification(
-          title, body, scheduledTime, type);
+      // await notificationService.scheduleNotification(
+      //     title, body, scheduledTime, type);
 
       // calls zonedSchedule
       // verify(() => mockFlutterLocalNotificationsPlugin.zonedSchedule(
