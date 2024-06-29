@@ -1,0 +1,53 @@
+name: Flutter Build and Test CI
+
+# This workflow is triggered on pushes to the repository.
+# runs when pushed/merged (via pull request) into dev
+
+on:
+  push:
+    branches:
+    - dev
+  pull_request:
+    branches:
+    - dev
+    
+# on: push    # Default will running for every branch.
+    
+jobs:
+  build:
+    # This job will run on ubuntu virtual machine
+    runs-on: ubuntu-latest
+    steps:
+    
+    - uses: actions/checkout@v4
+    # Setup Java environment in order to build the Android app.
+    # - uses: actions/setup-java@v1
+    #   with:
+    #     java-version: '12.x'
+    
+    # Setup the flutter environment.
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable' # 'dev', 'alpha', default to: 'stable'
+        # flutter-version: '1.12.x' # you can also specify exact version of flutter
+    
+    # Upgrade flutter
+    - run: flutter upgrade
+    
+    # Get flutter dependencies.
+    - run: flutter pub get
+    
+    # Statically analyze the Dart code for any errors.
+    - run: flutter analyze .
+    
+    # Run unit tests.
+    - run: flutter test
+    
+    # Build apk.
+    - run: flutter build apk
+    
+    # Upload generated apk to the artifacts.
+    - uses: actions/upload-artifact@v4
+      with:
+        name: debug-apk
+        path: build/app/outputs/apk/debug/app-debug.apk
