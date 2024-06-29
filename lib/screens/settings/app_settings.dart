@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
-import 'package:wagtrack/screens/misc_pages.dart';
+import 'package:wagtrack/screens/settings/data_policy_page.dart';
 import 'package:wagtrack/screens/settings/delete_settings.dart';
+import 'package:wagtrack/screens/settings/faqs_page.dart';
+import 'package:wagtrack/screens/settings/report_vulnerabilities_page.dart';
+import 'package:wagtrack/screens/settings/terms_page.dart';
 import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
@@ -295,17 +298,17 @@ class _AppSettingsState extends State<AppSettings> {
           ),
           const SizedBoxh10(),
           const AppTextOnTap(
-            onTap: BlankPage(),
+            onTap: TermsPage(),
             text: Text('Terms'),
           ),
           const SizedBoxh10(),
           const AppTextOnTap(
-            onTap: BlankPage(),
+            onTap: DataPolicyPage(),
             text: Text('Data Policy'),
           ),
           const SizedBoxh10(),
           const AppTextOnTap(
-            onTap: BlankPage(),
+            onTap: ReportVulnerabilities(),
             text: Text('Report Vulnerabilities'),
           ),
           const SizedBoxh20(),
@@ -316,7 +319,7 @@ class _AppSettingsState extends State<AppSettings> {
           ),
           const SizedBoxh10(),
           const AppTextOnTap(
-            onTap: BlankPage(),
+            onTap: FaqsPage(),
             text: Text('Frequently Asked Questions'),
           ),
           const SizedBoxh10(),
