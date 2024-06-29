@@ -34,7 +34,7 @@ class PetService with ChangeNotifier {
     } catch (e) {
       // TODO is there a specific error that you want to catch?
       _db.collection("pets").add(pet.toJSON());
-      AppLogger.d("Error adding pet: $e", e);
+      AppLogger.e("Error adding pet: $e", e);
     }
   }
 
