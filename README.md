@@ -8,13 +8,33 @@
 
 1. Go to [Releases](https://github.com/LunarEclipz/WagTrack/releases).
 2. Find the newest release.
-3. Download the apk file (`wagtrack.apk`).
+3. Download the APK file (`wagtrack.apk`).
 4. Install and run on your device.
 5. If a pop-up shows up warning you of installing apps from an unverified source, press `continue`.
 
 ### iOS
 
-Installing a test build for iOS is currently unavailable at this time.
+Installing a test build for iOS is currently unavailable at this time. Choose one of the emulation options below:
+
+### Desktop Emulators
+
+1. Go to [Releases](https://github.com/LunarEclipz/WagTrack/releases).
+2. Find the newest release.
+3. Download the APK file (`wagtrack.apk`).
+4. Install the APK file and run the app using an emulator.
+
+#### Android Studio (Windows, MacOS-Intel/Apple Silicon, Linux)
+
+1. [Download](https://developer.android.com/studio) and install Android Studio.
+2. [Create a Virtual Device](https://developer.android.com/studio/run/managing-avds#createavd).
+3. Once everything is set up and the emulated Android device running, simply drag the APK file from your computer onto the emulator screen.
+4. An APK installer dialog should appear and you can install the app.
+
+#### BlueStacks (Windows, MacOS-Intel)
+
+1. [Download](https://www.bluestacks.com/download.html) and install Bluestacks. Specific versions (4/5, Android versions) don't matter, just get the right one for your OS.
+2. While BlueStacks is running, go to the 'My Games' tab.
+3. Click on 'Install Locak APK' and locate the APK file.
 
 ---
 

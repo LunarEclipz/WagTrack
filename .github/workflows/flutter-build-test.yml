@@ -1,12 +1,15 @@
-name: Flutter Build CI
+name: Flutter Build and Test CI
 
 # This workflow is triggered on pushes to the repository.
-# runs when pushed/merged (via pull request) into main
+# runs when pushed/merged (via pull request) into dev
 
 on:
   push:
     branches:
-    - main
+    - dev
+  pull_request:
+    branches:
+    - dev
     
 # on: push    # Default will running for every branch.
     
@@ -37,8 +40,8 @@ jobs:
     # Statically analyze the Dart code for any errors.
     - run: flutter analyze .
     
-    # Run widget tests for our flutter project.
-    # - run: flutter test
+    # Run unit tests.
+    - run: flutter test
     
     # Build apk.
     - run: flutter build apk
@@ -46,5 +49,5 @@ jobs:
     # Upload generated apk to the artifacts.
     - uses: actions/upload-artifact@v4
       with:
-        name: release-apk
-        path: build/app/outputs/apk/release/app-release.apk
+        name: debug-apk
+        path: build/app/outputs/apk/debug/app-debug.apk
