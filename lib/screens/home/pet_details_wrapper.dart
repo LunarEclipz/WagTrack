@@ -24,6 +24,7 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final petData = widget.petData;
     return Scaffold(
       // App Bar
@@ -203,6 +204,9 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
 
                   // Bottom Navigation
                 ],
+                backgroundColor: colorScheme.surface,
+                shadowColor: Colors.transparent,
+                elevation: 0.0,
               ),
               if (currentPageIndex == 0)
                 PetDetails(

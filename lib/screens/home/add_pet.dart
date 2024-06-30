@@ -92,7 +92,7 @@ class _AddPetPageState extends State<AddPetPage> {
         breedController.text = selectedPet!.breed ?? "";
         descController.text = selectedPet!.description;
         idController.text = selectedPet!.idNumber;
-        weightController.text = selectedPet!.weight.toString();
+        weightController.text = selectedPet!.weight[0].value;
         selectedSex = selectedPet!.sex;
         selectedSpecies = selectedPet!.species;
       });
