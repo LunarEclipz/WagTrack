@@ -39,6 +39,10 @@ class _AppWrapperState extends State<AppWrapper> {
           height: 50,
           fit: BoxFit.fitHeight,
         ),
+        // to remove the change of color when scrolling
+        forceMaterialTransparency: true,
+
+        // actions
         actions: <Widget>[
           InkWell(
             onTap: () {

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
+import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/themes.dart';
 import 'package:wagtrack/shared/utils.dart';
 
@@ -15,19 +17,20 @@ class SymptomsPage extends StatefulWidget {
 }
 
 class _SymptomsPageState extends State<SymptomsPage> {
-  List<Symptom> symptoms = [];
+  List<Symptom> pastSymptoms = [];
+  List<Symptom> currentSymptoms = [];
 
-  // TODO: Split by current & past
-  Future<void> getInitData() async {
-    try {
-      final retrivedSymptoms =
-          await SymptomService().getAllPetsByUID(petID: widget.petData.petID!);
-      setState(() {
-        symptoms = retrivedSymptoms;
-      });
-    } catch (e) {
-      // print("Error fetching pets: $e");
-    }
+  bool loaded = false;
+
+  void getAllSymptoms() async {
+    final SymptomService symptomService = context.watch<SymptomService>();
+    List<Symptom> symptoms = await symptomService.getAllSymptomsByPetID(
+        // The only way to access a Pet Page is if the Pet has an ID
+        petID: widget.petData.petID!);
+
+    symptomService.setPastCurrentSymptoms(symptoms: symptoms);
+    pastSymptoms = symptomService.pastSymptoms;
+    currentSymptoms = symptomService.currentSymptoms;
   }
 
   @override
@@ -38,50 +41,74 @@ class _SymptomsPageState extends State<SymptomsPage> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
-    // TODO: Need help ensuring that when Add Symptom is done, this function is called
-    getInitData();
+    if (!loaded) {
+      getAllSymptoms();
+      setState(() {
+        loaded = true;
+      });
+    }
+    final SymptomService symptomService = context.watch<SymptomService>();
+    pastSymptoms = symptomService.pastSymptoms;
+    currentSymptoms = symptomService.currentSymptoms;
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-            'Ongoing Symptoms',
-            style: textStyles.headlineMedium,
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(
+          'Ongoing Symptoms',
+          style: textStyles.headlineMedium,
+        ),
+        const SizedBoxh10(),
+        if (currentSymptoms.isNotEmpty)
+          Column(
+            children: List.generate(currentSymptoms.length, (index) {
+              return SymptomsCard(
+                symptom: currentSymptoms[index],
+              );
+            }),
           ),
-          const SizedBoxh10(),
-          if (symptoms.isNotEmpty)
-            Column(
-              children: List.generate(symptoms.length, (index) {
-                return SymptomsCard(
-                  symptom: symptoms[index],
-                );
-              }),
-            ),
-          const SizedBoxh20(),
-          const Divider(),
-          const SizedBoxh20(),
-          Text(
-            'Past Symptoms',
-            style: textStyles.headlineMedium,
+        const SizedBoxh20(),
+        const Divider(),
+        const SizedBoxh20(),
+        Text(
+          'Past Symptoms',
+          style: textStyles.headlineMedium,
+        ),
+        const SizedBoxh10(),
+        if (pastSymptoms.isNotEmpty)
+          Column(
+            children: List.generate(pastSymptoms.length, (index) {
+              return SymptomsCard(
+                symptom: pastSymptoms[index],
+              );
+            }),
           ),
-          const SizedBoxh10(),
-        ]),
-      ),
+      ]),
     );
   }
 }
 
 class SymptomsCard extends StatefulWidget {
   final Symptom symptom;
-  const SymptomsCard({super.key, required this.symptom});
+  final Function? buttonFn;
+  final String? buttonText;
+
+  const SymptomsCard(
+      {super.key, required this.symptom, this.buttonFn, this.buttonText});
 
   @override
   State<SymptomsCard> createState() => _SymptomsCardState();
 }
 
 class _SymptomsCardState extends State<SymptomsCard> {
+  bool _isExpanded = false;
+
+  void _toggleExpansion() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
@@ -89,9 +116,9 @@ class _SymptomsCardState extends State<SymptomsCard> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final symptom = widget.symptom;
-
+    print(symptom.mid);
     return InkWell(
-        onTap: () {},
+        onTap: _toggleExpansion,
         child: Card(
           color: Colors.white,
           child: SizedBox(
@@ -104,16 +131,22 @@ class _SymptomsCardState extends State<SymptomsCard> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Chip(
-                          side: const BorderSide(style: BorderStyle.none),
-                          avatar: CircleAvatar(
-                            backgroundColor: customColors.green,
+                        if (symptom.mid!.isNotEmpty)
+                          Wrap(
+                            children:
+                                List.generate(symptom.mid!.length, (index) {
+                              return Chip(
+                                side: const BorderSide(style: BorderStyle.none),
+                                avatar: CircleAvatar(
+                                  backgroundColor: customColors.green,
+                                ),
+                                label: Text(
+                                  '#${symptom.mName![index]}',
+                                  style: textStyles.bodyMedium,
+                                ),
+                              );
+                            }),
                           ),
-                          label: Text(
-                            '#Medication378',
-                            style: textStyles.bodyMedium,
-                          ),
-                        ),
                         CircleAvatar(
                           radius: 15,
                           backgroundColor: colorScheme.primary,
@@ -139,12 +172,82 @@ class _SymptomsCardState extends State<SymptomsCard> {
                           ),
                         if (symptom.hasEnd)
                           Text(
-                            "${formatDateTime(symptom.startDate).date} (${formatDateTime(symptom.startDate).time}) to \n${symptom.endDate})",
+                            "${formatDateTime(symptom.startDate).date} (${formatDateTime(symptom.startDate).time}) to \n${formatDateTime(symptom.startDate).date} (${formatDateTime(symptom.endDate!).time})",
                             style: textStyles.bodyMedium,
                           ),
-                        const Icon(Icons.expand_more_rounded)
+                        _isExpanded
+                            ? const Icon(Icons.expand_less)
+                            : const Icon(Icons.expand_more)
                       ],
                     ),
+                    AnimatedCrossFade(
+                      firstChild: const SizedBox.shrink(),
+                      secondChild: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBoxh10(),
+                          Text(
+                            getShortDescBySymptomName(symptom.symptom),
+                            style: textStyles.bodyMedium!
+                                .copyWith(fontStyle: FontStyle.italic),
+                          ),
+                          Wrap(
+                            spacing: 10,
+                            children:
+                                List.generate(symptom.tags.length, (index) {
+                              return Chip(
+                                side: const BorderSide(style: BorderStyle.none),
+                                label: Text("#${symptom.tags[index]}"),
+                              );
+                            }),
+                          ),
+                          if (symptom.factors != "")
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.8,
+                              child: Text(
+                                '\n"${symptom.factors}"',
+                                style: textStyles.bodyMedium,
+                              ),
+                            ),
+                          // const SizedBoxh10(),
+                          // SizedBox(
+                          //   width: double.infinity,
+                          //   child: Text(
+                          //     "hold for more options ...",
+                          //     style: textStyles.bodySmall!
+                          //         .copyWith(fontStyle: FontStyle.italic),
+                          //   ),
+                          // )
+                        ],
+                      ),
+                      crossFadeState: _isExpanded
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
+                      duration: const Duration(milliseconds: 200),
+                    ),
+                    const SizedBoxh10(),
+                    if (widget.buttonFn != null)
+                      Center(
+                        child: InkWell(
+                          onTap: () {
+                            widget.buttonFn!();
+                          },
+                          child: Container(
+                            width: 300,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Center(
+                              child: Text(
+                                widget.buttonText!,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                   ]),
             ),
           ),

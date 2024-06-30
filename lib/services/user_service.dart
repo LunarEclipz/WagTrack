@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wagtrack/models/user_model.dart';
 import 'package:wagtrack/services/logging.dart';
@@ -64,8 +64,8 @@ import 'package:wagtrack/services/logging.dart';
 /// ```
 ///
 class UserService with ChangeNotifier {
-  static FirebaseFirestore db = FirebaseFirestore.instance;
-  static Reference storageRef = FirebaseStorage.instance.ref();
+  static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
+  final SharedPreferences _prefs = GetIt.I<SharedPreferences>();
 
   /// Current user.
   ///
@@ -81,10 +81,10 @@ class UserService with ChangeNotifier {
   ///
   /// (And local preferences for local settings)
   Future<void> updateUserInDb() async {
-    AppLogger.d("Updating local user in db");
+    AppLogger.d("[USER] Updating local user in db");
     if (_user.isEmpty()) {
       // user does not exist
-      AppLogger.w("Local user does not exist");
+      AppLogger.w("[USER] Local user does not exist");
       return;
     }
 
@@ -92,24 +92,22 @@ class UserService with ChangeNotifier {
       // first get uid to be used as document id
       String uid = _user.uid;
 
-      SharedPreferences.getInstance().then((prefs) {
-        prefs.setBool('device_allow_camera', _user.allowCamera);
-        prefs.setBool('device_allow_gallery', _user.allowGallery);
-      });
+      _prefs.setBool('device_allow_camera', _user.allowCamera);
+      _prefs.setBool('device_allow_gallery', _user.allowGallery);
 
-      await db.collection("users").doc(uid).set(_user.toJson());
-      AppLogger.i("Successfully updated local user params in Firestore");
+      await _db.collection("users").doc(uid).set(_user.toJson());
+      AppLogger.i("[USER] Successfully updated local user params in Firestore");
     } catch (e) {
-      AppLogger.e("Error updating local user in db: $e", e);
+      AppLogger.e("[USER] Error updating local user in db: $e", e);
     }
   }
 
   /// Updates local preferences.
   Future<void> updateLocalPrefs() async {
-    AppLogger.d("Updating local preferences");
+    AppLogger.d("[USER] Updating local preferences");
     if (_user.isEmpty()) {
       // user does not exist
-      AppLogger.w("Local user does not exist");
+      AppLogger.w("[USER] Local user does not exist");
       return;
     }
 
@@ -117,21 +115,19 @@ class UserService with ChangeNotifier {
       // first get uid to be used as document id
       String uid = _user.uid;
 
-      SharedPreferences.getInstance().then((prefs) {
-        prefs.setBool('device_allow_camera', _user.allowCamera);
-        prefs.setBool('device_allow_gallery', _user.allowGallery);
-      });
+      _prefs.setBool('device_allow_camera', _user.allowCamera);
+      _prefs.setBool('device_allow_gallery', _user.allowGallery);
 
-      await db.collection("users").doc(uid).set(_user.toJson());
-      AppLogger.i("Successfully updated local preferences");
+      await _db.collection("users").doc(uid).set(_user.toJson());
+      AppLogger.i("[USER] Successfully updated local preferences");
     } catch (e) {
-      AppLogger.e("Error updating local preferences: $e", e);
+      AppLogger.e("[USER] Error updating local preferences: $e", e);
     }
   }
 
   /// Sets current user from an `AppUser` object.
   void setUser({required AppUser user}) {
-    AppLogger.d("Setting current user");
+    AppLogger.d("[USER] Setting current user");
     _user = user;
     notifyListeners();
   }
@@ -148,7 +144,7 @@ class UserService with ChangeNotifier {
     bool? allowCamera,
     bool? allowGallery,
   }) {
-    AppLogger.d("Setting parameters of current user");
+    AppLogger.d("[USER] Setting parameters of current user");
     _user.updateParams(
       uid: uid,
       name: name,
@@ -170,9 +166,9 @@ class UserService with ChangeNotifier {
   ///
   /// https://firebase.google.com/docs/firestore/query-data/get-data
   Future<void> getUserFromDb({required String uid}) async {
-    AppLogger.d("Getting user from Firestore");
+    AppLogger.d("[USER] Getting user from Firestore");
 
-    final docRef = db.collection("users").doc(uid);
+    final docRef = _db.collection("users").doc(uid);
     await docRef.get().then((DocumentSnapshot doc) {
       if (!doc.exists) {
         // doc does not exist - no changes
@@ -186,16 +182,14 @@ class UserService with ChangeNotifier {
       notifyListeners();
     },
         onError: (e) =>
-            {AppLogger.e("Error getting user from Firestore: $e", e)});
+            {AppLogger.e("[USER] Error getting user from Firestore: $e", e)});
 
-    // get local prefs
-    AppLogger.t("Getting local preferences");
-    SharedPreferences.getInstance().then((prefs) {
-      _user.allowCamera = prefs.getBool('device_allow_camera') ?? false;
-      _user.allowGallery = prefs.getBool('device_allow_gallery') ?? false;
-    });
+    // get local _prefs
+    AppLogger.t("[USER] Getting local preferences");
+    _user.allowCamera = _prefs.getBool('device_allow_camera') ?? false;
+    _user.allowGallery = _prefs.getBool('device_allow_gallery') ?? false;
 
-    AppLogger.i("User data obtained successfully");
+    AppLogger.i("[USER] User data obtained successfully");
   }
 
   /// Resets user data.
@@ -204,11 +198,11 @@ class UserService with ChangeNotifier {
   ///
   /// Does not delete user from FireStore.
   Future<void> resetUserData() async {
-    AppLogger.d("resetting user data");
+    AppLogger.d("[USER] resetting user data");
     _user.resetData();
     String uid = _user.uid;
 
-    final docRef = db.collection("users").doc(uid);
+    final docRef = _db.collection("users").doc(uid);
 
     final overwriteData = {
       "phoneNumber": null,
@@ -218,22 +212,20 @@ class UserService with ChangeNotifier {
       "hasOnboarded": false,
     };
 
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setBool('device_allow_camera', false);
-      prefs.setBool('device_allow_gallery', false);
-    });
+    _prefs.setBool('device_allow_camera', false);
+    _prefs.setBool('device_allow_gallery', false);
 
-    docRef.set(overwriteData).onError(
-        (e, _) => AppLogger.e("Error resetting user data in Firestore: $e", e));
+    docRef.set(overwriteData).onError((e, _) =>
+        AppLogger.e("[USER] Error resetting user data in Firestore: $e", e));
 
     notifyListeners();
-    AppLogger.i("User data reset successfully");
+    AppLogger.i("[USER] User data reset successfully");
   }
 
   /// Checks firestore db if a document exists under the given uid.
   Future<bool> doesUserExist(String uid) async {
-    AppLogger.t("Checking if user exists");
-    final docRef = db.collection("users").doc(uid);
+    AppLogger.t("[USER] Checking if user exists");
+    final docRef = _db.collection("users").doc(uid);
     DocumentSnapshot doc = await docRef.get();
 
     return doc.exists;
@@ -247,11 +239,11 @@ class UserService with ChangeNotifier {
   ///
   /// https://firebase.google.com/docs/firestore/manage-data/delete-data
   Future<void> deleteUser() async {
-    AppLogger.d("Deleting user");
-    await db.collection("users").doc(_user.uid).delete().then(
-        (doc) => AppLogger.i("User deleted from Firestore"),
+    AppLogger.d("[USER] Deleting user");
+    await _db.collection("users").doc(_user.uid).delete().then(
+        (doc) => AppLogger.i("[USER] User deleted from Firestore"),
         onError: (e, _) =>
-            AppLogger.e("Error deleting user from Firestore: $e", e));
+            AppLogger.e("[USER] Error deleting user from Firestore: $e", e));
 
     _user = AppUser.createEmptyUser();
   }
@@ -263,11 +255,11 @@ class UserService with ChangeNotifier {
   /// https://firebase.google.com/docs/firestore/query-data/get-data
   Future<List<AppUser>> getUsersFromDbByName(
       {required uid, required String email}) async {
-    AppLogger.d("Getting users from Firestore");
+    AppLogger.d("[USER] Getting users from Firestore");
 
     try {
       final querySnapshot =
-          await db.collection("users").where("email", isEqualTo: email).get();
+          await _db.collection("users").where("email", isEqualTo: email).get();
 
       final List<AppUser> users = [];
       for (final docSnapshot in querySnapshot.docs) {
@@ -277,10 +269,10 @@ class UserService with ChangeNotifier {
           users.add(user);
         }
       }
-      AppLogger.i("Users fetched (by uid) successfully");
+      AppLogger.i("[USER] Users fetched (by uid) successfully");
       return users;
     } catch (e) {
-      AppLogger.e("Error fetching users for email $email: $e", e);
+      AppLogger.e("[USER] Error fetching users for email $email: $e", e);
       return []; // Return an empty list on error
     }
   }

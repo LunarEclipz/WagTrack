@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:wagtrack/models/pet_model.dart';
+import 'package:wagtrack/screens/medication/medication_frame.dart';
 import 'package:wagtrack/screens/pet_details/pet_details.dart';
+import 'package:wagtrack/screens/posts/pet_posts_page.dart';
 import 'package:wagtrack/screens/symptoms/add_symptoms.dart';
 import 'package:wagtrack/screens/symptoms/symptoms.dart';
 import 'package:wagtrack/shared/background_img.dart';
@@ -40,6 +42,9 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
             ),
           ],
         ),
+
+        // to remove the change of color when scrolling
+        forceMaterialTransparency: true,
         actions: <Widget>[
           petData.imgPath == null
               ? const Padding(
@@ -162,50 +167,61 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
       ),
       // Screens
       body: BackgroundImageWrapper(
-        child: Column(
-          children: [
-            NavigationBar(
-              labelBehavior:
-                  NavigationDestinationLabelBehavior.onlyShowSelected,
-              selectedIndex: currentPageIndex,
-              onDestinationSelected: (int index) {
-                setState(() {
-                  currentPageIndex = index;
-                });
-              },
-              destinations: const <Widget>[
-                NavigationDestination(
-                  icon: Icon(Icons.pets),
-                  label: 'Details',
-                ),
-                NavigationDestination(
-                  selectedIcon: Icon(Icons.feed_rounded),
-                  icon: Icon(Icons.feed_rounded),
-                  label: 'Posts',
-                ),
-                NavigationDestination(
-                  selectedIcon: Icon(Icons.thermostat_rounded),
-                  icon: Icon(Icons.thermostat_rounded),
-                  label: 'Symptoms',
-                ),
-                NavigationDestination(
-                  selectedIcon: Icon(Icons.medical_information_rounded),
-                  icon: Icon(Icons.medical_information_rounded),
-                  label: 'Medications',
-                ),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              NavigationBar(
+                labelBehavior:
+                    NavigationDestinationLabelBehavior.onlyShowSelected,
+                selectedIndex: currentPageIndex,
+                onDestinationSelected: (int index) {
+                  setState(() {
+                    currentPageIndex = index;
+                  });
+                },
+                destinations: const <Widget>[
+                  NavigationDestination(
+                    icon: Icon(Icons.pets),
+                    label: 'Details',
+                  ),
+                  NavigationDestination(
+                    selectedIcon: Icon(Icons.feed_rounded),
+                    icon: Icon(Icons.feed_rounded),
+                    label: 'Posts',
+                  ),
+                  NavigationDestination(
+                    selectedIcon: Icon(Icons.thermostat_rounded),
+                    icon: Icon(Icons.thermostat_rounded),
+                    label: 'Symptoms',
+                  ),
+                  NavigationDestination(
+                    selectedIcon: Icon(Icons.medical_information_rounded),
+                    icon: Icon(Icons.medical_information_rounded),
+                    label: 'Medications',
+                  ),
 
-                // Bottom Navigation
-              ],
-            ),
-            if (currentPageIndex == 0)
-              PetDetails(
-                petData: petData,
+                  // Bottom Navigation
+                ],
               ),
-            if (currentPageIndex == 2)
-              SymptomsPage(
-                petData: petData,
-              ),
-          ],
+              if (currentPageIndex == 0)
+                PetDetails(
+                  petData: petData,
+                ),
+              if (currentPageIndex == 1)
+                PetPostsPage(
+                  petData: petData,
+                ),
+              if (currentPageIndex == 2)
+                SymptomsPage(
+                  petData: petData,
+                ),
+              if (currentPageIndex == 3)
+                MedicationFrame(
+                  petData: petData,
+                ),
+            ],
+          ),
         ),
       ),
     );
