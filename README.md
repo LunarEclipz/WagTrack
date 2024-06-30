@@ -12,6 +12,8 @@
 4. Install and run on your device.
 5. If a pop-up shows up warning you of installing apps from an unverified source, press `continue`.
 
+Note that if you already have an older version of the app installed, you may have to delete that version and reinstsall again if an error pops up doing the installation process. 
+
 ### iOS
 
 Installing a test build for iOS is currently unavailable at this time. Choose one of the emulation options below:
