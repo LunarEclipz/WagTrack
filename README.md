@@ -12,7 +12,7 @@
 4. Install and run on your device.
 5. If a pop-up shows up warning you of installing apps from an unverified source, press `continue`.
 
-Note that if you already have an older version of the app installed, you may have to delete that version and reinstall again if an error pops up doing the installation process. 
+Note that if you already have an older version of the app installed, you may have to delete that version and reinstall again if an error pops up during the installation process. 
 
 ### iOS
 
