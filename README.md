@@ -34,7 +34,7 @@ Installing a test build for iOS is currently unavailable at this time. Choose on
 
 1. [Download](https://www.bluestacks.com/download.html) and install Bluestacks. Specific versions (4/5, Android versions) don't matter, just get the right one for your OS.
 2. While BlueStacks is running, go to the 'My Games' tab.
-3. Click on 'Install Locak APK' and locate the APK file.
+3. Click on 'Install Local APK' and locate the APK file.
 
 ---
 
