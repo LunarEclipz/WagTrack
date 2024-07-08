@@ -71,7 +71,7 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           // SYMPTOM HELP BUTTON (symptoms tab)
-          // TODO these red lower-right buttons can and should be refactored!
+          // TODO these Floating action buttons can and should be refactored!
           if (currentPageIndex == 2)
             FloatingActionButton(
               heroTag: "helpSymptoms",

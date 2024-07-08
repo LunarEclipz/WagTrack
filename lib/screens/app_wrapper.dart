@@ -81,34 +81,41 @@ class _AppWrapperState extends State<AppWrapper> {
       // Screens
       body: screens.elementAt(currentPageIndex),
       // Floating Action Buttons
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                const begin = Offset(1.0, 0.0);
-                const end = Offset.zero;
-                const curve = Curves.ease;
-                var tween = Tween(begin: begin, end: end)
-                    .chain(CurveTween(curve: curve));
 
-                return SlideTransition(
-                  position: animation.drive(tween),
-                  child: child,
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (currentPageIndex == 0)
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                    transitionDuration: const Duration(
+                        milliseconds: 500), // Adjust the duration here
+                    pageBuilder: (context, a, b) => const AddPetPage(),
+                  ),
                 );
               },
-              transitionDuration:
-                  const Duration(milliseconds: 500), // Adjust the duration here
-              pageBuilder: (context, a, b) => const AddPetPage(),
+              child: const Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
             ),
-          );
-        },
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
+        ],
       ),
       // Bottom Navigation
       bottomNavigationBar: NavigationBar(
