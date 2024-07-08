@@ -21,6 +21,16 @@ import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/themes.dart';
 import 'package:wagtrack/shared/utils.dart';
 
+/// Pet types
+enum PetType {
+  personal("personal"),
+  community("community");
+
+  final String string;
+
+  const PetType(this.string);
+}
+
 class AddPetPage extends StatefulWidget {
   const AddPetPage({super.key});
 
@@ -34,7 +44,7 @@ class _AddPetPageState extends State<AddPetPage> {
 
   late Pet? selectedPet;
 
-  late String petType = "";
+  PetType? petType;
   late String selectedLocation = "";
   late String selectedSex = "Male";
   late String selectedSpecies = "Dog";
@@ -60,10 +70,10 @@ class _AddPetPageState extends State<AddPetPage> {
 
   late Pet? caretakerMode;
 
-  setPetType(String pType) {
+  setPetType(PetType? pType) {
     setState(() {
       if (pType == petType) {
-        petType = "";
+        petType = null;
       } else {
         petType = pType;
       }
@@ -126,6 +136,8 @@ class _AddPetPageState extends State<AddPetPage> {
             'My Pet is a ...',
             style: textStyles.headlineMedium,
           ),
+
+          // choosing pet Type
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -133,10 +145,10 @@ class _AddPetPageState extends State<AddPetPage> {
                 flex: 1,
                 child: InkWell(
                   onTap: () {
-                    setPetType("personal");
+                    setPetType(PetType.personal);
                   },
                   child: Card(
-                    color: petType == "personal"
+                    color: petType == PetType.personal
                         ? customColors.green
                         : Colors.white,
                     child: Padding(
@@ -146,13 +158,13 @@ class _AddPetPageState extends State<AddPetPage> {
                         children: <Widget>[
                           Icon(
                             Icons.person,
-                            color: petType == "personal"
+                            color: petType == PetType.personal
                                 ? Colors.white
                                 : Colors.black,
                           ),
                           Text("Personal\nPet",
                               style: textStyles.bodyMedium!.copyWith(
-                                color: petType == "personal"
+                                color: petType == PetType.personal
                                     ? Colors.white
                                     : Colors.black,
                               ))
@@ -166,10 +178,10 @@ class _AddPetPageState extends State<AddPetPage> {
                 flex: 1,
                 child: InkWell(
                   onTap: () {
-                    setPetType("community");
+                    setPetType(PetType.community);
                   },
                   child: Card(
-                    color: petType == "community"
+                    color: petType == PetType.community
                         ? customColors.green
                         : Colors.white,
                     child: Padding(
@@ -179,13 +191,13 @@ class _AddPetPageState extends State<AddPetPage> {
                         children: <Widget>[
                           Icon(
                             Icons.person,
-                            color: petType == "community"
+                            color: petType == PetType.community
                                 ? Colors.white
                                 : Colors.black,
                           ),
                           Text("Community\nPet",
                               style: textStyles.bodyMedium!.copyWith(
-                                color: petType == "community"
+                                color: petType == PetType.community
                                     ? Colors.white
                                     : Colors.black,
                               ))
@@ -199,7 +211,7 @@ class _AddPetPageState extends State<AddPetPage> {
           ),
 
           // Section B : Pet Type
-          if (petType != "") // personal
+          if (petType == PetType.personal) // personal
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -225,7 +237,7 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ],
             ),
-          if (petType == "community")
+          if (petType == PetType.community)
             InkWell(
               onTap: () async {
                 List<Pet> pets = await petService.getAllCommunityPetsByRegion(
@@ -332,7 +344,7 @@ class _AddPetPageState extends State<AddPetPage> {
             ),
 
           // Section C : Pet Information
-          if (petType != "" && caretakerMode != null)
+          if (petType != null && caretakerMode != null)
             InkWell(
               onTap: () {
                 setState(() {
@@ -356,7 +368,7 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ),
             ),
-          if (petType != "")
+          if (petType != null)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -765,7 +777,8 @@ class _AddPetPageState extends State<AddPetPage> {
                             idController.text != "" &&
                             birthday &&
                             selectedSpecies != "") {
-                          if (petType == "Personal" || caretakerMode == null) {
+                          if (petType == PetType.personal ||
+                              caretakerMode == null) {
                             caretakers.add(Caretaker(
                                 username: userService.user.name!,
                                 uid: userService.user.uid,
@@ -781,7 +794,7 @@ class _AddPetPageState extends State<AddPetPage> {
                             description: descController.text,
                             sex: selectedSex,
                             species: selectedSpecies,
-                            petType: petType,
+                            petType: petType?.string ?? '',
                             idNumber: idController.text,
                             breed: breedController.text,
                             posts: 0,
