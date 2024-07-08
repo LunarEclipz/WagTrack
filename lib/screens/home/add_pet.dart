@@ -88,6 +88,7 @@ class _AddPetPageState extends State<AddPetPage> {
 
     uid = userService.user.uid;
     if (selectedPet != null) {
+      // means a pet is currently selected
       setState(() {
         // TODO: Zee need your help, if caretakeMode, all these fields should be disabled
         nameController.text = selectedPet!.name;
@@ -102,6 +103,9 @@ class _AddPetPageState extends State<AddPetPage> {
       caretakerMode = selectedPet!;
       selectedPet = null;
     }
+
+    // now set the selected location to the default user location.
+    selectedLocation = userService.user.defaultLocation!;
 
     return Scaffold(
       appBar: AppBar(
