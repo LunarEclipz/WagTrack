@@ -16,8 +16,12 @@ class Symptom {
   late DateTime? endDate;
   late String petID;
   String? oid;
-  List<String>? mid = [];
-  List<String>? mName = [];
+
+  /// medication ids
+  List<String> mid;
+
+  /// medication mNames
+  List<String> mName;
 
   Symptom(
       {required this.category,
@@ -29,9 +33,11 @@ class Symptom {
       required this.petID,
       this.endDate,
       this.oid,
-      this.mid,
-      this.mName,
-      required this.hasEnd});
+      List<String>? mid,
+      List<String>? mName,
+      required this.hasEnd})
+      : mid = mid ?? [],
+        mName = mName ?? [];
 
 // Converts Object to JSON for uploading into Firebase
   Map<String, dynamic> toJSON() {
