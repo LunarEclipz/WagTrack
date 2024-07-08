@@ -473,6 +473,7 @@ class _AddPetPageState extends State<AddPetPage> {
                   hintText: 'Weight',
                   prefixIcon: const Icon(Icons.scale_rounded),
                   showOptional: true,
+                  suffixString: "kg",
                 ),
                 const SizedBoxh10(),
                 Row(

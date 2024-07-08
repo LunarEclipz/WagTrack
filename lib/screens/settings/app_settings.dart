@@ -170,11 +170,12 @@ class _AppSettingsState extends State<AppSettings> {
                 controller: phoneNumberController,
                 hintText: 'Phone Number',
                 prefixIcon: SizedBox(
-                  width: 90,
+                  width: 72,
+                  // height: 24,
                   child: Row(
                     children: [
                       const Padding(
-                        padding: EdgeInsets.only(right: 10, left: 12),
+                        padding: EdgeInsets.only(right: 10, left: 0),
                         child: Icon(Icons.phone_android_outlined),
                       ),
                       Text(

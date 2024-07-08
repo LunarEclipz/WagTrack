@@ -162,11 +162,13 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
     // if there is suffix text, that overrides suffix icon
     // TODO suffix text is currently aligned top
     if (widget.suffixString.isNotEmpty) {
-      debugPrint(widget.suffixString);
-      suffixIcon = Text(
-        widget.suffixString,
-        style: textStyles.bodyLarge
-            ?.copyWith(color: AppTheme.customColors.secondaryText),
+      suffixIcon = Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        child: Text(
+          widget.suffixString,
+          style: textStyles.bodyLarge
+              ?.copyWith(color: AppTheme.customColors.secondaryText),
+        ),
       );
     }
 
@@ -178,14 +180,26 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       textAlignVertical: TextAlignVertical.top,
       decoration: InputDecoration(
-          hintText: hintText,
-          labelText: labelText,
-          prefixIcon: widget.prefixIcon,
-          prefixIconColor: AppTheme.customColors.hint,
-          prefixStyle: inputTextStyle,
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          suffixIcon: suffixIcon,
-          contentPadding: EdgeInsets.zero),
+        // isDense: true,
+        hintText: hintText,
+        labelText: labelText,
+        prefixIcon: widget.prefixIcon != null
+            ? Padding(
+                padding: const EdgeInsets.only(left: 12.0, right: 8.0),
+                child: widget.prefixIcon,
+              )
+            : null,
+        prefixIconColor: AppTheme.customColors.hint,
+        prefixStyle: inputTextStyle,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: suffixIcon,
+        contentPadding: const EdgeInsets.only(bottom: 0),
+        prefixIconConstraints: const BoxConstraints(maxHeight: 24),
+        suffixIconConstraints: const BoxConstraints(maxHeight: 24),
+
+        // force there to be no label IF there isn't a label text
+        labelStyle: labelText.isEmpty ? const TextStyle(fontSize: 0) : null,
+      ),
       style: inputTextStyle,
     );
   }
