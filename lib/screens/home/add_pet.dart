@@ -124,6 +124,9 @@ class _AddPetPageState extends State<AddPetPage> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: colorScheme.primary,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
       body: DefaultTextStyle.merge(
         style: textStyles.bodyLarge,

@@ -49,15 +49,17 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
               "Add Symptoms",
-              style: textStyles.bodyLarge,
+              // style: textStyles.bodyLarge,
+              style: TextStyle(color: Colors.white),
             ),
           ],
         ),
+        backgroundColor: colorScheme.primary,
         iconTheme: const IconThemeData(
           color: Colors.white,
         ),
