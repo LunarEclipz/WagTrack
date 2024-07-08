@@ -32,7 +32,7 @@ class SymptomService with ChangeNotifier {
 
   /// Sets List of pastSymptoms and currentSymptoms.
   void setPastCurrentSymptoms({required List<Symptom> symptoms}) async {
-    AppLogger.d("Setting pastSymptoms and currentSymptoms");
+    AppLogger.d("[SYMP] Setting pastSymptoms and currentSymptoms");
     _pastSymptoms =
         symptoms.where((symptom) => symptom.endDate != null).toList();
     _currentSymptoms =
@@ -71,7 +71,7 @@ class SymptomService with ChangeNotifier {
       return symptoms;
     } catch (e) {
       // **Bold Error Message**
-      AppLogger.e("**Error fetching symptoms for pet ID $petID: $e**");
+      AppLogger.e("[SYMP] Error fetching symptoms for pet ID $petID: $e", e);
       return []; // Return an empty list on error
     }
   }
@@ -85,8 +85,10 @@ class SymptomService with ChangeNotifier {
     symptomRef.update({
       "mid": FieldValue.arrayUnion([mID]),
       "mName": FieldValue.arrayUnion([mName]),
-    }).then((value) => AppLogger.d("Successfully Updated Session Records"),
-        onError: (e) => AppLogger.d("Error Updating Session Records: $e"));
+    }).then(
+        (value) => AppLogger.d("[SYMP] Successfully Updated Session Records"),
+        onError: (e) =>
+            AppLogger.d("[SYMP] Error Updating Session Records: $e", e));
 
     notifyListeners();
   }
