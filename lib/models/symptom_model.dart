@@ -6,15 +6,34 @@ class PetSymptomModel {
 }
 
 class Symptom {
+  /// Category of symptom.
   late String category;
+
+  /// Exact name of symptom.
   late String symptom;
+
+  /// Possible factors for symptom.
   late String factors;
+
+  /// List of tags.
   late List<String> tags;
+
+  /// Level of symptom severity.
   late int severity;
+
+  /// Start date of symptom. Always required.
   late DateTime startDate;
+
+  /// Whether this symptom has an end date.
   late bool hasEnd;
+
+  /// End date of symptom.
   late DateTime? endDate;
+
+  /// PetID of Pet which is associated with this symptom
   late String petID;
+
+  /// TODO WHAT IS THIS
   String? oid;
 
   /// medication ids
