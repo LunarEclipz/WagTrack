@@ -52,7 +52,10 @@ class WagTrackApp extends StatelessWidget {
           create: (context) => SymptomService(),
         ),
         ChangeNotifierProvider(
-          create: (context) => MedicationService(),
+          create: (context) => MedicationService(Provider.of<SymptomService>(
+            context,
+            listen: false,
+          )),
         ),
         // Provider<AuthenticationService>(
         //   create: (context) => AuthenticationService(FirebaseAuth.instance),

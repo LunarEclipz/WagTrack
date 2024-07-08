@@ -8,6 +8,8 @@ import 'package:wagtrack/services/symptom_service.dart';
 
 /// Communication to Firebase for Medication-related data.
 class MedicationService with ChangeNotifier {
+  final SymptomService _symptomService;
+
   // Instance of Firebase Firestore for interacting with the database
   static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
 
@@ -17,6 +19,9 @@ class MedicationService with ChangeNotifier {
   List<MedicationRoutine> _medicationRoutines = [];
 
   List<MedicationRoutine> get medicationRoutines => _medicationRoutines;
+
+  /// Constructor
+  MedicationService(this._symptomService);
 
   /// Adds a new medication document to the "medication" collection in Firestore
   void addMedicationRoutines({required MedicationRoutine formData}) {
@@ -62,7 +67,7 @@ class MedicationService with ChangeNotifier {
         medRoutine.oid = docSnapshot.id;
         if (first) {
           for (String symptomID in medRoutine.symptomsID) {
-            SymptomService().updateMID(
+            _symptomService.updateMID(
                 symptomID: symptomID,
                 mID: medRoutine.oid!,
                 mName: medRoutine.title);
