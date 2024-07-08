@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/services/symptom_service.dart';
@@ -44,17 +45,21 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
         .toList();
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    final SymptomService symptomService = context.watch<SymptomService>();
+
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
               "Add Symptoms",
-              style: textStyles.bodyLarge,
+              // style: textStyles.bodyLarge,
+              style: TextStyle(color: Colors.white),
             ),
           ],
         ),
+        backgroundColor: colorScheme.primary,
         iconTheme: const IconThemeData(
           color: Colors.white,
         ),
@@ -435,7 +440,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                             tags: tags,
                             hasEnd: endDate,
                             endDate: endDateTime);
-                    SymptomService().addSymptoms(formData: formData);
+                    symptomService.addSymptoms(formData: formData);
                     Navigator.pop(context);
                   }
                 },

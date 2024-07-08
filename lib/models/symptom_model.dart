@@ -6,18 +6,41 @@ class PetSymptomModel {
 }
 
 class Symptom {
+  /// Category of symptom.
   late String category;
+
+  /// Exact name of symptom.
   late String symptom;
+
+  /// Possible factors for symptom.
   late String factors;
+
+  /// List of tags.
   late List<String> tags;
+
+  /// Level of symptom severity.
   late int severity;
+
+  /// Start date of symptom. Always required.
   late DateTime startDate;
+
+  /// Whether this symptom has an end date.
   late bool hasEnd;
+
+  /// End date of symptom.
   late DateTime? endDate;
+
+  /// PetID of Pet which is associated with this symptom
   late String petID;
+
+  /// TODO WHAT IS THIS
   String? oid;
-  List<String>? mid = [];
-  List<String>? mName = [];
+
+  /// medication ids
+  List<String> mid;
+
+  /// medication mNames
+  List<String> mName;
 
   Symptom(
       {required this.category,
@@ -29,9 +52,11 @@ class Symptom {
       required this.petID,
       this.endDate,
       this.oid,
-      this.mid,
-      this.mName,
-      required this.hasEnd});
+      List<String>? mid,
+      List<String>? mName,
+      required this.hasEnd})
+      : mid = mid ?? [],
+        mName = mName ?? [];
 
 // Converts Object to JSON for uploading into Firebase
   Map<String, dynamic> toJSON() {

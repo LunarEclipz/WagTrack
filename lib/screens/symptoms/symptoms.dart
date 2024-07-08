@@ -116,7 +116,6 @@ class _SymptomsCardState extends State<SymptomsCard> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final symptom = widget.symptom;
-    print(symptom.mid);
     return InkWell(
         onTap: _toggleExpansion,
         child: Card(
@@ -131,17 +130,17 @@ class _SymptomsCardState extends State<SymptomsCard> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (symptom.mid!.isNotEmpty)
+                        if (symptom.mid.isNotEmpty)
                           Wrap(
                             children:
-                                List.generate(symptom.mid!.length, (index) {
+                                List.generate(symptom.mid.length, (index) {
                               return Chip(
                                 side: const BorderSide(style: BorderStyle.none),
                                 avatar: CircleAvatar(
                                   backgroundColor: customColors.green,
                                 ),
                                 label: Text(
-                                  '#${symptom.mName![index]}',
+                                  '#${symptom.mName[index]}',
                                   style: textStyles.bodyMedium,
                                 ),
                               );

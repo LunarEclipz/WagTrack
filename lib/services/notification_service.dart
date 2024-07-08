@@ -380,6 +380,11 @@ class NotificationService with ChangeNotifier {
   /// Highly inefficient, but since the notification list gets sorted every time
   /// it's called for and the numbers of notifications aren't large
   Future<void> limitNotifications({bool updateStorage = true}) async {
+    // if witihn length, don't care
+    if (notificationList.length < maxNotificationCount) {
+      return;
+    }
+
     // First sort notifications
     sortNotifications(
       sortingMode: NotificationSortingMode.timeNotified,

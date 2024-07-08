@@ -2,14 +2,16 @@
 // Breed, Birthdate, weight, Appointment Date, Caretakers, Community Pet are milestone 2 Features
 
 import 'dart:io';
+import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/user_model.dart';
+import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
@@ -18,6 +20,16 @@ import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/themes.dart';
 import 'package:wagtrack/shared/utils.dart';
+
+/// Pet types
+enum PetType {
+  personal("personal"),
+  community("community");
+
+  final String string;
+
+  const PetType(this.string);
+}
 
 class AddPetPage extends StatefulWidget {
   const AddPetPage({super.key});
@@ -32,7 +44,7 @@ class _AddPetPageState extends State<AddPetPage> {
 
   late Pet? selectedPet;
 
-  late String petType = "";
+  PetType? petType;
   late String selectedLocation = "";
   late String selectedSex = "Male";
   late String selectedSpecies = "Dog";
@@ -58,10 +70,10 @@ class _AddPetPageState extends State<AddPetPage> {
 
   late Pet? caretakerMode;
 
-  setPetType(String pType) {
+  setPetType(PetType? pType) {
     setState(() {
       if (pType == petType) {
-        petType = "";
+        petType = null;
       } else {
         petType = pType;
       }
@@ -86,6 +98,7 @@ class _AddPetPageState extends State<AddPetPage> {
 
     uid = userService.user.uid;
     if (selectedPet != null) {
+      // means a pet is currently selected
       setState(() {
         // TODO: Zee need your help, if caretakeMode, all these fields should be disabled
         nameController.text = selectedPet!.name;
@@ -101,6 +114,9 @@ class _AddPetPageState extends State<AddPetPage> {
       selectedPet = null;
     }
 
+    // now set the selected location to the default user location.
+    selectedLocation = userService.user.defaultLocation!;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -108,15 +124,23 @@ class _AddPetPageState extends State<AddPetPage> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: colorScheme.primary,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
       body: DefaultTextStyle.merge(
         style: textStyles.bodyLarge,
         child: AppScrollablePage(children: [
+          // DEBUG ONLY BUTTON
+          showDebugFillFieldsButton(context),
+
           // Section A : Pet Type
           Text(
             'My Pet is a ...',
             style: textStyles.headlineMedium,
           ),
+
+          // choosing pet Type
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -124,10 +148,10 @@ class _AddPetPageState extends State<AddPetPage> {
                 flex: 1,
                 child: InkWell(
                   onTap: () {
-                    setPetType("personal");
+                    setPetType(PetType.personal);
                   },
                   child: Card(
-                    color: petType == "personal"
+                    color: petType == PetType.personal
                         ? customColors.green
                         : Colors.white,
                     child: Padding(
@@ -137,13 +161,13 @@ class _AddPetPageState extends State<AddPetPage> {
                         children: <Widget>[
                           Icon(
                             Icons.person,
-                            color: petType == "personal"
+                            color: petType == PetType.personal
                                 ? Colors.white
                                 : Colors.black,
                           ),
                           Text("Personal\nPet",
                               style: textStyles.bodyMedium!.copyWith(
-                                color: petType == "personal"
+                                color: petType == PetType.personal
                                     ? Colors.white
                                     : Colors.black,
                               ))
@@ -157,10 +181,10 @@ class _AddPetPageState extends State<AddPetPage> {
                 flex: 1,
                 child: InkWell(
                   onTap: () {
-                    setPetType("community");
+                    setPetType(PetType.community);
                   },
                   child: Card(
-                    color: petType == "community"
+                    color: petType == PetType.community
                         ? customColors.green
                         : Colors.white,
                     child: Padding(
@@ -170,13 +194,13 @@ class _AddPetPageState extends State<AddPetPage> {
                         children: <Widget>[
                           Icon(
                             Icons.person,
-                            color: petType == "community"
+                            color: petType == PetType.community
                                 ? Colors.white
                                 : Colors.black,
                           ),
                           Text("Community\nPet",
                               style: textStyles.bodyMedium!.copyWith(
-                                color: petType == "community"
+                                color: petType == PetType.community
                                     ? Colors.white
                                     : Colors.black,
                               ))
@@ -188,8 +212,9 @@ class _AddPetPageState extends State<AddPetPage> {
               ),
             ],
           ),
+
           // Section B : Pet Type
-          if (petType != "")
+          if (petType == PetType.personal) // personal
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -215,7 +240,7 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ],
             ),
-          if (petType == "community")
+          if (petType == PetType.community)
             InkWell(
               onTap: () async {
                 List<Pet> pets = await petService.getAllCommunityPetsByRegion(
@@ -320,8 +345,9 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ),
             ),
-          // Section B : Pet Information
-          if (petType != "" && caretakerMode != null)
+
+          // Section C : Pet Information
+          if (petType != null && caretakerMode != null)
             InkWell(
               onTap: () {
                 setState(() {
@@ -345,7 +371,7 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ),
             ),
-          if (petType != "")
+          if (petType != null)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -396,11 +422,13 @@ class _AddPetPageState extends State<AddPetPage> {
                   controller: descController,
                   hintText: 'Description',
                   prefixIcon: const Icon(Icons.description),
+                  showOptional: true,
                 ),
                 AppTextFormField(
                   controller: breedController,
-                  hintText: 'Breed (optional)',
+                  hintText: 'Breed',
                   prefixIcon: const Icon(Icons.description),
+                  showOptional: true,
                 ),
                 // Text(
                 //   'Has this community pet been registered?',
@@ -444,6 +472,8 @@ class _AddPetPageState extends State<AddPetPage> {
                   controller: weightController,
                   hintText: 'Weight',
                   prefixIcon: const Icon(Icons.scale_rounded),
+                  showOptional: true,
+                  suffixString: "kg",
                 ),
                 const SizedBoxh10(),
                 Row(
@@ -537,10 +567,14 @@ class _AddPetPageState extends State<AddPetPage> {
                       flex: 1,
                       child: InkWell(
                         onTap: () {
+                          DateTime now = DateTime.now();
+
                           DatePicker.showDateTimePicker(context,
                               showTitleActions: true,
-                              minTime: DateTime(2024, 1, 1),
-                              maxTime: DateTime(2040, 1, 1), onConfirm: (date) {
+                              minTime: now,
+                              maxTime:
+                                  DateTime(now.year + 10, now.month, now.day),
+                              onConfirm: (date) {
                             setState(() {
                               apptDateTime = date;
                               apptDate = true;
@@ -631,7 +665,7 @@ class _AddPetPageState extends State<AddPetPage> {
                         'Ownership',
                         style: textStyles.headlineMedium,
                       ),
-                      if (petType == "personal")
+                      if (petType == PetType.personal)
                         Text(
                           'If this pet has already been added by someone, request role from them.',
                           style: textStyles.bodyMedium,
@@ -750,7 +784,8 @@ class _AddPetPageState extends State<AddPetPage> {
                             idController.text != "" &&
                             birthday &&
                             selectedSpecies != "") {
-                          if (petType == "Personal" || caretakerMode == null) {
+                          if (petType == PetType.personal ||
+                              caretakerMode == null) {
                             caretakers.add(Caretaker(
                                 username: userService.user.name!,
                                 uid: userService.user.uid,
@@ -766,7 +801,7 @@ class _AddPetPageState extends State<AddPetPage> {
                             description: descController.text,
                             sex: selectedSex,
                             species: selectedSpecies,
-                            petType: petType,
+                            petType: petType?.string ?? '',
                             idNumber: idController.text,
                             breed: breedController.text,
                             posts: 0,
@@ -793,7 +828,7 @@ class _AddPetPageState extends State<AddPetPage> {
                                   ]
                                 : [],
                           );
-                          PetService().addPet(
+                          petService.addPet(
                               pet: pet,
                               img: _imageFile,
                               uid: userService.user.uid);
@@ -840,6 +875,51 @@ class _AddPetPageState extends State<AddPetPage> {
   //     setState(() => _imageFile = File(pickedFile.path));
   //   }
   // }
+
+  /// Creates a button that is only shown when not in release mode that
+  /// fills in fields automaticatically upon pressing.
+  /// Used to quickly create a pet.
+  ///
+  /// Default pet name is 'AUTO-<random-number>'
+  Widget showDebugFillFieldsButton(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    if (!kReleaseMode) {
+      return InkWell(
+        onTap: () {
+          // setState to reset
+          setState(() {
+            nameController.text = "AUTO-${Random().nextInt(1000)}";
+            selectedLocation =
+                context.read<UserService>().user.defaultLocation ??
+                    locationList[0];
+            descController.text = "Automatically filled pet";
+            idController.text = "0";
+            breedController.text = "Untitled Breed";
+            birthday = true;
+            birthdayDateTime = DateTime.fromMillisecondsSinceEpoch(0);
+          });
+
+          AppLogger.d("[DEBUG]: Filled in pet fields");
+        },
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: colorScheme.primary,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: const Center(
+            child: Text(
+              'DEBUG: Fill Pet Fields',
+              style: TextStyle(fontSize: 18, color: Colors.white),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Container();
+    }
+  }
 }
 
 class RoleRow extends StatefulWidget {

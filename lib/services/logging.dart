@@ -61,7 +61,7 @@ class AppLogger {
       // Number of method calls to be displayed
       methodCount: 0,
       // Number of method calls if stacktrace is provided
-      errorMethodCount: 8,
+      errorMethodCount: 10,
       // Width of the output
       lineLength: 120,
       // Colorful log messages

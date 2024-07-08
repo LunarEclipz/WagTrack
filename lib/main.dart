@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/firebase_options.dart';
@@ -31,7 +32,10 @@ class WagTrackApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    AppLogger.i("Building main app");
+    AppLogger.i("[MAIN] Building main app...");
+
+    AppLogger.d("kReleaseMode: $kReleaseMode");
+    AppLogger.d("kDebugMode: $kDebugMode");
 
     return MultiProvider(
       providers: [
@@ -48,7 +52,10 @@ class WagTrackApp extends StatelessWidget {
           create: (context) => SymptomService(),
         ),
         ChangeNotifierProvider(
-          create: (context) => MedicationService(),
+          create: (context) => MedicationService(Provider.of<SymptomService>(
+            context,
+            listen: false,
+          )),
         ),
         // Provider<AuthenticationService>(
         //   create: (context) => AuthenticationService(FirebaseAuth.instance),

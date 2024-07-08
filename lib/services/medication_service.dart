@@ -8,6 +8,8 @@ import 'package:wagtrack/services/symptom_service.dart';
 
 /// Communication to Firebase for Medication-related data.
 class MedicationService with ChangeNotifier {
+  final SymptomService _symptomService;
+
   // Instance of Firebase Firestore for interacting with the database
   static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
 
@@ -18,9 +20,13 @@ class MedicationService with ChangeNotifier {
 
   List<MedicationRoutine> get medicationRoutines => _medicationRoutines;
 
+  /// Constructor
+  MedicationService(this._symptomService);
+
   /// Adds a new medication document to the "medication" collection in Firestore
   void addMedicationRoutines({required MedicationRoutine formData}) {
-    AppLogger.d("Adding Medication Routine to Firebase");
+    AppLogger.d("[MED] Adding Medication Routine to Firebase");
+
     _db.collection("medication routines").add(formData.toJSON());
     List<MedicationRoutine> medicationRoutines = [
       ..._medicationRoutines,
@@ -33,7 +39,7 @@ class MedicationService with ChangeNotifier {
   /// Sets MedicationRoutines.
   void setMedicationRoutines(
       {required List<MedicationRoutine> medicationRoutines}) async {
-    AppLogger.d("Setting medicationRoutines");
+    AppLogger.d("[MED] Setting medicationRoutines");
     _medicationRoutines = medicationRoutines;
     notifyListeners();
   }
@@ -61,7 +67,7 @@ class MedicationService with ChangeNotifier {
         medRoutine.oid = docSnapshot.id;
         if (first) {
           for (String symptomID in medRoutine.symptomsID) {
-            SymptomService().updateMID(
+            _symptomService.updateMID(
                 symptomID: symptomID,
                 mID: medRoutine.oid!,
                 mName: medRoutine.title);
@@ -74,7 +80,7 @@ class MedicationService with ChangeNotifier {
       return medRoutines;
     } catch (e) {
       // **Bold Error Message**
-      AppLogger.e("**Error fetching medRoutines for pet ID $petID: $e**");
+      AppLogger.e("[MED] Error fetching medRoutines for pet ID $petID: $e", e);
       return []; // Return an empty list on error
     }
   }

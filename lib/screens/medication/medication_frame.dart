@@ -1,9 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:wagtrack/models/pet_model.dart';
-import 'package:wagtrack/screens/authorisation/login_tab.dart';
-import 'package:wagtrack/screens/authorisation/register_tab.dart';
 import 'package:wagtrack/screens/medication/meds_overview_page.dart';
 import 'package:wagtrack/screens/medication/meds_routine/meds_routine_page.dart';
 import 'package:wagtrack/screens/medication/meds_sessions_page.dart';
