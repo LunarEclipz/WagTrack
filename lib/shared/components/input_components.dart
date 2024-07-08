@@ -40,14 +40,26 @@ class AppSwitch extends StatelessWidget {
 ///
 /// Wrap in a `Form` and supply a `GlobalKey` for external form validation.
 class AppTextFormField extends StatefulWidget {
-  /// Hint text
+  /// Hint text - inside the text field
   final String hintText;
 
-  /// Label Text
+  /// Label Text - above the text field
   final String labelText;
 
   /// Prefix icon
   final Widget? prefixIcon;
+
+  /// Whether or not to append the default "optional" UI item to the field
+  final bool showOptional;
+
+  /// Whether or not to append the default "required" UI item to the field
+  final bool showRequired;
+
+  /// Suffix icon
+  final Widget? suffixIcon;
+
+  /// Suffix text to be placed at the back
+  final String suffixString;
 
   /// TextEditingController
   final TextEditingController? controller;
@@ -65,7 +77,11 @@ class AppTextFormField extends StatefulWidget {
     required this.controller,
     this.hintText = '',
     this.labelText = '',
+    this.showOptional = false,
+    this.showRequired = false,
     this.prefixIcon,
+    this.suffixIcon,
+    this.suffixString = '',
     this.isObscurable = false,
     this.keyboardType = TextInputType.text,
     this.validator,
@@ -106,6 +122,54 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
     final TextStyle? inputTextStyle = textStyles.bodyLarge
         ?.copyWith(color: AppTheme.customColors.secondaryText);
 
+    String? hintText = widget.hintText;
+    String? labelText = widget.labelText;
+
+    // now change text based on optional/required
+    // mutually exclusive, with required taking priority over optional
+    //
+    // Label text takes precedence over hint text
+    if (widget.showRequired) {
+      if (widget.labelText.isNotEmpty) {
+        labelText = "${widget.labelText} (required)";
+      } else if (widget.hintText.isNotEmpty) {
+        hintText = "${widget.hintText} (required)";
+      }
+    } else if (widget.showOptional) {
+      if (widget.labelText.isNotEmpty) {
+        labelText = "${widget.labelText} (optional)";
+      } else if (widget.hintText.isNotEmpty) {
+        hintText = "${widget.hintText} (optional)";
+      }
+    }
+
+    final obscurer = widget.isObscurable
+        ? IconButton(
+            onPressed: () {
+              setState(() {
+                _obscuretext = !_obscuretext;
+              });
+            },
+            icon: Icon(
+              _obscuretext ? Icons.visibility_off : Icons.visibility,
+            ),
+          )
+        : null;
+
+    // if there is a suffix Icon, it overrides obscurer
+    Widget? suffixIcon = widget.suffixIcon ?? obscurer;
+
+    // if there is suffix text, that overrides suffix icon
+    // TODO suffix text is currently aligned top
+    if (widget.suffixString.isNotEmpty) {
+      debugPrint(widget.suffixString);
+      suffixIcon = Text(
+        widget.suffixString,
+        style: textStyles.bodyLarge
+            ?.copyWith(color: AppTheme.customColors.secondaryText),
+      );
+    }
+
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscuretext,
@@ -114,24 +178,13 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       textAlignVertical: TextAlignVertical.top,
       decoration: InputDecoration(
-          hintText: widget.hintText,
-          labelText: widget.labelText,
+          hintText: hintText,
+          labelText: labelText,
           prefixIcon: widget.prefixIcon,
           prefixIconColor: AppTheme.customColors.hint,
           prefixStyle: inputTextStyle,
           floatingLabelBehavior: FloatingLabelBehavior.always,
-          suffixIcon: widget.isObscurable
-              ? IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _obscuretext = !_obscuretext;
-                    });
-                  },
-                  icon: Icon(
-                    _obscuretext ? Icons.visibility_off : Icons.visibility,
-                  ),
-                )
-              : null,
+          suffixIcon: suffixIcon,
           contentPadding: EdgeInsets.zero),
       style: inputTextStyle,
     );

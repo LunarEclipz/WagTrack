@@ -419,11 +419,13 @@ class _AddPetPageState extends State<AddPetPage> {
                   controller: descController,
                   hintText: 'Description',
                   prefixIcon: const Icon(Icons.description),
+                  showOptional: true,
                 ),
                 AppTextFormField(
                   controller: breedController,
-                  hintText: 'Breed (optional)',
+                  hintText: 'Breed',
                   prefixIcon: const Icon(Icons.description),
+                  showOptional: true,
                 ),
                 // Text(
                 //   'Has this community pet been registered?',
@@ -467,6 +469,7 @@ class _AddPetPageState extends State<AddPetPage> {
                   controller: weightController,
                   hintText: 'Weight',
                   prefixIcon: const Icon(Icons.scale_rounded),
+                  showOptional: true,
                 ),
                 const SizedBoxh10(),
                 Row(
@@ -658,7 +661,7 @@ class _AddPetPageState extends State<AddPetPage> {
                         'Ownership',
                         style: textStyles.headlineMedium,
                       ),
-                      if (petType == "personal")
+                      if (petType == PetType.personal)
                         Text(
                           'If this pet has already been added by someone, request role from them.',
                           style: textStyles.bodyMedium,
