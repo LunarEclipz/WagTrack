@@ -23,18 +23,24 @@ class _HomeState extends State<Home> {
   String? uid;
   List<Pet> personalPets = [];
   List<Pet> communityPets = [];
-  bool loaded = false;
 
+  /// Init
   @override
   void initState() {
     super.initState();
+
+    /// load pets
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userService = Provider.of<UserService>(context, listen: false);
+      final petService = Provider.of<PetService>(context, listen: false);
+      uid = userService.user.uid;
+
+      getAllPets(uid, petService);
+    });
   }
 
-  void getAllPets() async {
-    final UserService userService = context.watch<UserService>();
-    uid = userService.user.uid;
-    final PetService petService = context.watch<PetService>();
-    List<Pet> pets = await PetService().getAllPetsByUID(uid: uid!);
+  void getAllPets(String? uid, PetService petService) async {
+    List<Pet> pets = await petService.getAllPetsByUID(uid: uid!);
     petService.setPersonalCommunityPets(pets: pets);
     personalPets = petService.personalPets;
     communityPets = petService.communityPets;
@@ -43,17 +49,10 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
+
+    // always have to initialise these for the PostFrameCallback
     final UserService userService = context.watch<UserService>();
     final PetService petService = context.watch<PetService>();
-
-    name = userService.user.name;
-    uid = userService.user.uid;
-    if (!loaded) {
-      getAllPets();
-      setState(() {
-        loaded = true;
-      });
-    }
     personalPets = petService.personalPets;
     communityPets = petService.communityPets;
 
@@ -89,6 +88,16 @@ class _HomeState extends State<Home> {
                 )),
       ),
       const SizedBoxh20(),
+      // ListView.separated(
+      //   itemBuilder: (BuildContext context, int index) => BuildPetCard(
+      //     petData: personalPets[index],
+      //   ),
+      //   separatorBuilder: (BuildContext context, int index) => Container(),
+      //   itemCount: personalPets.length,
+      //   physics: const ClampingScrollPhysics(),
+      //   shrinkWrap: true,
+      // ),
+      // const SizedBoxh20(),
 
       Text(
         "Community Pets",

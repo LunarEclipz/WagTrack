@@ -87,5 +87,7 @@ class SymptomService with ChangeNotifier {
       "mName": FieldValue.arrayUnion([mName]),
     }).then((value) => AppLogger.d("Successfully Updated Session Records"),
         onError: (e) => AppLogger.d("Error Updating Session Records: $e"));
+
+    notifyListeners();
   }
 }

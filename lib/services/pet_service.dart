@@ -22,32 +22,39 @@ class PetService with ChangeNotifier {
 
   void addPet(
       {required Pet pet, required File? img, required String uid}) async {
-    AppLogger.d("Adding pet");
+    AppLogger.d("[PET] Adding pet");
     try {
-      uploadPetImage(image: img, uid: pet.caretakers[0].uid).then((imgPath) {
-        pet.imgPath = imgPath;
-        _db.collection("pets").add(pet.toJSON());
-      });
-      AppLogger.i("Pet added");
+      // upload pet image and wait
+      String? imgPath =
+          await uploadPetImage(image: img, uid: pet.caretakers[0].uid);
+
+      // set pet image path
+      pet.imgPath = imgPath;
+
+      // WAIT for pet to be added to db!!!
+      await _db.collection("pets").add(pet.toJSON());
+
+      AppLogger.i("[PET] Pet added successfully");
       List<Pet> pets = await PetService().getAllPetsByUID(uid: uid);
       setPersonalCommunityPets(pets: pets);
     } catch (e) {
       // TODO is there a specific error that you want to catch?
       _db.collection("pets").add(pet.toJSON());
-      AppLogger.e("Error adding pet: $e", e);
+      AppLogger.e("[PET] Error adding pet: $e", e);
     }
+
+    notifyListeners();
   }
 
-  /// Sets List of Personal and Community Pets.
-  void setPersonalCommunityPets({required List<Pet> pets}) async {
-    AppLogger.d("Setting Personal and Community Pets");
+  /// Sets internal lists of Personal and Community Pets.
+  void setPersonalCommunityPets({required List<Pet> pets}) {
+    AppLogger.d("[PET] Setting Personal and Community Pets");
     _personalPets = pets.where((pet) => pet.petType == "personal").toList();
     _communityPets = pets.where((pet) => pet.petType == "community").toList();
     notifyListeners();
   }
 
   Future<List<Pet>> getAllPetsByUID({required String uid}) async {
-    AppLogger.d("Getting all pets by uid");
     try {
       final querySnapshot = await _db
           .collection("pets")
@@ -61,17 +68,19 @@ class PetService with ChangeNotifier {
         pet.petID = docSnapshot.id;
         pets.add(pet);
       }
-      AppLogger.i("Pets fetched (by uid) successfully");
+      AppLogger.i("[PET] Pets fetched (by uid) successfully");
+      notifyListeners();
       return pets;
     } catch (e) {
-      AppLogger.e("Error fetching pets for uid $uid: $e", e);
+      AppLogger.e("[PET] Error fetching pets for uid $uid: $e", e);
+      notifyListeners();
       return []; // Return an empty list on error
     }
   }
 
   Future<List<Pet>> getAllCommunityPetsByRegion(
       {required String location}) async {
-    AppLogger.d("Getting all community pets by location");
+    AppLogger.d("[PET] Getting all community pets by location");
     try {
       final querySnapshot = await _db
           .collection("pets")
@@ -85,17 +94,18 @@ class PetService with ChangeNotifier {
         final pet = Pet.fromJson(petData);
         pets.add(pet);
       }
-      AppLogger.i("Community pets fetched (by loc) successfully");
+      AppLogger.i("[PET] Community pets fetched (by loc) successfully");
       return pets;
     } catch (e) {
-      AppLogger.e("Error fetching community pets for location: $e", e);
+      AppLogger.e("[PET] Error fetching community pets for location: $e", e);
       return []; // Return an empty list on error
     }
   }
 
   /// Uploads Image to Firebase Storage.
-  uploadPetImage({required File? image, required String uid}) async {
-    AppLogger.d("Uploading pet image");
+  Future<String?> uploadPetImage(
+      {required File? image, required String uid}) async {
+    AppLogger.d("[PET] Uploading pet image");
     if (image != null) {
       try {
         var file = File(image.path);
@@ -106,59 +116,71 @@ class PetService with ChangeNotifier {
             .ref("petProfile/$uid/")
             .child(basename(image.path))
             .putFile(file);
-        AppLogger.t("File uploaded to Firebase storage");
+        AppLogger.t("[PET] File uploaded to Firebase storage");
         final imageUrl = await _storageRef
             .child("petProfile/$uid/${basename(image.path)}")
             .getDownloadURL();
-        AppLogger.i("Pet image added succesfully");
+        AppLogger.i("[PET] Pet image added succesfully");
         return imageUrl;
       } catch (e) {
-        AppLogger.e("Error uploading pet image: $e", e);
+        AppLogger.e("[PET] Error uploading pet image: $e", e);
+        return null;
       }
     } else {
-      AppLogger.w("Pet image is null");
+      AppLogger.w("[PET] Pet image is null");
+      return null;
     }
   }
 
   /// Update weight log
   void updateWeightLog(
       {required Pet petData, required List<DateTimeStringPair> weightLog}) {
-    AppLogger.d("Updating Weight Log");
+    AppLogger.d("[PET] Updating Weight Log");
     final petRef = _db.collection("pets").doc(petData.petID);
 
     petRef.update({
       "weight": weightLog.map((weight) => weight.toJSON()).toList(),
-    }).then((value) => AppLogger.d("Successfully Updated Weight Log"),
-        onError: (e) => AppLogger.d("Error Updating Weight Log: $e"));
+    }).then((value) => AppLogger.d("[PET] Successfully Updated Weight Log"),
+        onError: (e) => AppLogger.d("[PET] Error Updating Weight Log: $e"));
+
+    notifyListeners();
   }
 
   /// Update Vaccine Records
   void updateVaccineRecords(
       {required Pet petData,
       required List<DateTimeStringPair> vaccineRecords}) {
-    AppLogger.d("Updating Vaccine Records");
+    AppLogger.d("[PET] Updating Vaccine Records");
     final petRef = _db.collection("pets").doc(petData.petID);
 
     petRef.update({
       "vaccineRecords": vaccineRecords
           .map((vaccineRecord) => vaccineRecord.toJSON())
           .toList(),
-    }).then((value) => AppLogger.d("Successfully Updated Vaccine Records"),
-        onError: (e) => AppLogger.d("Error Updating Vaccine Records: $e"));
+    }).then(
+        (value) => AppLogger.d("[PET] Successfully Updated Vaccine Records"),
+        onError: (e) =>
+            AppLogger.d("[PET] Error Updating Vaccine Records: $e"));
+
+    notifyListeners();
   }
 
   /// Update Session Records
   void updateSessionRecords(
       {required Pet petData,
       required List<DateTimeStringPair> sessionRecords}) {
-    AppLogger.d("Updating Session Records");
+    AppLogger.d("[PET] Updating Session Records");
     final petRef = _db.collection("pets").doc(petData.petID);
 
     petRef.update({
       "sessionRecords": sessionRecords
           .map((sessionRecord) => sessionRecord.toJSON())
           .toList(),
-    }).then((value) => AppLogger.d("Successfully Updated Session Records"),
-        onError: (e) => AppLogger.d("Error Updating Session Records: $e"));
+    }).then(
+        (value) => AppLogger.d("[PET] Successfully Updated Session Records"),
+        onError: (e) =>
+            AppLogger.d("[PET] Error Updating Session Records: $e"));
+
+    notifyListeners();
   }
 }

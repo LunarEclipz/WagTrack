@@ -94,8 +94,8 @@ class Pet {
           .toList(),
       posts: json["posts"] as int,
       fans: json["fans"] as int,
-      imgPath: json["imgPath"] as String,
-      breed: json["breed"] as String,
+      imgPath: json["imgPath"] as String? ?? "",
+      breed: json["breed"] as String? ?? "",
       vaccineRecords: (json["vaccineRecords"] as List)
           .map((vaccineRecordsData) =>
               DateTimeStringPair.fromJson(vaccineRecordsData))
