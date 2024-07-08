@@ -2,13 +2,16 @@
 // Breed, Birthdate, weight, Appointment Date, Caretakers, Community Pet are milestone 2 Features
 
 import 'dart:io';
+import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/user_model.dart';
+import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
@@ -111,6 +114,9 @@ class _AddPetPageState extends State<AddPetPage> {
       body: DefaultTextStyle.merge(
         style: textStyles.bodyLarge,
         child: AppScrollablePage(children: [
+          // DEBUG ONLY BUTTON
+          showDebugFillFieldsButton(context),
+
           // Section A : Pet Type
           Text(
             'My Pet is a ...',
@@ -187,8 +193,9 @@ class _AddPetPageState extends State<AddPetPage> {
               ),
             ],
           ),
+
           // Section B : Pet Type
-          if (petType != "")
+          if (petType != "") // personal
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -319,7 +326,8 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ),
             ),
-          // Section B : Pet Information
+
+          // Section C : Pet Information
           if (petType != "" && caretakerMode != null)
             InkWell(
               onTap: () {
@@ -536,10 +544,14 @@ class _AddPetPageState extends State<AddPetPage> {
                       flex: 1,
                       child: InkWell(
                         onTap: () {
+                          DateTime now = DateTime.now();
+
                           DatePicker.showDateTimePicker(context,
                               showTitleActions: true,
-                              minTime: DateTime(2024, 1, 1),
-                              maxTime: DateTime(2040, 1, 1), onConfirm: (date) {
+                              minTime: now,
+                              maxTime:
+                                  DateTime(now.year + 10, now.month, now.day),
+                              onConfirm: (date) {
                             setState(() {
                               apptDateTime = date;
                               apptDate = true;
@@ -839,6 +851,51 @@ class _AddPetPageState extends State<AddPetPage> {
   //     setState(() => _imageFile = File(pickedFile.path));
   //   }
   // }
+
+  /// Creates a button that is only shown when not in release mode that
+  /// fills in fields automaticatically upon pressing.
+  /// Used to quickly create a pet.
+  ///
+  /// Default pet name is 'AUTO-<random-number>'
+  Widget showDebugFillFieldsButton(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    if (!kReleaseMode) {
+      return InkWell(
+        onTap: () {
+          // setState to reset
+          setState(() {
+            nameController.text = "AUTO-${Random().nextInt(1000)}";
+            selectedLocation =
+                context.read<UserService>().user.defaultLocation ??
+                    locationList[0];
+            descController.text = "Automatically filled pet";
+            idController.text = "0";
+            breedController.text = "Untitled Breed";
+            birthday = true;
+            birthdayDateTime = DateTime.fromMillisecondsSinceEpoch(0);
+          });
+
+          AppLogger.d("[DEBUG]: Filled in pet fields");
+        },
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: colorScheme.primary,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: const Center(
+            child: Text(
+              'DEBUG: Fill Pet Fields',
+              style: TextStyle(fontSize: 18, color: Colors.white),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Container();
+    }
+  }
 }
 
 class RoleRow extends StatefulWidget {
