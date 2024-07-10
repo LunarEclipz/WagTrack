@@ -48,10 +48,10 @@ class _AddPetPageState extends State<AddPetPage> {
   late String selectedLocation = "";
   late String selectedSex = "Male";
   late String selectedSpecies = "Dog";
-  late bool birthday = false;
+  late bool isBirthdaySet = false;
   late DateTime birthdayDateTime;
 
-  late bool apptDate = false;
+  late bool isApptDateSet = false;
   late DateTime apptDateTime;
 
   late List<Caretaker> caretakers = [];
@@ -491,11 +491,11 @@ class _AddPetPageState extends State<AddPetPage> {
                               maxTime: DateTime.now(), onConfirm: (date) {
                             setState(() {
                               birthdayDateTime = date;
-                              birthday = true;
+                              isBirthdaySet = true;
                             });
                           }, onCancel: () {
                             setState(() {
-                              birthday = false;
+                              isBirthdaySet = false;
                             });
                           },
                               currentTime: DateTime.now(),
@@ -511,7 +511,7 @@ class _AddPetPageState extends State<AddPetPage> {
                                   padding: const EdgeInsets.all(
                                     8,
                                   ),
-                                  child: birthday == false
+                                  child: isBirthdaySet == false
                                       ? Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -591,11 +591,11 @@ class _AddPetPageState extends State<AddPetPage> {
                               onConfirm: (date) {
                             setState(() {
                               apptDateTime = date;
-                              apptDate = true;
+                              isApptDateSet = true;
                             });
                           }, onCancel: () {
                             setState(() {
-                              apptDate = false;
+                              isApptDateSet = false;
                             });
                           },
                               currentTime: DateTime.now(),
@@ -611,7 +611,7 @@ class _AddPetPageState extends State<AddPetPage> {
                                   padding: const EdgeInsets.all(
                                     8,
                                   ),
-                                  child: apptDate == false
+                                  child: isApptDateSet == false
                                       ? Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -807,7 +807,7 @@ class _AddPetPageState extends State<AddPetPage> {
                             selectedLocation != "" &&
                             descController.text != "" &&
                             idController.text != "" &&
-                            birthday &&
+                            isBirthdaySet &&
                             selectedSpecies != "") {
                           if (petType == PetType.personal ||
                               caretakerMode == null) {
@@ -845,7 +845,7 @@ class _AddPetPageState extends State<AddPetPage> {
                             caretakers: caretakers,
                             caretakerIDs: caretakerIDs,
                             vaccineRecords: [],
-                            sessionRecords: apptDate
+                            sessionRecords: isApptDateSet
                                 ? [
                                     DateTimeStringPair(
                                         dateTime: apptDateTime,
@@ -921,7 +921,7 @@ class _AddPetPageState extends State<AddPetPage> {
             descController.text = "Automatically filled pet";
             idController.text = "0";
             breedController.text = "Untitled Breed";
-            birthday = true;
+            isBirthdaySet = true;
             birthdayDateTime = DateTime.fromMillisecondsSinceEpoch(0);
           });
 

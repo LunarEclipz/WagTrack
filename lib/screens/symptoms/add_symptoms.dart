@@ -24,8 +24,8 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
   late String selectedTag = "";
   late List<String> tags = [];
 
-  late bool startDate = false;
-  late bool endDate = false;
+  late bool isStartDateSet = false;
+  late bool isEndDateSet = false;
   late DateTime startDateTime;
   late DateTime endDateTime;
 
@@ -113,11 +113,11 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                         maxTime: DateTime.now(), onConfirm: (date) {
                       setState(() {
                         startDateTime = date;
-                        startDate = true;
+                        isStartDateSet = true;
                       });
                     }, onCancel: () {
                       setState(() {
-                        startDate = false;
+                        isStartDateSet = false;
                       });
                     }, currentTime: DateTime.now(), locale: LocaleType.en);
                   },
@@ -129,7 +129,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                           padding: const EdgeInsets.all(
                             8,
                           ),
-                          child: startDate == false
+                          child: isStartDateSet == false
                               ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -191,11 +191,11 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                         maxTime: DateTime.now(), onConfirm: (date) {
                       setState(() {
                         endDateTime = date;
-                        endDate = true;
+                        isEndDateSet = true;
                       });
                     }, onCancel: () {
                       setState(() {
-                        endDate = false;
+                        isEndDateSet = false;
                       });
                     }, currentTime: DateTime.now(), locale: LocaleType.en);
                   },
@@ -207,7 +207,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                           padding: const EdgeInsets.all(
                             8,
                           ),
-                          child: endDate == false
+                          child: isEndDateSet == false
                               ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -416,8 +416,8 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                 onTap: () {
                   if (selectedCategory != "" &&
                       selectedSymptoms != "" &&
-                      startDate == true) {
-                    Symptom formData = !endDate
+                      isStartDateSet == true) {
+                    Symptom formData = !isEndDateSet
                         ? Symptom(
                             petID: widget.petData.petID!,
                             // Add symptom can only be accessed through PetID
@@ -427,7 +427,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                             startDate: startDateTime,
                             severity: _currentSliderValue.toInt(),
                             tags: tags,
-                            hasEnd: endDate,
+                            hasEnd: isEndDateSet,
                           )
                         : Symptom(
                             petID: widget.petData.petID!,
@@ -438,7 +438,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                             startDate: startDateTime,
                             severity: _currentSliderValue.toInt(),
                             tags: tags,
-                            hasEnd: endDate,
+                            hasEnd: isEndDateSet,
                             endDate: endDateTime);
                     symptomService.addSymptoms(formData: formData);
                     Navigator.pop(context);
