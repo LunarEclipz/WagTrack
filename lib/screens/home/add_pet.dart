@@ -512,20 +512,34 @@ class _AddPetPageState extends State<AddPetPage> {
                                     8,
                                   ),
                                   child: birthday == false
-                                      ? Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              "Set Birthday",
-                                              style: textStyles.bodyLarge!
-                                                  .copyWith(
-                                                      color:
-                                                          colorScheme.primary),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Set Birthday",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(Icons.cake_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
                                             ),
-                                            Icon(Icons.cake_rounded,
-                                                size: 20,
-                                                color: colorScheme.primary),
+                                            // Text(
+                                            //   "Mandatory*",
+                                            //   style: textStyles.bodyMedium!
+                                            //       .copyWith(
+                                            //           color:
+                                            //               colorScheme.primary),
+                                            // ),
                                           ],
                                         )
                                       : Column(
@@ -598,20 +612,31 @@ class _AddPetPageState extends State<AddPetPage> {
                                     8,
                                   ),
                                   child: apptDate == false
-                                      ? Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              "Check Up",
-                                              style: textStyles.bodyLarge!
-                                                  .copyWith(
-                                                      color:
-                                                          colorScheme.primary),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Check Up",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(
+                                                    Icons
+                                                        .calendar_month_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
                                             ),
-                                            Icon(Icons.calendar_month_rounded,
-                                                size: 20,
-                                                color: colorScheme.primary),
+                                            Text("(optional)",
+                                                style: textStyles.bodyMedium),
                                           ],
                                         )
                                       : Column(
