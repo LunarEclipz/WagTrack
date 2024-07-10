@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/user_model.dart';
+import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/services/user_service.dart';
@@ -39,6 +40,9 @@ class AddPetPage extends StatefulWidget {
 }
 
 class _AddPetPageState extends State<AddPetPage> {
+  // Form key for all pet fields
+  final _petInputFormKey = GlobalKey<FormState>();
+
   late String? uid;
   late String? username;
 
@@ -699,6 +703,11 @@ class _AddPetPageState extends State<AddPetPage> {
                         controller: usersController,
                         hintText: 'User\'s Email',
                         prefixIcon: const Icon(Icons.person),
+                        validator: (value) => !context
+                                .read<AuthenticationService>()
+                                .isEmailValidEmail(value!)
+                            ? 'Invalid email'
+                            : null,
                       ),
                       InkWell(
                         onTap: () async {
