@@ -50,6 +50,8 @@ class AppTextFormField extends StatefulWidget {
   final Widget? prefixIcon;
 
   /// Whether or not to append the default "optional" UI item to the field
+  ///
+  /// Also sets validator to be empty (disabled) if no other validator is set.
   final bool showOptional;
 
   /// Whether or not to append the default "required" UI item to the field
@@ -63,6 +65,11 @@ class AppTextFormField extends StatefulWidget {
 
   /// TextEditingController
   final TextEditingController? controller;
+
+  /// Defaults to `AutovalidateMode.onUserInteraction`.
+  ///
+  /// `AutovalidateMode.always` or `AutovalidateMode.disabled`
+  final AutovalidateMode autovalidateMode;
 
   /// Whether this field is obscurable.
   ///
@@ -82,6 +89,7 @@ class AppTextFormField extends StatefulWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.suffixString = '',
+    this.autovalidateMode = AutovalidateMode.onUserInteraction,
     this.isObscurable = false,
     this.keyboardType = TextInputType.text,
     this.validator,
@@ -172,12 +180,20 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
       );
     }
 
+    // set default validator
+    final String? Function(dynamic value) defaultValidator;
+    if (widget.showOptional) {
+      defaultValidator = (value) => InputStringValidators.emptyValidator(value);
+    } else {
+      defaultValidator = (value) => emptyStringValidator(value);
+    }
+
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscuretext,
       keyboardType: widget.keyboardType,
-      validator: widget.validator ?? (value) => emptyStringValidator(value),
-      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: widget.validator ?? defaultValidator,
+      autovalidateMode: widget.autovalidateMode,
       textAlignVertical: TextAlignVertical.top,
       decoration: InputDecoration(
         // isDense: true,

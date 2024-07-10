@@ -481,26 +481,27 @@ class _AddPetPageState extends State<AddPetPage> {
                   ),
                   const SizedBoxh10(),
                   AppTextFormField(
-                      controller: weightController,
-                      hintText: 'Weight',
-                      prefixIcon: const Icon(Icons.scale_rounded),
-                      showOptional: true,
-                      suffixString: "kg",
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          // if empty don't do anything (since optional)
-                          return null;
-                        }
-
-                        if (!isNumeric(value) || value[0] == "-") {
-                          // Input string is not numeric
-                          // Also checking if negative,
-                          // easier than just converting it to a double
-                          return "Please enter a valid weight";
-                        }
-
+                    controller: weightController,
+                    hintText: 'Weight',
+                    prefixIcon: const Icon(Icons.scale_rounded),
+                    showOptional: true,
+                    suffixString: "kg",
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        // if empty don't do anything (since optional)
                         return null;
-                      }),
+                      }
+
+                      if (!isNumeric(value) || value[0] == "-") {
+                        // Input string is not numeric
+                        // Also checking if negative,
+                        // easier than just converting it to a double
+                        return "Please enter a valid weight";
+                      }
+
+                      return null;
+                    },
+                  ),
                   const SizedBoxh10(),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
