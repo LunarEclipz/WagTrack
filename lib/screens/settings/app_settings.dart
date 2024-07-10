@@ -94,6 +94,9 @@ class _AppSettingsState extends State<AppSettings> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Changes saved!')),
       );
+
+      // unfocus fields
+      FocusScope.of(context).unfocus();
     }
   }
 
