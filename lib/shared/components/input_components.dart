@@ -406,3 +406,11 @@ class _AppDropdownState extends State<AppDropdown> {
     );
   }
 }
+
+/// String validator functions matching the format of `String? -> String?`
+class StringValidators {
+  /// validator that doesn't do anything. Use for optional fields
+  String? emptyValidator(String? value) {
+    return null;
+  }
+}
