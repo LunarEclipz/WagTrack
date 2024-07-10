@@ -223,6 +223,11 @@ class AppTextFormFieldLarge extends StatefulWidget {
   /// TextEditingController
   final TextEditingController? controller;
 
+  /// Defaults to `AutovalidateMode.onUserInteraction`.
+  ///
+  /// `AutovalidateMode.always` or `AutovalidateMode.disabled`
+  final AutovalidateMode autovalidateMode;
+
   /// Whether this field is obscurable.
   ///
   /// Obscurable fields are obscured by default.
@@ -238,6 +243,7 @@ class AppTextFormFieldLarge extends StatefulWidget {
     this.labelText = '',
     this.prefixIcon,
     this.isObscurable = false,
+    this.autovalidateMode = AutovalidateMode.onUserInteraction,
     this.keyboardType = TextInputType.text,
     this.validator,
   });
@@ -282,7 +288,7 @@ class _AppTextFormFieldLargeState extends State<AppTextFormFieldLarge> {
       obscureText: _obscuretext,
       keyboardType: widget.keyboardType,
       validator: widget.validator ?? (value) => emptyStringValidator(value),
-      autovalidateMode: AutovalidateMode.onUserInteraction,
+      autovalidateMode: widget.autovalidateMode,
       textAlignVertical: TextAlignVertical.top,
       decoration: InputDecoration(
         hintText: widget.hintText,

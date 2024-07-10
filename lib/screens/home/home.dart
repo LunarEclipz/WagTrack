@@ -19,7 +19,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String? name;
+  String name = "";
   String? uid;
   List<Pet> personalPets = [];
   List<Pet> communityPets = [];
@@ -34,6 +34,7 @@ class _HomeState extends State<Home> {
       final userService = Provider.of<UserService>(context, listen: false);
       final petService = Provider.of<PetService>(context, listen: false);
       uid = userService.user.uid;
+      name = userService.user.name!;
 
       getAllPets(uid, petService);
     });
@@ -58,7 +59,9 @@ class _HomeState extends State<Home> {
 
     return AppScrollablePage(children: <Widget>[
       Text(
-        "Welcome Back ${name ?? ''}",
+        name.isEmpty
+            ? "Welcome Back ${name ?? ''}"
+            : "Welcome Back ${name ?? ''}",
         style: textStyles.headlineMedium,
       ),
       const SizedBoxh20(),
