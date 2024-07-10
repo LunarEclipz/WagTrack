@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:string_validator/string_validator.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/user_model.dart';
+import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/services/user_service.dart';
@@ -39,6 +41,9 @@ class AddPetPage extends StatefulWidget {
 }
 
 class _AddPetPageState extends State<AddPetPage> {
+  // Form key for all pet fields
+  final _petInputFormKey = GlobalKey<FormState>();
+
   late String? uid;
   late String? username;
 
@@ -48,10 +53,10 @@ class _AddPetPageState extends State<AddPetPage> {
   late String selectedLocation = "";
   late String selectedSex = "Male";
   late String selectedSpecies = "Dog";
-  late bool birthday = false;
+  late bool isBirthdaySet = false;
   late DateTime birthdayDateTime;
 
-  late bool apptDate = false;
+  late bool isApptDateSet = false;
   late DateTime apptDateTime;
 
   late List<Caretaker> caretakers = [];
@@ -371,492 +376,542 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ),
             ),
+          // Main pet info section
           if (petType != null)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const SizedBoxh20(),
-                Text(
-                  'Pet Information',
-                  style: textStyles.headlineMedium,
-                ),
-                const SizedBoxh10(),
-                if (caretakerMode != null)
-                  caretakerMode!.imgPath == null
-                      ? const CircleAvatar(
-                          backgroundColor: Color.fromARGB(255, 41, 41, 41),
+            Form(
+              key: _petInputFormKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const SizedBoxh20(),
+                  Text(
+                    'Pet Information',
+                    style: textStyles.headlineMedium,
+                  ),
+                  const SizedBoxh10(),
+                  if (caretakerMode != null)
+                    caretakerMode!.imgPath == null
+                        ? const CircleAvatar(
+                            backgroundColor: Color.fromARGB(255, 41, 41, 41),
+                            radius: 100,
+                          )
+                        : CircleAvatar(
+                            backgroundImage: Image.network(
+                              caretakerMode!.imgPath!,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ).image,
+                            radius: 100,
+                          ),
+
+                  if (_imageFile == null && caretakerMode == null)
+                    InkWell(
+                        onTap: () async => _pickImageFromGallery(),
+                        child: const CircleAvatar(
                           radius: 100,
-                        )
-                      : CircleAvatar(
-                          backgroundImage: Image.network(
-                            caretakerMode!.imgPath!,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          ).image,
-                          radius: 100,
-                        ),
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Icons.add_a_photo_rounded,
+                            size: 100,
+                          ),
+                        )),
+                  if (_imageFile != null && caretakerMode == null)
+                    InkWell(
+                        onTap: () async => _pickImageFromGallery(),
+                        child: CircleAvatar(
+                            radius: 100,
+                            backgroundImage: Image.file(_imageFile!).image)),
+                  AppTextFormField(
+                    controller: nameController,
+                    hintText: 'Name',
+                    prefixIcon: const Icon(Icons.person_outline),
+                  ),
+                  AppTextFormField(
+                    controller: descController,
+                    hintText: 'Description',
+                    prefixIcon: const Icon(Icons.description),
+                    showOptional: true,
+                    validator: (value) =>
+                        InputStringValidators.emptyValidator(value),
+                  ),
+                  AppTextFormField(
+                    controller: breedController,
+                    hintText: 'Breed',
+                    prefixIcon: const Icon(Icons.description),
+                    showOptional: true,
+                    validator: (value) =>
+                        InputStringValidators.emptyValidator(value),
+                  ),
+                  // Text(
+                  //   'Has this community pet been registered?',
+                  //   style: textStyles.bodyMedium,
+                  // ),
+                  const SizedBoxh20(),
+                  AppDropdown(
+                    optionsList: sexList,
+                    selectedText: selectedSex,
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedSex = value!;
+                      });
+                    },
+                  ),
+                  const SizedBoxh20(),
 
-                if (_imageFile == null && caretakerMode == null)
-                  InkWell(
-                      onTap: () async => _pickImageFromGallery(),
-                      child: const CircleAvatar(
-                        radius: 100,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.add_a_photo_rounded,
-                          size: 100,
-                        ),
-                      )),
-                if (_imageFile != null && caretakerMode == null)
-                  InkWell(
-                      onTap: () async => _pickImageFromGallery(),
-                      child: CircleAvatar(
-                          radius: 100,
-                          backgroundImage: Image.file(_imageFile!).image)),
-                AppTextFormField(
-                  controller: nameController,
-                  hintText: 'Name',
-                  prefixIcon: const Icon(Icons.person_outline),
-                ),
-                AppTextFormField(
-                  controller: descController,
-                  hintText: 'Description',
-                  prefixIcon: const Icon(Icons.description),
-                  showOptional: true,
-                ),
-                AppTextFormField(
-                  controller: breedController,
-                  hintText: 'Breed',
-                  prefixIcon: const Icon(Icons.description),
-                  showOptional: true,
-                ),
-                // Text(
-                //   'Has this community pet been registered?',
-                //   style: textStyles.bodyMedium,
-                // ),
-                const SizedBoxh20(),
-                AppDropdown(
-                  optionsList: sexList,
-                  selectedText: selectedSex,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedSex = value!;
-                    });
-                  },
-                ),
-                const SizedBoxh20(),
+                  AppDropdown(
+                    optionsList: speciesList,
+                    selectedText: selectedSpecies,
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedSpecies = value!;
+                      });
+                    },
+                  ),
 
-                AppDropdown(
-                  optionsList: speciesList,
-                  selectedText: selectedSpecies,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedSpecies = value!;
-                    });
-                  },
-                ),
+                  // Section C : Pet Details
+                  const SizedBoxh20(),
+                  Text(
+                    'Pet Details',
+                    style: textStyles.headlineMedium,
+                  ),
+                  AppTextFormField(
+                    controller: idController,
+                    hintText: 'Microchip Number',
+                    prefixIcon: const Icon(Icons.card_membership_rounded),
+                  ),
+                  const SizedBoxh10(),
+                  AppTextFormField(
+                    controller: weightController,
+                    hintText: 'Weight',
+                    prefixIcon: const Icon(Icons.scale_rounded),
+                    showOptional: true,
+                    suffixString: "kg",
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        // if empty don't do anything (since optional)
+                        return null;
+                      }
 
-                // Section C : Pet Details
-                const SizedBoxh20(),
-                Text(
-                  'Pet Details',
-                  style: textStyles.headlineMedium,
-                ),
-                AppTextFormField(
-                  controller: idController,
-                  hintText: 'Microchip Number',
-                  prefixIcon: const Icon(Icons.card_membership_rounded),
-                ),
-                const SizedBoxh10(),
-                AppTextFormField(
-                  controller: weightController,
-                  hintText: 'Weight',
-                  prefixIcon: const Icon(Icons.scale_rounded),
-                  showOptional: true,
-                  suffixString: "kg",
-                ),
-                const SizedBoxh10(),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Birthday
-                    Flexible(
-                      flex: 1,
-                      child: InkWell(
-                        onTap: () {
-                          DatePicker.showDatePicker(context,
-                              showTitleActions: true,
-                              minTime: DateTime(1999, 1, 1),
-                              maxTime: DateTime.now(), onConfirm: (date) {
-                            setState(() {
-                              birthdayDateTime = date;
-                              birthday = true;
-                            });
-                          }, onCancel: () {
-                            setState(() {
-                              birthday = false;
-                            });
-                          },
-                              currentTime: DateTime.now(),
-                              locale: LocaleType.en);
-                        },
-                        child: Column(
-                          children: [
-                            Card(
-                              color: Colors.white,
-                              child: SizedBox(
-                                width: 170,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                    8,
-                                  ),
-                                  child: birthday == false
-                                      ? Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              "Set Birthday",
-                                              style: textStyles.bodyLarge!
-                                                  .copyWith(
-                                                      color:
-                                                          colorScheme.primary),
-                                            ),
-                                            Icon(Icons.cake_rounded,
-                                                size: 20,
-                                                color: colorScheme.primary),
-                                          ],
-                                        )
-                                      : Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  "Birthday",
-                                                  style: textStyles.bodyLarge!
-                                                      .copyWith(
-                                                          color: colorScheme
-                                                              .primary),
-                                                ),
-                                                Icon(Icons.cake_rounded,
-                                                    size: 20,
-                                                    color: colorScheme.primary),
-                                              ],
-                                            ),
-                                            Text(
-                                                formatDateTime(birthdayDateTime)
-                                                    .date,
-                                                style: textStyles.labelLarge),
-                                          ],
-                                        ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Next Appointment
-                    Flexible(
-                      flex: 1,
-                      child: InkWell(
-                        onTap: () {
-                          DateTime now = DateTime.now();
+                      if (!isNumeric(value) || value[0] == "-") {
+                        // Input string is not numeric
+                        // Also checking if negative,
+                        // easier than just converting it to a double
+                        return "Please enter a valid weight";
+                      }
 
-                          DatePicker.showDateTimePicker(context,
-                              showTitleActions: true,
-                              minTime: now,
-                              maxTime:
-                                  DateTime(now.year + 10, now.month, now.day),
-                              onConfirm: (date) {
-                            setState(() {
-                              apptDateTime = date;
-                              apptDate = true;
-                            });
-                          }, onCancel: () {
-                            setState(() {
-                              apptDate = false;
-                            });
-                          },
-                              currentTime: DateTime.now(),
-                              locale: LocaleType.en);
-                        },
-                        child: Column(
-                          children: [
-                            Card(
-                              color: Colors.white,
-                              child: SizedBox(
-                                width: 170,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                    8,
-                                  ),
-                                  child: apptDate == false
-                                      ? Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              "Check Up",
-                                              style: textStyles.bodyLarge!
-                                                  .copyWith(
-                                                      color:
-                                                          colorScheme.primary),
-                                            ),
-                                            Icon(Icons.calendar_month_rounded,
-                                                size: 20,
-                                                color: colorScheme.primary),
-                                          ],
-                                        )
-                                      : Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  "Check Up",
-                                                  style: textStyles.bodyLarge!
-                                                      .copyWith(
-                                                          color: colorScheme
-                                                              .primary),
-                                                ),
-                                                Icon(
-                                                    Icons
-                                                        .calendar_month_rounded,
-                                                    size: 20,
-                                                    color: colorScheme.primary),
-                                              ],
-                                            ),
-                                            Text(
-                                                formatDateTime(apptDateTime)
-                                                    .date,
-                                                style: textStyles.labelLarge),
-                                            Text(
-                                                formatDateTime(apptDateTime)
-                                                    .time,
-                                                style: textStyles.labelLarge),
-                                          ],
-                                        ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                if (caretakerMode == null)
-                  Column(
+                      return null;
+                    },
+                  ),
+                  const SizedBoxh10(),
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const SizedBoxh20(),
-                      Text(
-                        'Ownership',
-                        style: textStyles.headlineMedium,
-                      ),
-                      if (petType == PetType.personal)
-                        Text(
-                          'If this pet has already been added by someone, request role from them.',
-                          style: textStyles.bodyMedium,
-                        ),
-                      AppTextFormField(
-                        controller: usersController,
-                        hintText: 'User\'s Email',
-                        prefixIcon: const Icon(Icons.person),
-                      ),
-                      InkWell(
-                        onTap: () async {
-                          List<AppUser> users =
-                              await userService.getUsersFromDbByName(
-                                  uid: userService.user.uid,
-                                  email: usersController.text);
-
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text("Users"),
-                                  content: SingleChildScrollView(
-                                    physics: const BouncingScrollPhysics(),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: double.infinity,
-                                          child: Text(
-                                            '${users.length} matching users.',
-                                            style: textStyles.bodyMedium!
-                                                .copyWith(
-                                                    color: colorScheme.primary),
-                                          ),
-                                        ),
-                                        Column(
-                                          children: List.generate(users.length,
-                                              (index) {
-                                            return InkWell(
-                                              onTap: () {
-                                                setState(() {
-                                                  caretakers.add(
-                                                    Caretaker(
-                                                        username:
-                                                            users[index].name!,
-                                                        uid: users[index].uid,
-                                                        role: "Caretaker"),
-                                                  );
-                                                });
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: DropdownMenuItem(
-                                                  child:
-                                                      Text(users[index].name!)),
-                                            );
-                                          }),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
+                      // Birthday
+                      Flexible(
+                        flex: 1,
+                        child: InkWell(
+                          onTap: () {
+                            DatePicker.showDatePicker(context,
+                                showTitleActions: true,
+                                minTime: DateTime(1999, 1, 1),
+                                maxTime: DateTime.now(), onConfirm: (date) {
+                              setState(() {
+                                birthdayDateTime = date;
+                                isBirthdaySet = true;
                               });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            }, onCancel: () {
+                              setState(() {
+                                isBirthdaySet = false;
+                              });
+                            },
+                                currentTime: DateTime.now(),
+                                locale: LocaleType.en);
+                          },
+                          child: Column(
                             children: [
-                              Icon(
-                                Icons.search_rounded,
-                                color: colorScheme.primary,
-                              ),
-                              Text(
-                                'Search',
-                                style: textStyles.bodyMedium!
-                                    .copyWith(color: colorScheme.primary),
+                              Card(
+                                color: Colors.white,
+                                child: SizedBox(
+                                  width: 170,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(
+                                      8,
+                                    ),
+                                    child: isBirthdaySet == false
+                                        ? Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Set Birthday",
+                                                    style: textStyles.bodyLarge!
+                                                        .copyWith(
+                                                            color: colorScheme
+                                                                .primary),
+                                                  ),
+                                                  Icon(Icons.cake_rounded,
+                                                      size: 20,
+                                                      color:
+                                                          colorScheme.primary),
+                                                ],
+                                              ),
+                                              Text(
+                                                "Mandatory*",
+                                                style: textStyles.bodyMedium!
+                                                    .copyWith(
+                                                        color: colorScheme
+                                                            .primary),
+                                              ),
+                                            ],
+                                          )
+                                        : Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Birthday",
+                                                    style: textStyles.bodyLarge!
+                                                        .copyWith(
+                                                            color: colorScheme
+                                                                .primary),
+                                                  ),
+                                                  Icon(Icons.cake_rounded,
+                                                      size: 20,
+                                                      color:
+                                                          colorScheme.primary),
+                                                ],
+                                              ),
+                                              Text(
+                                                  formatDateTime(
+                                                          birthdayDateTime)
+                                                      .date,
+                                                  style: textStyles.labelLarge),
+                                            ],
+                                          ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      RoleRow(
-                          username: userService.user.name!,
-                          popUser: () {},
-                          role: "Main"),
-                      Column(
-                        children: List.generate(caretakers.length, (index) {
-                          return Column(
+                      // Next Appointment
+                      Flexible(
+                        flex: 1,
+                        child: InkWell(
+                          onTap: () {
+                            DateTime now = DateTime.now();
+
+                            DatePicker.showDateTimePicker(context,
+                                showTitleActions: true,
+                                minTime: now,
+                                maxTime:
+                                    DateTime(now.year + 10, now.month, now.day),
+                                onConfirm: (date) {
+                              setState(() {
+                                apptDateTime = date;
+                                isApptDateSet = true;
+                              });
+                            }, onCancel: () {
+                              setState(() {
+                                isApptDateSet = false;
+                              });
+                            },
+                                currentTime: DateTime.now(),
+                                locale: LocaleType.en);
+                          },
+                          child: Column(
                             children: [
-                              const SizedBoxh10(),
-                              RoleRow(
-                                  username: caretakers[index].username,
-                                  popUser: () {
-                                    setState(() {
-                                      caretakers.remove(caretakers[index]);
-                                    });
-                                  },
-                                  role: caretakers[index].role),
+                              Card(
+                                color: Colors.white,
+                                child: SizedBox(
+                                  width: 170,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(
+                                      8,
+                                    ),
+                                    child: isApptDateSet == false
+                                        ? Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Check Up",
+                                                    style: textStyles.bodyLarge!
+                                                        .copyWith(
+                                                            color: colorScheme
+                                                                .primary),
+                                                  ),
+                                                  Icon(
+                                                      Icons
+                                                          .calendar_month_rounded,
+                                                      size: 20,
+                                                      color:
+                                                          colorScheme.primary),
+                                                ],
+                                              ),
+                                              Text("(optional)",
+                                                  style: textStyles.bodyMedium),
+                                            ],
+                                          )
+                                        : Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Check Up",
+                                                    style: textStyles.bodyLarge!
+                                                        .copyWith(
+                                                            color: colorScheme
+                                                                .primary),
+                                                  ),
+                                                  Icon(
+                                                      Icons
+                                                          .calendar_month_rounded,
+                                                      size: 20,
+                                                      color:
+                                                          colorScheme.primary),
+                                                ],
+                                              ),
+                                              Text(
+                                                  formatDateTime(apptDateTime)
+                                                      .date,
+                                                  style: textStyles.labelLarge),
+                                              Text(
+                                                  formatDateTime(apptDateTime)
+                                                      .time,
+                                                  style: textStyles.labelLarge),
+                                            ],
+                                          ),
+                                  ),
+                                ),
+                              ),
                             ],
-                          );
-                        }),
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                const SizedBoxh20(), const SizedBoxh20(),
+                ],
+              ),
+            ),
+          // Moved outside the form
+          if (caretakerMode == null)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBoxh20(),
+                Text(
+                  'Ownership',
+                  style: textStyles.headlineMedium,
+                ),
+                if (petType == PetType.personal)
+                  Text(
+                    'If this pet has already been added by someone, request role from them.',
+                    style: textStyles.bodyMedium,
+                  ),
+                AppTextFormField(
+                  controller: usersController,
+                  hintText: 'User\'s Email',
+                  prefixIcon: const Icon(Icons.person),
+                  validator: (value) => !context
+                          .read<AuthenticationService>()
+                          .isEmailValidEmail(value!)
+                      ? 'Invalid email'
+                      : null,
+                ),
+                InkWell(
+                  onTap: () async {
+                    List<AppUser> users =
+                        await userService.getUsersFromDbByName(
+                            uid: userService.user.uid,
+                            email: usersController.text);
 
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Center(
-                    child: InkWell(
-                      onTap: () {
-                        if (nameController.text != "" &&
-                            selectedLocation != "" &&
-                            descController.text != "" &&
-                            idController.text != "" &&
-                            birthday &&
-                            selectedSpecies != "") {
-                          if (petType == PetType.personal ||
-                              caretakerMode == null) {
-                            caretakers.add(Caretaker(
-                                username: userService.user.name!,
-                                uid: userService.user.uid,
-                                role: "Main"));
-                          }
-                          List<String> caretakerIDs = caretakers
-                              .map((caretaker) => caretaker.uid)
-                              .toList();
-
-                          Pet pet = Pet(
-                            location: selectedLocation,
-                            name: nameController.text,
-                            description: descController.text,
-                            sex: selectedSex,
-                            species: selectedSpecies,
-                            petType: petType?.string ?? '',
-                            idNumber: idController.text,
-                            breed: breedController.text,
-                            posts: 0,
-                            fans: 0,
-                            birthDate: birthdayDateTime,
-                            weight: weightController.text == ""
-                                ? [
-                                    DateTimeStringPair(
-                                        dateTime: DateTime.now(), value: "0")
-                                  ]
-                                : [
-                                    DateTimeStringPair(
-                                        dateTime: DateTime.now(),
-                                        value: weightController.text)
-                                  ],
-                            caretakers: caretakers,
-                            caretakerIDs: caretakerIDs,
-                            vaccineRecords: [],
-                            sessionRecords: apptDate
-                                ? [
-                                    DateTimeStringPair(
-                                        dateTime: apptDateTime,
-                                        value: "Next Appointment")
-                                  ]
-                                : [],
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text("Users"),
+                            content: SingleChildScrollView(
+                              physics: const BouncingScrollPhysics(),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: Text(
+                                      '${users.length} matching users.',
+                                      style: textStyles.bodyMedium!
+                                          .copyWith(color: colorScheme.primary),
+                                    ),
+                                  ),
+                                  Column(
+                                    children:
+                                        List.generate(users.length, (index) {
+                                      return InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            caretakers.add(
+                                              Caretaker(
+                                                  username: users[index].name!,
+                                                  uid: users[index].uid,
+                                                  role: "Caretaker"),
+                                            );
+                                          });
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: DropdownMenuItem(
+                                            child: Text(users[index].name!)),
+                                      );
+                                    }),
+                                  ),
+                                ],
+                              ),
+                            ),
                           );
-                          petService.addPet(
-                              pet: pet,
-                              img: _imageFile,
-                              uid: userService.user.uid);
-                          Navigator.pop(context);
-                        }
-                        if (caretakerMode != null) {
-                          Navigator.pop(context);
-                        }
-                      },
-                      child: Container(
-                        width: 300,
-                        height: 40,
-                        decoration: BoxDecoration(
+                        });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Icon(
+                          Icons.search_rounded,
                           color: colorScheme.primary,
-                          borderRadius: BorderRadius.circular(5),
                         ),
-                        child: const Center(
-                          child: Text(
-                            'Add Pet',
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
+                        Text(
+                          'Search',
+                          style: textStyles.bodyMedium!
+                              .copyWith(color: colorScheme.primary),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
+                RoleRow(
+                    username: userService.user.name!,
+                    popUser: () {},
+                    role: "Main"),
+                Column(
+                  children: List.generate(caretakers.length, (index) {
+                    return Column(
+                      children: [
+                        const SizedBoxh10(),
+                        RoleRow(
+                            username: caretakers[index].username,
+                            popUser: () {
+                              setState(() {
+                                caretakers.remove(caretakers[index]);
+                              });
+                            },
+                            role: caretakers[index].role),
+                      ],
+                    );
+                  }),
+                ),
               ],
             ),
+          const SizedBoxh20(), const SizedBoxh20(),
+
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: Center(
+              child: InkWell(
+                onTap: () {
+                  if (_petInputFormKey.currentState!.validate() &&
+                      isBirthdaySet &&
+                      selectedSpecies != "") {
+                    // WHAT DOES THIS DO
+                    if (petType == PetType.personal || caretakerMode == null) {
+                      caretakers.add(Caretaker(
+                          username: userService.user.name!,
+                          uid: userService.user.uid,
+                          role: "Main"));
+                    }
+
+                    List<String> caretakerIDs =
+                        caretakers.map((caretaker) => caretaker.uid).toList();
+
+                    Pet pet = Pet(
+                      location: selectedLocation,
+                      name: nameController.text,
+                      description: descController.text,
+                      sex: selectedSex,
+                      species: selectedSpecies,
+                      petType: petType?.string ?? '',
+                      idNumber: idController.text,
+                      breed: breedController.text,
+                      posts: 0,
+                      fans: 0,
+                      birthDate: birthdayDateTime,
+                      weight: weightController.text == ""
+                          ? [
+                              DateTimeStringPair(
+                                  dateTime: DateTime.now(), value: "0")
+                            ]
+                          : [
+                              DateTimeStringPair(
+                                  dateTime: DateTime.now(),
+                                  value: weightController.text)
+                            ],
+                      caretakers: caretakers,
+                      caretakerIDs: caretakerIDs,
+                      vaccineRecords: [],
+                      sessionRecords: isApptDateSet
+                          ? [
+                              DateTimeStringPair(
+                                  dateTime: apptDateTime,
+                                  value: "Next Appointment")
+                            ]
+                          : [],
+                    );
+                    petService.addPet(
+                        pet: pet, img: _imageFile, uid: userService.user.uid);
+                    Navigator.pop(context);
+                  }
+                  if (caretakerMode != null) {
+                    Navigator.pop(context);
+                  }
+                },
+                child: Container(
+                  width: 300,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Add Pet',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ]),
       ),
     );
@@ -896,7 +951,7 @@ class _AddPetPageState extends State<AddPetPage> {
             descController.text = "Automatically filled pet";
             idController.text = "0";
             breedController.text = "Untitled Breed";
-            birthday = true;
+            isBirthdaySet = true;
             birthdayDateTime = DateTime.fromMillisecondsSinceEpoch(0);
           });
 

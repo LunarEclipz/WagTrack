@@ -50,6 +50,8 @@ class AppTextFormField extends StatefulWidget {
   final Widget? prefixIcon;
 
   /// Whether or not to append the default "optional" UI item to the field
+  ///
+  /// Also sets validator to be empty (disabled) if no other validator is set.
   final bool showOptional;
 
   /// Whether or not to append the default "required" UI item to the field
@@ -63,6 +65,11 @@ class AppTextFormField extends StatefulWidget {
 
   /// TextEditingController
   final TextEditingController? controller;
+
+  /// Defaults to `AutovalidateMode.onUserInteraction`.
+  ///
+  /// `AutovalidateMode.always` or `AutovalidateMode.disabled`
+  final AutovalidateMode autovalidateMode;
 
   /// Whether this field is obscurable.
   ///
@@ -82,6 +89,7 @@ class AppTextFormField extends StatefulWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.suffixString = '',
+    this.autovalidateMode = AutovalidateMode.onUserInteraction,
     this.isObscurable = false,
     this.keyboardType = TextInputType.text,
     this.validator,
@@ -172,12 +180,20 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
       );
     }
 
+    // set default validator
+    final String? Function(dynamic value) defaultValidator;
+    if (widget.showOptional) {
+      defaultValidator = (value) => InputStringValidators.emptyValidator(value);
+    } else {
+      defaultValidator = (value) => emptyStringValidator(value);
+    }
+
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscuretext,
       keyboardType: widget.keyboardType,
-      validator: widget.validator ?? (value) => emptyStringValidator(value),
-      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: widget.validator ?? defaultValidator,
+      autovalidateMode: widget.autovalidateMode,
       textAlignVertical: TextAlignVertical.top,
       decoration: InputDecoration(
         // isDense: true,
@@ -223,6 +239,11 @@ class AppTextFormFieldLarge extends StatefulWidget {
   /// TextEditingController
   final TextEditingController? controller;
 
+  /// Defaults to `AutovalidateMode.onUserInteraction`.
+  ///
+  /// `AutovalidateMode.always` or `AutovalidateMode.disabled`
+  final AutovalidateMode autovalidateMode;
+
   /// Whether this field is obscurable.
   ///
   /// Obscurable fields are obscured by default.
@@ -238,6 +259,7 @@ class AppTextFormFieldLarge extends StatefulWidget {
     this.labelText = '',
     this.prefixIcon,
     this.isObscurable = false,
+    this.autovalidateMode = AutovalidateMode.onUserInteraction,
     this.keyboardType = TextInputType.text,
     this.validator,
   });
@@ -282,7 +304,7 @@ class _AppTextFormFieldLargeState extends State<AppTextFormFieldLarge> {
       obscureText: _obscuretext,
       keyboardType: widget.keyboardType,
       validator: widget.validator ?? (value) => emptyStringValidator(value),
-      autovalidateMode: AutovalidateMode.onUserInteraction,
+      autovalidateMode: widget.autovalidateMode,
       textAlignVertical: TextAlignVertical.top,
       decoration: InputDecoration(
         hintText: widget.hintText,
@@ -376,25 +398,35 @@ class _AppDropdownState extends State<AppDropdown> {
       ),
       child: SizedBox(
         height: 20,
-        child: DropdownButton<String>(
-          value: !widget.optionsList.contains(widget.selectedText)
-              ? null
-              : widget.selectedText,
-          icon: const Icon(Icons.expand_more),
-          style: textStyles.bodyMedium
-              ?.copyWith(color: AppTheme.customColors.secondaryText),
-          isExpanded: true,
-          onChanged: widget.onChanged,
-          hint: widget.hint,
-          items:
-              widget.optionsList.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: !widget.optionsList.contains(widget.selectedText)
+                ? null
+                : widget.selectedText,
+            icon: const Icon(Icons.expand_more),
+            style: textStyles.bodyMedium
+                ?.copyWith(color: AppTheme.customColors.secondaryText),
+            isExpanded: true,
+            onChanged: widget.onChanged,
+            hint: widget.hint,
+            items: widget.optionsList
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );
+  }
+}
+
+/// String validator functions matching the format of `String? -> String?`
+class InputStringValidators {
+  /// validator that doesn't do anything. Use for optional fields
+  static String? emptyValidator(String? value) {
+    return null;
   }
 }

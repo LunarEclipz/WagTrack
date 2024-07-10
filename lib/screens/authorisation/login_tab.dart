@@ -44,11 +44,13 @@ class _LoginTabState extends State<LoginTab> {
                             .isEmailValidEmail(value!)
                         ? 'Invalid email'
                         : null,
+                    // autovalidateMode: AutovalidateMode.disabled,
                   ),
                   AppTextFormFieldLarge(
                     labelText: 'Password',
                     controller: passwordController,
                     isObscurable: true,
+                    // autovalidateMode: AutovalidateMode.disabled,
                   ),
                 ],
               ),

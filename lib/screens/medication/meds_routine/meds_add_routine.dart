@@ -9,7 +9,6 @@ import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
-import 'package:wagtrack/shared/themes.dart';
 
 class MedsAddRoutine extends StatefulWidget {
   final Pet petData;
@@ -20,6 +19,12 @@ class MedsAddRoutine extends StatefulWidget {
 }
 
 class _MedsAddRoutineState extends State<MedsAddRoutine> {
+  // Form Keys
+  final _medicationFormKey = GlobalKey<FormState>();
+  final _routineFormKey = GlobalKey<FormState>();
+  final _addInfoFormKey = GlobalKey<FormState>();
+
+  // Text Controllers
   late TextEditingController titleController =
       TextEditingController(text: null);
   late TextEditingController clinicNameController =
@@ -39,11 +44,30 @@ class _MedsAddRoutineState extends State<MedsAddRoutine> {
   late List<Symptom> symtomsTagged = [];
   late List<Medication> medicationList = [];
 
+  // State booleans
+  bool _showMedicationsRequired = false;
+  AutovalidateMode _overrideMedAutovalidateMode =
+      AutovalidateMode.onUserInteraction;
+
+  // TODO this doesn't work atm
+  void _resetMedAutovalidateMode() {
+    setState(() {
+      _overrideMedAutovalidateMode = AutovalidateMode.disabled;
+    });
+
+    // Delay re-enabling the auto-validation to ensure the UI is updated
+    Future.delayed(const Duration(milliseconds: 10), () {
+      setState(() {
+        _overrideMedAutovalidateMode = AutovalidateMode.onUserInteraction;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final CustomColors customColors = AppTheme.customColors;
+    // final CustomColors customColors = AppTheme.customColors;
     final SymptomService symptomService = context.watch<SymptomService>();
     final MedicationService medicationService =
         context.watch<MedicationService>();
@@ -55,67 +79,108 @@ class _MedsAddRoutineState extends State<MedsAddRoutine> {
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: colorScheme.primary,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
       ),
       body: DefaultTextStyle.merge(
         style: textStyles.bodyLarge,
         child: AppScrollablePage(
           children: [
-            // Section A : Pet Type
+            // SECTION: Routine Details
             Text(
               'Routine Details',
               style: textStyles.headlineMedium,
             ),
-            AppTextFormField(
-              controller: titleController,
-              hintText: 'Routine Title',
-              prefixIcon: const Icon(Icons.title_rounded),
-            ),
-            AppTextFormField(
-              controller: clinicNameController,
-              hintText: 'Clinic Name',
-              prefixIcon: const Icon(Icons.local_hospital_rounded),
-            ),
-            AppTextFormField(
-              controller: appointmentNumberController,
-              hintText: 'Appointment Number',
-              prefixIcon: const Icon(Icons.app_registration_outlined),
+            Form(
+              key: _routineFormKey,
+              child: Column(
+                children: [
+                  AppTextFormField(
+                    controller: titleController,
+                    hintText: 'Routine Title',
+                    prefixIcon: const Icon(Icons.title_rounded),
+                  ),
+                  AppTextFormField(
+                    controller: clinicNameController,
+                    hintText: 'Clinic Name',
+                    prefixIcon: const Icon(Icons.local_hospital_rounded),
+                  ),
+                  AppTextFormField(
+                    controller: appointmentNumberController,
+                    hintText: 'Appointment Number',
+                    prefixIcon: const Icon(Icons.app_registration_outlined),
+                  ),
+                ],
+              ),
             ),
 
-            // List all symptoms card, or add a new symptom
+            // SECTION: Medications
             const SizedBoxh20(),
             Text(
               'Medications',
               style: textStyles.headlineMedium,
             ),
-            AppTextFormField(
-              controller: medNameController,
-              hintText: 'Medication Name (incl. Volume)',
-              prefixIcon: const Icon(Icons.medication_liquid_rounded),
+            if (_showMedicationsRequired && medicationList.isEmpty)
+              Text(
+                "At least one medication required",
+                style:
+                    textStyles.bodyMedium!.copyWith(color: colorScheme.primary),
+              ),
+            Form(
+              key: _medicationFormKey,
+              child: Column(
+                children: [
+                  AppTextFormField(
+                    controller: medNameController,
+                    hintText: 'Medication Name (incl. Volume)',
+                    prefixIcon: const Icon(Icons.medication_liquid_rounded),
+                    validator: (value) => value == null || value.isEmpty
+                        ? "Please enter a medication name"
+                        : null,
+                    autovalidateMode: _overrideMedAutovalidateMode,
+                  ),
+                  AppTextFormField(
+                    controller: medQuantityController,
+                    hintText: 'Quantity',
+                    prefixIcon: const Icon(Icons.numbers_rounded),
+                    autovalidateMode: _overrideMedAutovalidateMode,
+                    // no validator for qnty:
+                    // siknce a valid medication qnty could be like 2 tablets 3 times a day
+                  ),
+                  AppTextFormField(
+                    controller: medDescController,
+                    hintText: 'Description',
+                    prefixIcon: const Icon(Icons.description),
+                    showOptional: true,
+                    autovalidateMode: _overrideMedAutovalidateMode,
+                  ),
+                ],
+              ),
             ),
-            AppTextFormField(
-              controller: medQuantityController,
-              hintText: 'Quantity',
-              prefixIcon: const Icon(Icons.numbers_rounded),
-            ),
-            AppTextFormField(
-              controller: medDescController,
-              hintText: 'Description',
-              prefixIcon: const Icon(Icons.description),
-            ),
+
             const SizedBoxh10(),
+
+            // "Add Medication" Button
             InkWell(
               onTap: () {
-                if (medNameController.text != "" &&
-                    medDescController.text != "" &&
-                    medQuantityController.text != "") {
+                if (_medicationFormKey.currentState!.validate()) {
                   setState(() {
                     medicationList.add(Medication(
                         name: medNameController.text,
                         quantity: medQuantityController.text,
                         desc: medDescController.text));
+
+                    // reset controllers
                     medNameController.text = "";
                     medQuantityController.text = "";
                     medDescController.text = "";
+
+                    // temporarily reset autovalidationmode
+                    _resetMedAutovalidateMode();
+
+                    // unfocus fields
+                    FocusScope.of(context).unfocus();
                   });
                 }
               },
@@ -180,20 +245,28 @@ class _MedsAddRoutineState extends State<MedsAddRoutine> {
               ),
             const SizedBoxh20(),
 
-            // Additional Information
+            // SECTION: Additional Information
             Text(
               'Addional Information',
               style: textStyles.headlineMedium,
             ),
-            AppTextFormField(
-              controller: diagnosisController,
-              hintText: 'Diagnosis',
-              prefixIcon: const Icon(Icons.sick_rounded),
-            ),
-            AppTextFormField(
-              controller: commentsController,
-              hintText: 'Comments',
-              prefixIcon: const Icon(Icons.chat_bubble_rounded),
+            Form(
+              key: _addInfoFormKey,
+              child: Column(
+                children: [
+                  AppTextFormField(
+                    controller: diagnosisController,
+                    hintText: 'Diagnosis',
+                    prefixIcon: const Icon(Icons.sick_rounded),
+                  ),
+                  AppTextFormField(
+                    controller: commentsController,
+                    hintText: 'Comments',
+                    prefixIcon: const Icon(Icons.chat_bubble_rounded),
+                    showOptional: true,
+                  ),
+                ],
+              ),
             ),
 
             // Symptoms
@@ -287,17 +360,26 @@ class _MedsAddRoutineState extends State<MedsAddRoutine> {
             ),
             const SizedBoxh20(), const SizedBoxh20(),
 
-            // Add Button
+            // "Add Routine" Button
             Center(
               child: InkWell(
                 onTap: () {
-                  // TODO: Add validations
-                  if (titleController.text != "" &&
-                      clinicNameController.text != "" &&
-                      appointmentNumberController.text != "" &&
-                      diagnosisController.text != "" &&
-                      commentsController.text != "" &&
-                      medicationList != []) {
+                  setState(() {
+                    // sets states that need to show stuff post-validation
+                    // for validations that don't rely on the forms
+                    _showMedicationsRequired = true;
+                  });
+
+                  // validate
+                  bool routineValidation =
+                      _routineFormKey.currentState!.validate();
+                  bool addInfoValidation =
+                      _addInfoFormKey.currentState!.validate();
+
+                  if (routineValidation &&
+                      addInfoValidation &&
+                      medicationList.isNotEmpty) {
+                    // Create routine
                     MedicationRoutine formData = MedicationRoutine(
                         title: titleController.text,
                         clinicName: clinicNameController.text,
@@ -313,6 +395,7 @@ class _MedsAddRoutineState extends State<MedsAddRoutine> {
                         medications: medicationList,
                         petID: widget.petData.petID!);
                     medicationService.addMedicationRoutines(formData: formData);
+
                     Navigator.pop(context);
                   }
                 },
