@@ -10,6 +10,7 @@ class BackgroundImageWrapper extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.height;
 
+    // das is broken :c
     // return Scaffold(
     //   resizeToAvoidBottomInset: false,
     //   body: SingleChildScrollView(
