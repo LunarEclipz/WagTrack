@@ -382,23 +382,25 @@ class _AppDropdownState extends State<AppDropdown> {
       ),
       child: SizedBox(
         height: 20,
-        child: DropdownButton<String>(
-          value: !widget.optionsList.contains(widget.selectedText)
-              ? null
-              : widget.selectedText,
-          icon: const Icon(Icons.expand_more),
-          style: textStyles.bodyMedium
-              ?.copyWith(color: AppTheme.customColors.secondaryText),
-          isExpanded: true,
-          onChanged: widget.onChanged,
-          hint: widget.hint,
-          items:
-              widget.optionsList.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: !widget.optionsList.contains(widget.selectedText)
+                ? null
+                : widget.selectedText,
+            icon: const Icon(Icons.expand_more),
+            style: textStyles.bodyMedium
+                ?.copyWith(color: AppTheme.customColors.secondaryText),
+            isExpanded: true,
+            onChanged: widget.onChanged,
+            hint: widget.hint,
+            items: widget.optionsList
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );
