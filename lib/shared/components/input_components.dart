@@ -345,7 +345,7 @@ class AppDropdown extends StatefulWidget {
 
   /// Initial selected text
   ///
-  /// Can be empty.
+  /// Can be null.
   final String? selectedText;
 
   /// Hint widget to be displayed when no initial selection is made
@@ -361,7 +361,7 @@ class AppDropdown extends StatefulWidget {
   /// ```
   /// onChanged: (String? value) {
   ///   setState(() {
-  ///     toUpdate = value!;
+  ///     toUpdate = value ?? "";
   ///   });
   /// },
   /// ```
