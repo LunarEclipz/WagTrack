@@ -447,6 +447,7 @@ class NotificationService with ChangeNotifier {
   ///
   /// clears lists of notifications
   void resetService() {
+    AppLogger.t("[NOTIF] Resetting notification service");
     notificationList = [];
   }
 }

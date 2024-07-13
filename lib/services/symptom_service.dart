@@ -97,6 +97,7 @@ class SymptomService with ChangeNotifier {
   ///
   /// clears lists of symptoms
   void resetService() {
+    AppLogger.t("[SYMP] Resetting symptom service");
     _currentSymptoms = [];
     _pastSymptoms = [];
   }

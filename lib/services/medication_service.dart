@@ -89,6 +89,7 @@ class MedicationService with ChangeNotifier {
   ///
   /// clears lists of medication routines
   void resetService() {
+    AppLogger.t("[MEDS] Resetting medication service");
     _medicationRoutines = [];
   }
 }

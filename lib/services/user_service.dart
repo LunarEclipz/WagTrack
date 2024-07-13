@@ -281,6 +281,7 @@ class UserService with ChangeNotifier {
   ///
   /// Sets current user to an empty user
   void resetService() {
+    AppLogger.t("[USER] Resetting user service");
     _user = AppUser.createEmptyUser();
   }
 }
