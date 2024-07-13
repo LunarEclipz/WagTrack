@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/medication_model.dart';
 import 'package:wagtrack/models/pet_model.dart';
@@ -45,7 +43,7 @@ class _MedsRoutinePageState extends State<MedsRoutinePage> {
     final MedicationService medicationService =
         context.watch<MedicationService>();
     medicationRoutine = medicationService.medicationRoutines;
-    print(medicationRoutine);
+    // print(medicationRoutine);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
