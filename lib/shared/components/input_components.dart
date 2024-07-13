@@ -40,6 +40,9 @@ class AppSwitch extends StatelessWidget {
 ///
 /// Wrap in a `Form` and supply a `GlobalKey` for external form validation.
 class AppTextFormField extends StatefulWidget {
+  /// Whether this text field is enabled
+  final bool enabled;
+
   /// Hint text - inside the text field
   final String hintText;
 
@@ -82,6 +85,7 @@ class AppTextFormField extends StatefulWidget {
   const AppTextFormField({
     super.key,
     required this.controller,
+    this.enabled = true,
     this.hintText = '',
     this.labelText = '',
     this.showOptional = false,
@@ -189,6 +193,7 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
     }
 
     return TextFormField(
+      enabled: widget.enabled,
       controller: widget.controller,
       obscureText: _obscuretext,
       keyboardType: widget.keyboardType,
@@ -332,6 +337,12 @@ class _AppTextFormFieldLargeState extends State<AppTextFormFieldLarge> {
 
 /// Standard text dropdown for WagTrack.
 class AppDropdown extends StatefulWidget {
+  /// Whether this drop down is enabled
+  ///
+  /// Works by overriding the "onChanged" function to do nothing and setting the
+  /// options list to just the selected option
+  final bool enabled;
+
   /// Initial selected text
   ///
   /// Can be empty.
@@ -360,6 +371,7 @@ class AppDropdown extends StatefulWidget {
   const AppDropdown({
     super.key,
     required this.optionsList,
+    this.enabled = true,
     this.selectedText,
     this.hint,
     this.onChanged,
@@ -407,15 +419,22 @@ class _AppDropdownState extends State<AppDropdown> {
             style: textStyles.bodyMedium
                 ?.copyWith(color: AppTheme.customColors.secondaryText),
             isExpanded: true,
-            onChanged: widget.onChanged,
+            onChanged: widget.enabled ? widget.onChanged : (value) {},
             hint: widget.hint,
-            items: widget.optionsList
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
+            items: widget.enabled
+                ? widget.optionsList
+                    .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList()
+                : [
+                    // only the selected value is shown if dropdown is disabled!
+                    DropdownMenuItem<String>(
+                        value: widget.selectedText,
+                        child: Text(widget.selectedText ?? "")),
+                  ],
           ),
         ),
       ),

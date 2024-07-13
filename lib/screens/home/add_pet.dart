@@ -37,10 +37,10 @@ class AddPetPage extends StatefulWidget {
   const AddPetPage({super.key});
 
   @override
-  State<AddPetPage> createState() => isCaretakerMode();
+  State<AddPetPage> createState() => _AddPetPageState();
 }
 
-class isCaretakerMode extends State<AddPetPage> {
+class _AddPetPageState extends State<AddPetPage> {
   // Form key for all pet fields
   final _petInputFormKey = GlobalKey<FormState>();
 
@@ -73,8 +73,12 @@ class isCaretakerMode extends State<AddPetPage> {
 
   TextEditingController usersController = TextEditingController(text: "");
 
+  // CARETAKER MODE
   /// A pet that is selected that the user is attaching themselves as a caretaker to
   Pet? caretakerModeSelectedPet;
+
+  /// whether there is a pet in caretaker mode
+  bool get caretakerModeHasSelectedPet => caretakerModeSelectedPet != null;
 
   setPetType(PetType? pType) {
     setState(() {
@@ -112,7 +116,6 @@ class isCaretakerMode extends State<AddPetPage> {
     if (selectedPet != null) {
       // means a pet is currently selected
       setState(() {
-        // TODO: Zee need your help, if caretakeMode, all these fields should be disabled
         nameController.text = selectedPet!.name;
         breedController.text = selectedPet!.breed ?? "";
         descController.text = selectedPet!.description;
@@ -241,6 +244,7 @@ class isCaretakerMode extends State<AddPetPage> {
                 ),
                 const SizedBoxh10(),
                 AppDropdown(
+                  enabled: !caretakerModeHasSelectedPet,
                   optionsList: locationList,
                   selectedText: selectedLocation,
                   onChanged: (String? value) {
@@ -360,7 +364,7 @@ class isCaretakerMode extends State<AddPetPage> {
 
           // Section C : Pet Information
           // WHAT IS THE USE OF THIS SECTION
-          if (selectedPetType != null && caretakerModeSelectedPet != null)
+          if (selectedPetType != null && caretakerModeHasSelectedPet)
             InkWell(
               onTap: () {
                 setState(() {
@@ -431,11 +435,13 @@ class isCaretakerMode extends State<AddPetPage> {
                             radius: 100,
                             backgroundImage: Image.file(_imageFile!).image)),
                   AppTextFormField(
+                    enabled: !caretakerModeHasSelectedPet,
                     controller: nameController,
                     hintText: 'Name',
                     prefixIcon: const Icon(Icons.person_outline),
                   ),
                   AppTextFormField(
+                    enabled: !caretakerModeHasSelectedPet,
                     controller: descController,
                     hintText: 'Description',
                     prefixIcon: const Icon(Icons.description),
@@ -444,6 +450,7 @@ class isCaretakerMode extends State<AddPetPage> {
                         InputStringValidators.emptyValidator(value),
                   ),
                   AppTextFormField(
+                    enabled: !caretakerModeHasSelectedPet,
                     controller: breedController,
                     hintText: 'Breed',
                     prefixIcon: const Icon(Icons.description),
@@ -457,6 +464,7 @@ class isCaretakerMode extends State<AddPetPage> {
                   // ),
                   const SizedBoxh20(),
                   AppDropdown(
+                    enabled: !caretakerModeHasSelectedPet,
                     optionsList: sexList,
                     selectedText: selectedSex,
                     onChanged: (String? value) {
@@ -468,6 +476,7 @@ class isCaretakerMode extends State<AddPetPage> {
                   const SizedBoxh20(),
 
                   AppDropdown(
+                    enabled: !caretakerModeHasSelectedPet,
                     optionsList: speciesList,
                     selectedText: selectedSpecies,
                     onChanged: (String? value) {
@@ -484,12 +493,14 @@ class isCaretakerMode extends State<AddPetPage> {
                     style: textStyles.headlineMedium,
                   ),
                   AppTextFormField(
+                    enabled: !caretakerModeHasSelectedPet,
                     controller: idController,
                     hintText: 'Microchip Number',
                     prefixIcon: const Icon(Icons.card_membership_rounded),
                   ),
                   const SizedBoxh10(),
                   AppTextFormField(
+                    enabled: !caretakerModeHasSelectedPet,
                     controller: weightController,
                     hintText: 'Weight',
                     prefixIcon: const Icon(Icons.scale_rounded),
@@ -728,7 +739,7 @@ class isCaretakerMode extends State<AddPetPage> {
 
           // Caretaker/user editing section
           // Only shows if it's not a caretakerModeSelectedPet
-          if (selectedPetType != null && caretakerModeSelectedPet == null)
+          if (selectedPetType != null && !caretakerModeHasSelectedPet)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -859,7 +870,7 @@ class isCaretakerMode extends State<AddPetPage> {
                         selectedSpecies != "") {
                       // WHAT DOES THIS DO
                       if (selectedPetType == PetType.personal ||
-                          caretakerModeSelectedPet == null) {
+                          !caretakerModeHasSelectedPet) {
                         caretakers.add(Caretaker(
                             username: userService.user.name!,
                             uid: userService.user.uid,
@@ -906,7 +917,7 @@ class isCaretakerMode extends State<AddPetPage> {
                           pet: pet, img: _imageFile, uid: userService.user.uid);
                       Navigator.pop(context);
                     }
-                    if (caretakerModeSelectedPet != null) {
+                    if (caretakerModeHasSelectedPet) {
                       Navigator.pop(context);
                     }
                   },
