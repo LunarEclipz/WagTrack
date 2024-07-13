@@ -223,7 +223,7 @@ class _AddPetPageState extends State<AddPetPage> {
           ),
 
           // Section B : LOCATION
-          if (petType == PetType.personal) // only for personal
+          if (petType != null) // show for all pets
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
