@@ -276,4 +276,11 @@ class UserService with ChangeNotifier {
       return []; // Return an empty list on error
     }
   }
+
+  /// Signs out user
+  ///
+  /// Sets current user to an empty user
+  void signOutUser() {
+    _user = AppUser.createEmptyUser();
+  }
 }
