@@ -15,6 +15,8 @@ class _FaqsPageState extends State<FaqsPage> {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    // TODO: "Question", "Section", "Answer" widgets
+
     return Scaffold(
         appBar: AppBar(
           title: const Text(

@@ -32,6 +32,8 @@ class AuthenticationService with ChangeNotifier {
     AppLogger.d("[AUTH] Updating local user from Firebase Auth");
     String? uid = this.uid;
 
+    AppLogger.t(uid);
+
     if (uid.isEmpty) {
       AppLogger.i("[AUTH] Local auth user does not exist");
       return false;
@@ -238,7 +240,7 @@ class AuthenticationService with ChangeNotifier {
     }
   }
 
-  /// TODO: Update user email in FirebaseAuth
+  /// TODO: Add option to update user email in FirebaseAuth
 
   /// Sign out user
   Future<void> signOutUser() async {
@@ -246,6 +248,7 @@ class AuthenticationService with ChangeNotifier {
     try {
       final User? firebaseUser = _firebaseAuth.currentUser;
       if (firebaseUser != null) {
+        // signout from FBA
         await _firebaseAuth.signOut();
       }
       AppLogger.i("[AUTH] User sign out successful");

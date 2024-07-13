@@ -276,4 +276,12 @@ class UserService with ChangeNotifier {
       return []; // Return an empty list on error
     }
   }
+
+  /// Resets userService
+  ///
+  /// Sets current user to an empty user
+  void resetService() {
+    AppLogger.t("[USER] Resetting user service");
+    _user = AppUser.createEmptyUser();
+  }
 }

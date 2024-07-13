@@ -183,4 +183,13 @@ class PetService with ChangeNotifier {
 
     notifyListeners();
   }
+
+  /// Resets petService
+  ///
+  /// clears lists of pets
+  void resetService() {
+    AppLogger.t("[PET] Resetting pet service");
+    _personalPets = [];
+    _communityPets = [];
+  }
 }
