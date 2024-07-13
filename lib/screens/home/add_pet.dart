@@ -90,6 +90,13 @@ class _AddPetPageState extends State<AddPetPage> {
     super.initState();
     selectedPet = null;
     caretakerMode = null;
+
+    // load userService to get default params
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userService = Provider.of<UserService>(context, listen: false);
+      // Set the selected location to the default user location.
+      selectedLocation = userService.user.defaultLocation!;
+    });
   }
 
   @override
@@ -119,9 +126,6 @@ class _AddPetPageState extends State<AddPetPage> {
       selectedPet = null;
     }
 
-    // now set the selected location to the default user location.
-    selectedLocation = userService.user.defaultLocation!;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -145,7 +149,7 @@ class _AddPetPageState extends State<AddPetPage> {
             style: textStyles.headlineMedium,
           ),
 
-          // choosing pet Type
+          // PET TYPE CHOICE
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -218,8 +222,8 @@ class _AddPetPageState extends State<AddPetPage> {
             ],
           ),
 
-          // Section B : Pet Type
-          if (petType == PetType.personal) // personal
+          // Section B : LOCATION
+          if (petType == PetType.personal) // only for personal
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -245,7 +249,7 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ],
             ),
-          if (petType == PetType.community)
+          if (petType == PetType.community) // only for community
             InkWell(
               onTap: () async {
                 List<Pet> pets = await petService.getAllCommunityPetsByRegion(
