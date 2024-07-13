@@ -92,4 +92,12 @@ class SymptomService with ChangeNotifier {
 
     notifyListeners();
   }
+
+  /// Resets symptomService
+  ///
+  /// clears lists of symptoms
+  void resetService() {
+    _currentSymptoms = [];
+    _pastSymptoms = [];
+  }
 }

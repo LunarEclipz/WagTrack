@@ -442,4 +442,11 @@ class NotificationService with ChangeNotifier {
       AppLogger.w("[NOTIF] Error deleting notifications: $e", e);
     }
   }
+
+  /// Resets notificationService
+  ///
+  /// clears lists of notifications
+  void resetService() {
+    notificationList = [];
+  }
 }

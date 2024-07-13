@@ -183,4 +183,12 @@ class PetService with ChangeNotifier {
 
     notifyListeners();
   }
+
+  /// Resets petService
+  ///
+  /// clears lists of pets
+  void resetService() {
+    _personalPets = [];
+    _communityPets = [];
+  }
 }

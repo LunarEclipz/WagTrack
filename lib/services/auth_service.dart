@@ -250,9 +250,6 @@ class AuthenticationService with ChangeNotifier {
       if (firebaseUser != null) {
         // signout from FBA
         await _firebaseAuth.signOut();
-
-        // signout locally
-        _userService.signOutUser();
       }
       AppLogger.i("[AUTH] User sign out successful");
     } on FirebaseAuthException catch (e) {

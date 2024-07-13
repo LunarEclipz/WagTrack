@@ -7,6 +7,10 @@ import 'package:wagtrack/screens/settings/faqs_page.dart';
 import 'package:wagtrack/screens/settings/report_vulnerabilities_page.dart';
 import 'package:wagtrack/screens/settings/terms_page.dart';
 import 'package:wagtrack/services/auth_service.dart';
+import 'package:wagtrack/services/medication_service.dart';
+import 'package:wagtrack/services/notification_service.dart';
+import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
@@ -332,11 +336,22 @@ class _AppSettingsState extends State<AppSettings> {
             text: Text('Reset Settings'),
           ),
           const SizedBoxh20(),
+
           // LOGOUT BUTTON
           Center(
             child: InkWell(
               onTap: () {
+                // sign out from authService
                 context.read<AuthenticationService>().signOutUser();
+
+                // reset data for all services
+                context.read<UserService>().resetService();
+                context.read<PetService>().resetService();
+                context.read<SymptomService>().resetService();
+                context.read<MedicationService>().resetService();
+                context.read<NotificationService>().resetService();
+
+                // Exit to login page
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const Authenticate()),

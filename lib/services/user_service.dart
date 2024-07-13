@@ -277,10 +277,10 @@ class UserService with ChangeNotifier {
     }
   }
 
-  /// Signs out user
+  /// Resets userService
   ///
   /// Sets current user to an empty user
-  void signOutUser() {
+  void resetService() {
     _user = AppUser.createEmptyUser();
   }
 }

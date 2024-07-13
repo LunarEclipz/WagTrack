@@ -244,15 +244,27 @@ class _PetDetailsState extends State<PetDetails> {
 
           Column(
             children: List.generate(petData.weight.length, (index) {
-              return Wrap(
-                spacing: 20,
+              return Row(
                 children: [
                   const Icon(
                     Icons.monitor_weight_rounded,
                   ),
-                  Text(
-                    "${petData.weight[index].value.toString()} KG     (${formatDateTime(petData.weight[index].dateTime).date})",
-                    style: textStyles.bodyLarge,
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Text(
+                      "${petData.weight[index].value.toString()} KG",
+                      style: textStyles.bodyLarge,
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Row(children: [
+                      Text(
+                        "(${formatDateTime(petData.weight[index].dateTime).date})",
+                        style: textStyles.bodyLarge,
+                      ),
+                      const SizedBox(width: 80),
+                    ]),
                   ),
                 ],
               );
