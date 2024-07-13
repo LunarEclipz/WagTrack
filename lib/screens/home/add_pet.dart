@@ -37,10 +37,10 @@ class AddPetPage extends StatefulWidget {
   const AddPetPage({super.key});
 
   @override
-  State<AddPetPage> createState() => _AddPetPageState();
+  State<AddPetPage> createState() => isCaretakerMode();
 }
 
-class _AddPetPageState extends State<AddPetPage> {
+class isCaretakerMode extends State<AddPetPage> {
   // Form key for all pet fields
   final _petInputFormKey = GlobalKey<FormState>();
 
@@ -49,7 +49,7 @@ class _AddPetPageState extends State<AddPetPage> {
 
   late Pet? selectedPet;
 
-  PetType? petType;
+  PetType? selectedPetType;
   late String selectedLocation = "";
   late String selectedSex = "Male";
   late String selectedSpecies = "Dog";
@@ -73,14 +73,15 @@ class _AddPetPageState extends State<AddPetPage> {
 
   TextEditingController usersController = TextEditingController(text: "");
 
-  late Pet? caretakerMode;
+  /// A pet that is selected that the user is attaching themselves as a caretaker to
+  Pet? caretakerModeSelectedPet;
 
   setPetType(PetType? pType) {
     setState(() {
-      if (pType == petType) {
-        petType = null;
+      if (pType == selectedPetType) {
+        selectedPetType = null;
       } else {
-        petType = pType;
+        selectedPetType = pType;
       }
     });
   }
@@ -89,7 +90,6 @@ class _AddPetPageState extends State<AddPetPage> {
   void initState() {
     super.initState();
     selectedPet = null;
-    caretakerMode = null;
 
     // load userService to get default params
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -122,7 +122,7 @@ class _AddPetPageState extends State<AddPetPage> {
         selectedSpecies = selectedPet!.species;
       });
 
-      caretakerMode = selectedPet!;
+      caretakerModeSelectedPet = selectedPet;
       selectedPet = null;
     }
 
@@ -140,7 +140,8 @@ class _AddPetPageState extends State<AddPetPage> {
       body: DefaultTextStyle.merge(
         style: textStyles.bodyLarge,
         child: AppScrollablePage(children: [
-          // DEBUG ONLY BUTTON
+          // DEBUG ONLY stuff
+          showDebugInfo(context),
           showDebugFillFieldsButton(context),
 
           // Section A : Pet Type
@@ -160,7 +161,7 @@ class _AddPetPageState extends State<AddPetPage> {
                     setPetType(PetType.personal);
                   },
                   child: Card(
-                    color: petType == PetType.personal
+                    color: selectedPetType == PetType.personal
                         ? customColors.green
                         : Colors.white,
                     child: Padding(
@@ -170,13 +171,13 @@ class _AddPetPageState extends State<AddPetPage> {
                         children: <Widget>[
                           Icon(
                             Icons.person,
-                            color: petType == PetType.personal
+                            color: selectedPetType == PetType.personal
                                 ? Colors.white
                                 : Colors.black,
                           ),
                           Text("Personal\nPet",
                               style: textStyles.bodyMedium!.copyWith(
-                                color: petType == PetType.personal
+                                color: selectedPetType == PetType.personal
                                     ? Colors.white
                                     : Colors.black,
                               ))
@@ -193,7 +194,7 @@ class _AddPetPageState extends State<AddPetPage> {
                     setPetType(PetType.community);
                   },
                   child: Card(
-                    color: petType == PetType.community
+                    color: selectedPetType == PetType.community
                         ? customColors.green
                         : Colors.white,
                     child: Padding(
@@ -203,13 +204,13 @@ class _AddPetPageState extends State<AddPetPage> {
                         children: <Widget>[
                           Icon(
                             Icons.person,
-                            color: petType == PetType.community
+                            color: selectedPetType == PetType.community
                                 ? Colors.white
                                 : Colors.black,
                           ),
                           Text("Community\nPet",
                               style: textStyles.bodyMedium!.copyWith(
-                                color: petType == PetType.community
+                                color: selectedPetType == PetType.community
                                     ? Colors.white
                                     : Colors.black,
                               ))
@@ -223,7 +224,8 @@ class _AddPetPageState extends State<AddPetPage> {
           ),
 
           // Section B : LOCATION
-          if (petType != null) // show for all pets
+          // show for all pets
+          if (selectedPetType != null)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -249,7 +251,8 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ],
             ),
-          if (petType == PetType.community) // only for community
+          // only for community
+          if (selectedPetType == PetType.community)
             InkWell(
               onTap: () async {
                 List<Pet> pets = await petService.getAllCommunityPetsByRegion(
@@ -356,11 +359,12 @@ class _AddPetPageState extends State<AddPetPage> {
             ),
 
           // Section C : Pet Information
-          if (petType != null && caretakerMode != null)
+          // WHAT IS THE USE OF THIS SECTION
+          if (selectedPetType != null && caretakerModeSelectedPet != null)
             InkWell(
               onTap: () {
                 setState(() {
-                  caretakerMode = null;
+                  caretakerModeSelectedPet = null;
                 });
               },
               child: Chip(
@@ -370,7 +374,7 @@ class _AddPetPageState extends State<AddPetPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      caretakerMode!.name,
+                      caretakerModeSelectedPet!.name,
                       style: textStyles.bodyLarge,
                     ),
                     const Icon(
@@ -380,8 +384,9 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ),
             ),
+
           // Main pet info section
-          if (petType != null)
+          if (selectedPetType != null)
             Form(
               key: _petInputFormKey,
               child: Column(
@@ -393,22 +398,22 @@ class _AddPetPageState extends State<AddPetPage> {
                     style: textStyles.headlineMedium,
                   ),
                   const SizedBoxh10(),
-                  if (caretakerMode != null)
-                    caretakerMode!.imgPath == null
+                  if (caretakerModeSelectedPet != null)
+                    caretakerModeSelectedPet!.imgPath == null
                         ? const CircleAvatar(
                             backgroundColor: Color.fromARGB(255, 41, 41, 41),
                             radius: 100,
                           )
                         : CircleAvatar(
                             backgroundImage: Image.network(
-                              caretakerMode!.imgPath!,
+                              caretakerModeSelectedPet!.imgPath!,
                               fit: BoxFit.cover,
                               width: double.infinity,
                             ).image,
                             radius: 100,
                           ),
 
-                  if (_imageFile == null && caretakerMode == null)
+                  if (_imageFile == null && caretakerModeSelectedPet == null)
                     InkWell(
                         onTap: () async => _pickImageFromGallery(),
                         child: const CircleAvatar(
@@ -419,7 +424,7 @@ class _AddPetPageState extends State<AddPetPage> {
                             size: 100,
                           ),
                         )),
-                  if (_imageFile != null && caretakerMode == null)
+                  if (_imageFile != null && caretakerModeSelectedPet == null)
                     InkWell(
                         onTap: () async => _pickImageFromGallery(),
                         child: CircleAvatar(
@@ -720,8 +725,10 @@ class _AddPetPageState extends State<AddPetPage> {
                 ],
               ),
             ),
-          // Moved outside the form
-          if (caretakerMode == null)
+
+          // Caretaker/user editing section
+          // Only shows if it's not a caretakerModeSelectedPet
+          if (selectedPetType != null && caretakerModeSelectedPet == null)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -730,7 +737,7 @@ class _AddPetPageState extends State<AddPetPage> {
                   'Ownership',
                   style: textStyles.headlineMedium,
                 ),
-                if (petType == PetType.personal)
+                if (selectedPetType == PetType.personal)
                   Text(
                     'If this pet has already been added by someone, request role from them.',
                     style: textStyles.bodyMedium,
@@ -837,85 +844,89 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ],
             ),
+
           const SizedBoxh20(), const SizedBoxh20(),
 
-          SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: Center(
-              child: InkWell(
-                onTap: () {
-                  if (_petInputFormKey.currentState!.validate() &&
-                      isBirthdaySet &&
-                      selectedSpecies != "") {
-                    // WHAT DOES THIS DO
-                    if (petType == PetType.personal || caretakerMode == null) {
-                      caretakers.add(Caretaker(
-                          username: userService.user.name!,
-                          uid: userService.user.uid,
-                          role: "Main"));
+          // Final section for ADD PET button
+          if (selectedPetType != null)
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Center(
+                child: InkWell(
+                  onTap: () {
+                    if (_petInputFormKey.currentState!.validate() &&
+                        isBirthdaySet &&
+                        selectedSpecies != "") {
+                      // WHAT DOES THIS DO
+                      if (selectedPetType == PetType.personal ||
+                          caretakerModeSelectedPet == null) {
+                        caretakers.add(Caretaker(
+                            username: userService.user.name!,
+                            uid: userService.user.uid,
+                            role: "Main"));
+                      }
+
+                      List<String> caretakerIDs =
+                          caretakers.map((caretaker) => caretaker.uid).toList();
+
+                      Pet pet = Pet(
+                        location: selectedLocation,
+                        name: nameController.text,
+                        description: descController.text,
+                        sex: selectedSex,
+                        species: selectedSpecies,
+                        petType: selectedPetType?.string ?? '',
+                        idNumber: idController.text,
+                        breed: breedController.text,
+                        posts: 0,
+                        fans: 0,
+                        birthDate: birthdayDateTime,
+                        weight: weightController.text == ""
+                            ? [
+                                DateTimeStringPair(
+                                    dateTime: DateTime.now(), value: "0")
+                              ]
+                            : [
+                                DateTimeStringPair(
+                                    dateTime: DateTime.now(),
+                                    value: weightController.text)
+                              ],
+                        caretakers: caretakers,
+                        caretakerIDs: caretakerIDs,
+                        vaccineRecords: [],
+                        sessionRecords: isApptDateSet
+                            ? [
+                                DateTimeStringPair(
+                                    dateTime: apptDateTime,
+                                    value: "Next Appointment")
+                              ]
+                            : [],
+                      );
+                      petService.addPet(
+                          pet: pet, img: _imageFile, uid: userService.user.uid);
+                      Navigator.pop(context);
                     }
-
-                    List<String> caretakerIDs =
-                        caretakers.map((caretaker) => caretaker.uid).toList();
-
-                    Pet pet = Pet(
-                      location: selectedLocation,
-                      name: nameController.text,
-                      description: descController.text,
-                      sex: selectedSex,
-                      species: selectedSpecies,
-                      petType: petType?.string ?? '',
-                      idNumber: idController.text,
-                      breed: breedController.text,
-                      posts: 0,
-                      fans: 0,
-                      birthDate: birthdayDateTime,
-                      weight: weightController.text == ""
-                          ? [
-                              DateTimeStringPair(
-                                  dateTime: DateTime.now(), value: "0")
-                            ]
-                          : [
-                              DateTimeStringPair(
-                                  dateTime: DateTime.now(),
-                                  value: weightController.text)
-                            ],
-                      caretakers: caretakers,
-                      caretakerIDs: caretakerIDs,
-                      vaccineRecords: [],
-                      sessionRecords: isApptDateSet
-                          ? [
-                              DateTimeStringPair(
-                                  dateTime: apptDateTime,
-                                  value: "Next Appointment")
-                            ]
-                          : [],
-                    );
-                    petService.addPet(
-                        pet: pet, img: _imageFile, uid: userService.user.uid);
-                    Navigator.pop(context);
-                  }
-                  if (caretakerMode != null) {
-                    Navigator.pop(context);
-                  }
-                },
-                child: Container(
-                  width: 300,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Add Pet',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    if (caretakerModeSelectedPet != null) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Container(
+                    width: 300,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'Add Pet',
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
         ]),
       ),
     );
@@ -978,6 +989,27 @@ class _AddPetPageState extends State<AddPetPage> {
     } else {
       return Container();
     }
+  }
+
+  /// A section used to just show a bunch of debug info
+  Widget showDebugInfo(BuildContext context) {
+    final TextTheme textStyles = Theme.of(context).textTheme;
+    if (!kReleaseMode) {
+      return DefaultTextStyle(
+          style: textStyles.bodySmall!,
+          child: Column(
+            children: [
+              Text(
+                'THIS IS SHOWN IN DEBUG MODE ONLY',
+                style: textStyles.titleSmall,
+              ),
+              Text('caretakerModeSelectedPet: $caretakerModeSelectedPet'),
+              const SizedBoxh10()
+            ],
+          ));
+    }
+
+    return Container();
   }
 }
 
