@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/shared/components/button_components.dart';
+import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
@@ -17,6 +19,14 @@ class PetDetails extends StatefulWidget {
 
 class _PetDetailsState extends State<PetDetails> {
   late TextEditingController weightController = TextEditingController();
+
+  /// Deletes pet.
+  void _deletePet({required String id}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final petService = Provider.of<PetService>(context, listen: false);
+      petService.deletePet(id: id);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -269,7 +279,26 @@ class _PetDetailsState extends State<PetDetails> {
                 ],
               );
             }),
-          )
+          ),
+
+          const SizedBoxh20(),
+
+          // DELETE PET BUTTON
+          AppButtonLarge(
+            onTap: () => showAppConfirmationDialog(
+              context: context,
+              titleString: 'Confirm Deletion',
+              contentString:
+                  'Are you sure you want to delete this pet? \nThis action is irreversible!',
+              continueAction: () {
+                _deletePet(id: petData.petID ?? "");
+                Navigator.pop(context);
+              },
+            ),
+            width: 250,
+            height: 30,
+            text: 'TEMP UI: Delete Pet',
+          ),
         ],
       ),
     );

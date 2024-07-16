@@ -35,6 +35,9 @@ class _LoginPageState extends State<LoginPage> {
             physics: const BouncingScrollPhysics(),
             child: Column(
               children: <Widget>[
+                SizedBox(
+                  height: screenHeight * 0.1,
+                ),
                 Image.asset(
                   "assets/wagtrack_v1.png",
                   height: 121,
@@ -60,8 +63,9 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ])),
                 const SizedBox(height: 10),
-                SizedBox(
-                  height: screenHeight * 0.6,
+                Container(
+                  // height: screenHeight * 0.6,
+                  constraints: BoxConstraints(maxHeight: screenHeight * 0.7),
                   child: DefaultTabController(
                     length: 2,
                     child: Scaffold(

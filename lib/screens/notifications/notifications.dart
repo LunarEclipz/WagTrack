@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/models/notification_model.dart';
 import 'package:wagtrack/models/notification_params.dart';
 import 'package:wagtrack/services/notification_service.dart';
+import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
@@ -75,42 +76,20 @@ Maximum of $maxNotifCount notifications shown.''',
         Row(
           children: [
             Expanded(
-              child: InkWell(
+              child: AppButtonLarge(
                 onTap: () => _createRandomNotification(),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Create Random',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
-                ),
+                text: 'Create Random',
+                padding: const EdgeInsets.all(10),
               ),
             ),
             const SizedBox(
               width: 20,
             ),
             Expanded(
-              child: InkWell(
+              child: AppButtonLarge(
                 onTap: () => _clearAllNotifications(),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Clear',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
-                ),
+                text: 'Clear',
+                padding: const EdgeInsets.all(10),
               ),
             ),
           ],

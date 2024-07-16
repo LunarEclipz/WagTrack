@@ -12,6 +12,8 @@ class Pet {
 
   /// personal or community
   String petType;
+
+  /// License id number
   String idNumber;
   DateTime birthDate;
   List<DateTimeStringPair> weight;
@@ -19,6 +21,8 @@ class Pet {
   int posts;
   int fans;
   String? imgPath;
+
+  /// Reference id of pet. Used for storing in Firestore
   String? petID;
 
   /// medication information
