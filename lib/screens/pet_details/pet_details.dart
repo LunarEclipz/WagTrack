@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -283,7 +284,7 @@ class _PetDetailsState extends State<PetDetails> {
           const SizedBoxh20(),
 
           // DELETE PET BUTTON
-          InkWell(
+          AppButtonLarge(
             onTap: () => showAppConfirmationDialog(
               context: context,
               titleString: 'Confirm Deletion',
@@ -294,20 +295,9 @@ class _PetDetailsState extends State<PetDetails> {
                 Navigator.pop(context);
               },
             ),
-            child: Container(
-              width: 250,
-              height: 30,
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: const Center(
-                child: Text(
-                  'TEMP UI: Delete Pet',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-            ),
+            width: 250,
+            height: 30,
+            text: 'TEMP UI: Delete Pet',
           ),
         ],
       ),

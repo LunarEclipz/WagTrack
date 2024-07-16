@@ -4,6 +4,7 @@ import 'package:wagtrack/models/medication_model.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/screens/medication/meds_routine/meds_add_routine.dart';
 import 'package:wagtrack/services/medication_service.dart';
+import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
 
@@ -33,7 +34,7 @@ class _MedsRoutinePageState extends State<MedsRoutinePage> {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // final ColorScheme colorScheme = Theme.of(context).colorScheme;
     if (!loaded) {
       getAllMedicationRoutine();
       setState(() {
@@ -49,7 +50,7 @@ class _MedsRoutinePageState extends State<MedsRoutinePage> {
       child: Column(
         children: [
           Center(
-            child: InkWell(
+            child: AppButtonLarge(
               onTap: () {
                 Navigator.push(
                   context,
@@ -75,29 +76,11 @@ class _MedsRoutinePageState extends State<MedsRoutinePage> {
                   ),
                 );
               },
-              child: Container(
-                width: 300,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: const Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add_rounded,
-                        color: Colors.white,
-                      ),
-                      Text(
-                        'Add Routine',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
+              buttonTextPrefix: const Icon(
+                Icons.add_rounded,
+                color: Colors.white,
               ),
+              text: 'Add Routine',
             ),
           ),
           const SizedBoxh20(),
@@ -136,7 +119,7 @@ class _MedicationRoutineCardState extends State<MedicationRoutineCard> {
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final CustomColors customColors = AppTheme.customColors;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // final ColorScheme colorScheme = Theme.of(context).colorScheme;
     MedicationRoutine medicationRoutine = widget.medicationRoutine;
     return InkWell(
       onTap: _toggleExpansion,

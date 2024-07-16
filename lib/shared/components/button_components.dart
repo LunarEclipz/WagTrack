@@ -43,6 +43,7 @@ class _AppButtonLargeState extends State<AppButtonLarge> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textStyles = Theme.of(context).textTheme;
 
     // set up button label
     final List<Widget> label = [];
@@ -52,7 +53,10 @@ class _AppButtonLargeState extends State<AppButtonLarge> {
 
     label.add(Text(
       widget.text ?? "",
-      style: const TextStyle(fontSize: 18, color: Colors.white),
+
+      // set to the bold font!
+      style: textStyles.bodyLarge!.copyWith(fontSize: 18, color: Colors.white),
+      // style: const TextStyle(fontSize: 18, color: Colors.white),
     ));
 
     if (widget.buttonTextSuffix != null) {
@@ -74,6 +78,7 @@ class _AppButtonLargeState extends State<AppButtonLarge> {
       borderRadius: BorderRadius.circular(5),
       child: InkWell(
         onTap: widget.onTap,
+        // splashColor: Colors.black.withOpacity(0.4),
         child: Container(
           padding: widget.padding,
           width: width,
