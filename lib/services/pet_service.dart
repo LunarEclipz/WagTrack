@@ -102,7 +102,26 @@ class PetService with ChangeNotifier {
     }
   }
 
+  /// Deletes the pet with the given id from Firebase
+  Future<void> deletePet({required String id}) async {
+    AppLogger.d("[PET] Deleting pet with id $id");
+    try {
+      // remove from local pet lists. needed to reset the UI of the home page!
+      _communityPets.removeWhere((pet) => pet.petID == id);
+      _personalPets.removeWhere((pet) => pet.petID == id);
+
+      // delete from firestore
+      await _db.collection('pets').doc(id).delete();
+    } catch (e) {
+      AppLogger.e("[PET] Error deleting community pet", e);
+    }
+
+    notifyListeners();
+  }
+
   /// Uploads Image to Firebase Storage.
+  ///
+  /// Returns the url to the image
   Future<String?> uploadPetImage(
       {required File? image, required String uid}) async {
     AppLogger.d("[PET] Uploading pet image");

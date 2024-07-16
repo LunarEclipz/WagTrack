@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
@@ -17,6 +18,14 @@ class PetDetails extends StatefulWidget {
 
 class _PetDetailsState extends State<PetDetails> {
   late TextEditingController weightController = TextEditingController();
+
+  /// Deletes pet.
+  void _deletePet({required String id}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final petService = Provider.of<PetService>(context, listen: false);
+      petService.deletePet(id: id);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -269,7 +278,37 @@ class _PetDetailsState extends State<PetDetails> {
                 ],
               );
             }),
-          )
+          ),
+
+          const SizedBoxh20(),
+
+          // DELETE PET BUTTON
+          InkWell(
+            onTap: () => showAppConfirmationDialog(
+              context: context,
+              titleString: 'Confirm Deletion',
+              contentString:
+                  'Are you sure you want to delete this pet? \nThis action is irreversible!',
+              continueAction: () {
+                _deletePet(id: petData.petID ?? "");
+                Navigator.pop(context);
+              },
+            ),
+            child: Container(
+              width: 250,
+              height: 30,
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: const Center(
+                child: Text(
+                  'TEMP UI: Delete Pet',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
