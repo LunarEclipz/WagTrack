@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/authenticate.dart';
 import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/services/user_service.dart';
+import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -93,7 +94,7 @@ class _DeletionSettingsState extends State<DeletionSettings> {
           ),
           const Text('The following actions are irreversible!'),
           const SizedBoxh10(),
-          InkWell(
+          AppButtonLarge(
             onTap: () => showAppConfirmationDialog(
               context: context,
               titleString: 'Confirm?',
@@ -101,46 +102,24 @@ class _DeletionSettingsState extends State<DeletionSettings> {
                   'Are you sure you want to reset device preferences?',
               continueAction: () => _resetDevicePreferences(),
             ),
-            child: Container(
-              width: 250,
-              height: 30,
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: const Center(
-                child: Text(
-                  'Reset Device Preferences',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-            ),
+            width: 250,
+            height: 30,
+            text: 'Reset Device Preferences',
           ),
           const SizedBoxh10(),
-          InkWell(
+          AppButtonLarge(
             onTap: () => showAppConfirmationDialog(
               context: context,
               titleString: 'Confirm?',
               contentString: 'Are you sure you want to reset user preferences?',
               continueAction: () => _resetUserPreferences(),
             ),
-            child: Container(
-              width: 250,
-              height: 30,
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: const Center(
-                child: Text(
-                  'Reset User Preferences',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-            ),
+            width: 250,
+            height: 30,
+            text: 'Reset User Preferences',
           ),
           const SizedBoxh10(),
-          InkWell(
+          AppButtonLarge(
             onTap: () => showAppConfirmationDialog(
               context: context,
               titleString: 'Confirm?',
@@ -148,23 +127,12 @@ class _DeletionSettingsState extends State<DeletionSettings> {
                   'Are you sure you want to reset user data? (your name and email will stil be associated with this account) \nWarning: this action is irreversible!',
               continueAction: () => _resetUserData(),
             ),
-            child: Container(
-              width: 250,
-              height: 30,
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: const Center(
-                child: Text(
-                  'Delete User Data',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-            ),
+            width: 250,
+            height: 30,
+            text: 'Delete User Data',
           ),
           const SizedBoxh10(),
-          InkWell(
+          AppButtonLarge(
             onTap: () => showAppConfirmationDialog(
               context: context,
               titleString: 'Confirm?',
@@ -197,20 +165,9 @@ class _DeletionSettingsState extends State<DeletionSettings> {
                 }
               },
             ),
-            child: Container(
-              width: 250,
-              height: 30,
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: const Center(
-                child: Text(
-                  'Delete Account',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-            ),
+            width: 250,
+            height: 30,
+            text: 'Delete Account',
           ),
           const SizedBoxh10(),
         ]),

@@ -7,7 +7,12 @@ import 'package:wagtrack/screens/settings/faqs_page.dart';
 import 'package:wagtrack/screens/settings/report_vulnerabilities_page.dart';
 import 'package:wagtrack/screens/settings/terms_page.dart';
 import 'package:wagtrack/services/auth_service.dart';
+import 'package:wagtrack/services/medication_service.dart';
+import 'package:wagtrack/services/notification_service.dart';
+import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/services/user_service.dart';
+import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -94,6 +99,9 @@ class _AppSettingsState extends State<AppSettings> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Changes saved!')),
       );
+
+      // unfocus fields
+      FocusScope.of(context).unfocus();
     }
   }
 
@@ -196,22 +204,11 @@ class _AppSettingsState extends State<AppSettings> {
 
           const SizedBoxh10(),
           // Save Personal Info Changes Button
-          InkWell(
+          AppButtonLarge(
             onTap: () => _saveChangesManual(userService),
-            child: Container(
-              width: 200,
-              height: 30,
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: const Center(
-                child: Text(
-                  'Save Changes',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-            ),
+            width: 200,
+            height: 30,
+            text: 'Save Changes',
           ),
           const SizedBoxh20(),
           // SECTION: DATA CONSENT
@@ -329,31 +326,29 @@ class _AppSettingsState extends State<AppSettings> {
             text: Text('Reset Settings'),
           ),
           const SizedBoxh20(),
+
           // LOGOUT BUTTON
           Center(
-            child: InkWell(
+            child: AppButtonLarge(
               onTap: () {
+                // sign out from authService
                 context.read<AuthenticationService>().signOutUser();
+
+                // reset data for all services
+                context.read<UserService>().resetService();
+                context.read<PetService>().resetService();
+                context.read<SymptomService>().resetService();
+                context.read<MedicationService>().resetService();
+                context.read<NotificationService>().resetService();
+
+                // Exit to login page
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const Authenticate()),
                   (Route<dynamic> route) => false,
                 );
               },
-              child: Container(
-                width: 300,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: const Center(
-                  child: Text(
-                    'Log Out',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ),
-              ),
+              text: 'Log Out',
             ),
           ),
         ]),

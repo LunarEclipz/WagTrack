@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/shared/components/button_components.dart';
+import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
@@ -17,6 +19,14 @@ class PetDetails extends StatefulWidget {
 
 class _PetDetailsState extends State<PetDetails> {
   late TextEditingController weightController = TextEditingController();
+
+  /// Deletes pet.
+  void _deletePet({required String id}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final petService = Provider.of<PetService>(context, listen: false);
+      petService.deletePet(id: id);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -244,20 +254,51 @@ class _PetDetailsState extends State<PetDetails> {
 
           Column(
             children: List.generate(petData.weight.length, (index) {
-              return Wrap(
-                spacing: 20,
+              return Row(
                 children: [
                   const Icon(
                     Icons.monitor_weight_rounded,
                   ),
-                  Text(
-                    "${petData.weight[index].value.toString()} KG     (${formatDateTime(petData.weight[index].dateTime).date})",
-                    style: textStyles.bodyLarge,
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Text(
+                      "${petData.weight[index].value.toString()} KG",
+                      style: textStyles.bodyLarge,
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Row(children: [
+                      Text(
+                        "(${formatDateTime(petData.weight[index].dateTime).date})",
+                        style: textStyles.bodyLarge,
+                      ),
+                      const SizedBox(width: 80),
+                    ]),
                   ),
                 ],
               );
             }),
-          )
+          ),
+
+          const SizedBoxh20(),
+
+          // DELETE PET BUTTON
+          AppButtonLarge(
+            onTap: () => showAppConfirmationDialog(
+              context: context,
+              titleString: 'Confirm Deletion',
+              contentString:
+                  'Are you sure you want to delete this pet? \nThis action is irreversible!',
+              continueAction: () {
+                _deletePet(id: petData.petID ?? "");
+                Navigator.pop(context);
+              },
+            ),
+            width: 250,
+            height: 30,
+            text: 'TEMP UI: Delete Pet',
+          ),
         ],
       ),
     );

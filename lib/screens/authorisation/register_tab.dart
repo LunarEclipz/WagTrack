@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/login_social_account.dart';
 import 'package:wagtrack/services/auth_service.dart';
+import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 
@@ -77,7 +78,7 @@ class _RegisterTabState extends State<RegisterTab> {
               ),
             ),
             const SizedBox(height: 16.0),
-            InkWell(
+            AppButtonLarge(
               onTap: () async {
                 // first validate
                 if (!_registerFormKey.currentState!.validate()) {
@@ -149,20 +150,9 @@ class _RegisterTabState extends State<RegisterTab> {
                   }
                 }
               },
-              child: Container(
-                width: 300,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: const Center(
-                  child: Text(
-                    'Register',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ),
-              ),
+              width: 300,
+              height: 40,
+              text: "Register",
             ),
             const SizedBox(height: 10),
             const LoginSocial(),

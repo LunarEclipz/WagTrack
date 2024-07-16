@@ -84,4 +84,12 @@ class MedicationService with ChangeNotifier {
       return []; // Return an empty list on error
     }
   }
+
+  /// Resets medicationService
+  ///
+  /// clears lists of medication routines
+  void resetService() {
+    AppLogger.t("[MEDS] Resetting medication service");
+    _medicationRoutines = [];
+  }
 }

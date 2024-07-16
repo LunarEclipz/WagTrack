@@ -31,6 +31,8 @@ Future<void> showAppErrorAlertDialog(
 /// Default buttons are 'Cancel' and 'Continue'
 ///
 /// Continue pops the confirmation dialog as well by default.
+/// It will however, not pop the context of the underlying page. That has to be done
+/// manually outside of this dialog.
 Future<void> showAppConfirmationDialog(
     {required BuildContext context,
     String titleString = 'Confirmation',
