@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:wagtrack/screens/explore/explore.dart';
-import 'package:wagtrack/screens/home/add_pet.dart';
 import 'package:wagtrack/screens/home/home.dart';
 import 'package:wagtrack/screens/notifications/notifications.dart';
+import 'package:wagtrack/screens/pet_details/add_pet.dart';
 import 'package:wagtrack/screens/reports/reports.dart';
 import 'package:wagtrack/screens/settings/app_settings.dart';
 

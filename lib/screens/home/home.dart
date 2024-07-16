@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
-import 'package:wagtrack/screens/home/pet_details_wrapper.dart';
+import 'package:wagtrack/screens/pet_details/pet_details_wrapper.dart';
 import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/components/call_to_action.dart';
