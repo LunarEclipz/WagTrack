@@ -58,6 +58,7 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
               : Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CircleAvatar(
+                    backgroundColor: const Color.fromARGB(255, 41, 41, 41),
                     backgroundImage: Image.network(
                       petData.imgPath!,
                       fit: BoxFit.cover,
