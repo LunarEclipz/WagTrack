@@ -106,6 +106,39 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
             ),
           const SizedBoxh20(),
 
+          // ADD POST BUTTON (posts tab)
+          if (currentPageIndex == 1)
+            FloatingActionButton(
+              heroTag: "addPost",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                    transitionDuration: const Duration(
+                        milliseconds: 300), // Adjust the duration here
+                    pageBuilder: (context, a, b) => Container(),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+            ),
+
           // ADD SYMPTOM BUTTON (symptoms tab)
           if (currentPageIndex == 2)
             FloatingActionButton(

@@ -36,6 +36,9 @@ class Post {
   /// Caption of this Post
   late String caption;
 
+  /// List of Media of this Post
+  List<String> media;
+
   /// Location of this Post
   late String location;
 
@@ -57,6 +60,7 @@ class Post {
     required this.category,
     required this.title,
     required this.caption,
+    required this.media,
     required this.location,
     required this.date,
     required this.comments,
