@@ -65,6 +65,25 @@ class Post {
     required this.date,
     required this.comments,
   });
+
+  Map<String, dynamic> toJSON() {
+    final postData = {
+      "petID": petID,
+      "petName": petName,
+      "petImgUrl": petImgUrl,
+      "visibility": visibility,
+      "likes": likes,
+      "saves": saves,
+      "category": category,
+      "title": title,
+      "caption": caption,
+      "media": media,
+      "location": location,
+      "date": date.millisecondsSinceEpoch,
+      "comments": comments.map((comment) => comment.toJSON()).toList(),
+    };
+    return postData;
+  }
 }
 
 class Comment {
@@ -81,4 +100,13 @@ class Comment {
       {required this.comment,
       required this.commentor,
       required this.commentorID});
+
+  Map<String, dynamic> toJSON() {
+    final commentData = {
+      "comment": comment,
+      "commentor": commentor,
+      "commentorID": commentorID,
+    };
+    return commentData;
+  }
 }

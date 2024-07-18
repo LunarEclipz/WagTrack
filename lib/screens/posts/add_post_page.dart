@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/post_model.dart';
 import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/services/post_service.dart';
 import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
@@ -392,7 +393,8 @@ class _AddPostPageState extends State<AddPostPage> {
                                   location: selectedLocation,
                                   date: DateTime.now(),
                                   comments: []);
-
+                              PostService().addPost(
+                                  postData: postData, imgs: _imageFiles);
                               Navigator.pop(context);
                             }
                           },
