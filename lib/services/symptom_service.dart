@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:wagtrack/models/symptom_model.dart';
@@ -9,9 +8,10 @@ import 'package:wagtrack/services/logging.dart';
 class SymptomService with ChangeNotifier {
   // Instance of Firebase Firestore for interacting with the database
   static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
+  static final _firestoreSymptomCollection = _db.collection("symptoms");
 
   // Reference to Firebase Storage for potential future storage needs
-  static final Reference _storageRef = GetIt.I<FirebaseStorage>().ref();
+  // static final Reference _storageRef = GetIt.I<FirebaseStorage>().ref();
 
   List<Symptom> _currentSymptoms = [];
   List<Symptom> _pastSymptoms = [];
@@ -21,7 +21,9 @@ class SymptomService with ChangeNotifier {
 
   /// Adds a new symptom document to the "symptoms" collection in Firestore
   void addSymptoms({required Symptom formData}) {
-    _db.collection("symptoms").add(formData.toJSON());
+    _firestoreSymptomCollection
+        .add(formData.toJSON())
+        .then((docRef) => formData.oid = docRef.id);
     List<Symptom> symptoms = [
       ...currentSymptoms,
       ...pastSymptoms,
@@ -30,7 +32,8 @@ class SymptomService with ChangeNotifier {
     setPastCurrentSymptoms(symptoms: symptoms);
   }
 
-  /// Sets List of pastSymptoms and currentSymptoms.
+  /// Sets List of pastSymptoms and currentSymptoms based from the input list of
+  /// symptoms.
   void setPastCurrentSymptoms({required List<Symptom> symptoms}) async {
     AppLogger.d("[SYMP] Setting pastSymptoms and currentSymptoms");
     _pastSymptoms =
@@ -40,12 +43,11 @@ class SymptomService with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Fetches all symptoms associated with a specific pet ID
+  /// Fetches all symptoms from Firestore associated with a specific pet ID
   Future<List<Symptom>> getAllSymptomsByPetID({required String petID}) async {
     try {
       // Query Firestore for documents in the "symptoms" collection where "petID" field matches the provided petID
-      final querySnapshot = await _db
-          .collection("symptoms")
+      final querySnapshot = await _firestoreSymptomCollection
           .where("petID", isEqualTo: petID)
           .get();
 
@@ -76,11 +78,28 @@ class SymptomService with ChangeNotifier {
     }
   }
 
+  /// Fetches all symptoms locally
+  ///
+  /// I swear why aren't the symptoms like just a hashmap goddamnit TODO
+  List<Symptom> getSymptomsFromIDs(List<String> symptomIDs) {
+    // most efficient, since length of desired IDs << total symptoms, is to
+    // go through each desired ID and find that symptom
+    final List<Symptom> symptoms = [];
+
+    // too lazy to use maps - or is that actually faster
+    for (String id in symptomIDs) {
+      symptoms.addAll(_currentSymptoms.where((symptom) => symptom.oid == id));
+      symptoms.addAll(_pastSymptoms.where((symptom) => symptom.oid == id));
+    }
+
+    return symptoms;
+  }
+
   /// Update Medication Routines
   void updateMID(
       {required String symptomID, required String mID, required String mName}) {
     AppLogger.d("Updating Session Records");
-    final symptomRef = _db.collection("symptoms").doc(symptomID);
+    final symptomRef = _firestoreSymptomCollection.doc(symptomID);
 
     symptomRef.update({
       "mid": FieldValue.arrayUnion([mID]),
@@ -89,6 +108,78 @@ class SymptomService with ChangeNotifier {
         (value) => AppLogger.d("[SYMP] Successfully Updated Session Records"),
         onError: (e) =>
             AppLogger.d("[SYMP] Error Updating Session Records: $e", e));
+
+    notifyListeners();
+  }
+
+  /// Deletes the symptom with the given id from Firebase
+  Future<void> deleteSymptom({required String id}) async {
+    if (id.isEmpty) {
+      AppLogger.w("[SYMP] Symptom id for deletion is empty");
+      return;
+    }
+
+    AppLogger.d("[SYMP] Deleting symptom with id $id");
+    try {
+      // remove from local symptom lists. needed to reset the UI of the home page!
+      _currentSymptoms.removeWhere((symptom) => symptom.oid == id);
+      _pastSymptoms.removeWhere((symptom) => symptom.oid == id);
+
+      // delete from firestore
+      await _firestoreSymptomCollection.doc(id).delete();
+    } catch (e) {
+      AppLogger.e("[SYMP] Error deleting symptom", e);
+    }
+
+    notifyListeners();
+  }
+
+  /// Updates the symptom with the given id locally and in firebase
+  Future<void> updateSymptom({
+    required String id,
+    String? category,
+    String? symptom,
+    String? factors,
+    int? severity,
+    List<String>? tags,
+    bool? hasEnd,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    AppLogger.d("[SYMP] Updating symptom with id $id");
+
+    // we search a list to properly do a null check!
+    final List<Symptom> foundSymptoms = getSymptomsFromIDs([id]);
+    // exit if empty
+    if (foundSymptoms.isEmpty) {
+      AppLogger.w("[SYMP] No symptoms found with id $id");
+      return;
+    }
+
+    try {
+      // get symptom object
+      final Symptom symptomToEdit = foundSymptoms[0];
+
+      // apply changes
+      symptomToEdit.category = category ?? symptomToEdit.category;
+      symptomToEdit.symptom = symptom ?? symptomToEdit.symptom;
+      symptomToEdit.factors = factors ?? symptomToEdit.factors;
+      symptomToEdit.severity = severity ?? symptomToEdit.severity;
+      symptomToEdit.tags = tags ?? symptomToEdit.tags;
+      symptomToEdit.hasEnd = hasEnd ?? symptomToEdit.hasEnd;
+      symptomToEdit.startDate = startDate ?? symptomToEdit.startDate;
+      symptomToEdit.endDate = endDate ?? symptomToEdit.endDate;
+
+      // then apply updates to Firestore
+      final symptomDocRef = _firestoreSymptomCollection.doc(id);
+
+      await symptomDocRef.update(symptomToEdit.toJSON()).then(
+          (value) => AppLogger.d("[SYMP] Successfully updated symptom $id"),
+          onError: (e) =>
+              AppLogger.d("[SYMP] Error updating symptom $id: $e", e));
+    } catch (e) {
+      AppLogger.e("[SYMP] Error updating symptom $id", e);
+    }
 
     notifyListeners();
   }

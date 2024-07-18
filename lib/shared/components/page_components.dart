@@ -46,3 +46,30 @@ class AppScrollablePage extends StatelessWidget {
     );
   }
 }
+
+///  Scrollable Page (with background, wihtout pading)
+///
+/// Children are aligned to `CrossAxisAlignment.start`
+class AppScrollableNoPaddingPage extends StatelessWidget {
+  /// List of widgets to display in the page.
+  final List<Widget> children;
+
+  /// Creates a page with the default background that is scrollable.
+  const AppScrollableNoPaddingPage({super.key, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    // final TextTheme textStyles = Theme.of(context).textTheme;
+    // final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return BackgroundImageWrapper(
+      child: AppScrollBar(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start, children: children),
+        ),
+      ),
+    );
+  }
+}

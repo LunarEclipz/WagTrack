@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/screens/medication/medication_frame.dart';
 import 'package:wagtrack/screens/misc_pages.dart';
+import 'package:wagtrack/screens/pet_details/edit_pet.dart';
 import 'package:wagtrack/screens/pet_details/pet_details.dart';
+import 'package:wagtrack/screens/posts/add_post_page.dart';
 import 'package:wagtrack/screens/posts/pet_posts_page.dart';
 import 'package:wagtrack/screens/symptoms/add_symptoms.dart';
 import 'package:wagtrack/screens/symptoms/symptoms.dart';
@@ -58,6 +60,7 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
               : Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CircleAvatar(
+                    backgroundColor: const Color.fromARGB(255, 41, 41, 41),
                     backgroundImage: Image.network(
                       petData.imgPath!,
                       fit: BoxFit.cover,
@@ -104,6 +107,41 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
               ),
             ),
           const SizedBoxh20(),
+
+          // ADD POST BUTTON (posts tab)
+          if (currentPageIndex == 1)
+            FloatingActionButton(
+              heroTag: "addPost",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                    transitionDuration: const Duration(
+                        milliseconds: 300), // Adjust the duration here
+                    pageBuilder: (context, a, b) => AddPostPage(
+                      pet: petData,
+                    ),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+            ),
 
           // ADD SYMPTOM BUTTON (symptoms tab)
           if (currentPageIndex == 2)
@@ -162,7 +200,9 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
                     },
                     transitionDuration: const Duration(
                         milliseconds: 300), // Adjust the duration here
-                    pageBuilder: (context, a, b) => const WorkInProgressPage(),
+                    pageBuilder: (context, a, b) => EditPetPage(
+                      petData: petData,
+                    ),
                   ),
                 );
               },

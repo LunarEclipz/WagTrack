@@ -11,6 +11,8 @@ import 'package:wagtrack/services/logging.dart';
 /// Communication to Firebase for Pet-related data.
 class PetService with ChangeNotifier {
   static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
+  static final _firestorePetCollection = _db.collection("pets");
+
   static final FirebaseStorage _firebaseStorage = GetIt.I<FirebaseStorage>();
   static final Reference _storageRef = _firebaseStorage.ref();
 
@@ -32,14 +34,16 @@ class PetService with ChangeNotifier {
       pet.imgPath = imgPath;
 
       // WAIT for pet to be added to db!!!
-      await _db.collection("pets").add(pet.toJSON());
+      await _firestorePetCollection
+          .add(pet.toJSON())
+          .then((docRef) => pet.petID = docRef.id);
 
       AppLogger.i("[PET] Pet added successfully");
       List<Pet> pets = await PetService().getAllPetsByUID(uid: uid);
       setPersonalCommunityPets(pets: pets);
     } catch (e) {
       // TODO is there a specific error that you want to catch?
-      _db.collection("pets").add(pet.toJSON());
+      _firestorePetCollection.add(pet.toJSON());
       AppLogger.e("[PET] Error adding pet: $e", e);
     }
 
@@ -104,6 +108,11 @@ class PetService with ChangeNotifier {
 
   /// Deletes the pet with the given id from Firebase
   Future<void> deletePet({required String id}) async {
+    if (id.isEmpty) {
+      AppLogger.w("[PET] Pet id for deletion is empty");
+      return;
+    }
+
     AppLogger.d("[PET] Deleting pet with id $id");
     try {
       // remove from local pet lists. needed to reset the UI of the home page!
@@ -111,9 +120,9 @@ class PetService with ChangeNotifier {
       _personalPets.removeWhere((pet) => pet.petID == id);
 
       // delete from firestore
-      await _db.collection('pets').doc(id).delete();
+      await _firestorePetCollection.doc(id).delete();
     } catch (e) {
-      AppLogger.e("[PET] Error deleting community pet", e);
+      AppLogger.e("[PET] Error deleting pet", e);
     }
 
     notifyListeners();
@@ -155,12 +164,12 @@ class PetService with ChangeNotifier {
   void updateWeightLog(
       {required Pet petData, required List<DateTimeStringPair> weightLog}) {
     AppLogger.d("[PET] Updating Weight Log");
-    final petRef = _db.collection("pets").doc(petData.petID);
+    final petRef = _firestorePetCollection.doc(petData.petID);
 
     petRef.update({
       "weight": weightLog.map((weight) => weight.toJSON()).toList(),
     }).then((value) => AppLogger.d("[PET] Successfully Updated Weight Log"),
-        onError: (e) => AppLogger.d("[PET] Error Updating Weight Log: $e"));
+        onError: (e) => AppLogger.e("[PET] Error Updating Weight Log: $e"));
 
     notifyListeners();
   }
@@ -170,7 +179,7 @@ class PetService with ChangeNotifier {
       {required Pet petData,
       required List<DateTimeStringPair> vaccineRecords}) {
     AppLogger.d("[PET] Updating Vaccine Records");
-    final petRef = _db.collection("pets").doc(petData.petID);
+    final petRef = _firestorePetCollection.doc(petData.petID);
 
     petRef.update({
       "vaccineRecords": vaccineRecords
@@ -179,7 +188,7 @@ class PetService with ChangeNotifier {
     }).then(
         (value) => AppLogger.d("[PET] Successfully Updated Vaccine Records"),
         onError: (e) =>
-            AppLogger.d("[PET] Error Updating Vaccine Records: $e"));
+            AppLogger.e("[PET] Error Updating Vaccine Records: $e"));
 
     notifyListeners();
   }
@@ -189,7 +198,7 @@ class PetService with ChangeNotifier {
       {required Pet petData,
       required List<DateTimeStringPair> sessionRecords}) {
     AppLogger.d("[PET] Updating Session Records");
-    final petRef = _db.collection("pets").doc(petData.petID);
+    final petRef = _firestorePetCollection.doc(petData.petID);
 
     petRef.update({
       "sessionRecords": sessionRecords
@@ -198,9 +207,113 @@ class PetService with ChangeNotifier {
     }).then(
         (value) => AppLogger.d("[PET] Successfully Updated Session Records"),
         onError: (e) =>
-            AppLogger.d("[PET] Error Updating Session Records: $e"));
+            AppLogger.e("[PET] Error Updating Session Records: $e"));
 
     notifyListeners();
+  }
+
+  /// Gets a pet from local using the given id. Returns null if no pet is found.
+  Pet? getPetFromLocalWithID({required String petID}) {
+// first find pet
+    final List<Pet> foundPets = [];
+    foundPets.addAll(_personalPets.where((pet) => pet.petID == petID));
+    foundPets.addAll(_communityPets.where((pet) => pet.petID == petID));
+
+    if (foundPets.isEmpty) {
+      // no pet with given ID found
+      return null;
+    }
+
+    return foundPets.first;
+  }
+
+  /// Updates the pet with the given id locally and in firebase
+  Future<void> updatePet({
+    required String id,
+    String? location,
+    String? name,
+    String? description,
+    String? sex,
+    String? species,
+    String? petType,
+    String? idNumber,
+    String? breed,
+    DateTime? birthDate,
+    List<DateTimeStringPair>? weight,
+    List<Caretaker>? caretakers,
+    List<String>? caretakerIDs,
+    List<DateTimeStringPair>? sessionRecords,
+    File? img,
+  }) async {
+    AppLogger.d("[PET] Updating pet $id");
+
+    // we search a list to properly do a null check!
+    final Pet? pet = getPetFromLocalWithID(petID: id);
+    // exit if empty
+    if (pet == null) {
+      AppLogger.w("[PET] No pets found with id $id");
+      return;
+    }
+
+    try {
+      // apply changes
+      pet.location = location ?? pet.location;
+      pet.name = name ?? pet.name;
+      pet.description = description ?? pet.description;
+      pet.sex = sex ?? pet.sex;
+      pet.species = species ?? pet.species;
+      pet.petType = petType ?? pet.petType;
+      pet.idNumber = idNumber ?? pet.idNumber;
+      pet.breed = breed ?? pet.breed;
+      pet.birthDate = birthDate ?? pet.birthDate;
+      pet.weight = weight ?? pet.weight;
+      pet.caretakers = caretakers ?? pet.caretakers;
+      pet.caretakerIDs = caretakerIDs ?? pet.caretakerIDs;
+      pet.sessionRecords = sessionRecords ?? pet.sessionRecords;
+
+      // IMAGE - only if image is present
+      if (img != null) {
+        // upload pet image and wait
+        String? imgPath =
+            await uploadPetImage(image: img, uid: pet.caretakers[0].uid);
+
+        // set pet image path
+        pet.imgPath = imgPath;
+      }
+
+      // then apply updates to Firestore
+      final petDocRef = _firestorePetCollection.doc(id);
+
+      await petDocRef.update(pet.toJSON()).then(
+          (value) => AppLogger.d("[PET] Successfully updated pet $id"),
+          onError: (e) => AppLogger.d("[PET] Error updating pet $id: $e", e));
+    } catch (e) {
+      AppLogger.e("[PET] Error updating pet $id", e);
+    }
+
+    notifyListeners();
+  }
+
+  /// Checks for the role of the given user with the given pet and returns the role
+  /// as a string. Returns `null` if there is no role.
+  ///
+  /// Checks against local pets.
+  String? checkUserPetRole({required String petID, required String userID}) {
+    final checkPet = getPetFromLocalWithID(petID: petID);
+
+    if (checkPet == null) {
+      return null;
+    }
+
+    // now look through pet caretakers
+    final caretakerMatches = checkPet.caretakers.where((c) => c.uid == userID);
+
+    if (caretakerMatches.isEmpty) {
+      // no user found for this pet.
+      return null;
+    }
+
+    return caretakerMatches.first.role;
   }
 
   /// Resets petService

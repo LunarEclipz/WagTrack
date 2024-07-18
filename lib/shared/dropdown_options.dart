@@ -241,3 +241,11 @@ List<String> tagFactorsList = [
   "Behavioral Problems",
   "Others",
 ];
+
+List<String> postCategory = [
+  "Play",
+  "Diet",
+  "Lifestyle",
+  "Health",
+  "Fashion",
+];

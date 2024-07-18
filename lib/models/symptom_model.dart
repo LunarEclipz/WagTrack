@@ -33,7 +33,7 @@ class Symptom {
   /// PetID of Pet which is associated with this symptom
   late String petID;
 
-  /// TODO WHAT IS THIS
+  /// Document id that represents symptom
   String? oid;
 
   /// medication ids
