@@ -32,7 +32,8 @@ class SymptomService with ChangeNotifier {
     setPastCurrentSymptoms(symptoms: symptoms);
   }
 
-  /// Sets List of pastSymptoms and currentSymptoms.
+  /// Sets List of pastSymptoms and currentSymptoms based from the input list of
+  /// symptoms.
   void setPastCurrentSymptoms({required List<Symptom> symptoms}) async {
     AppLogger.d("[SYMP] Setting pastSymptoms and currentSymptoms");
     _pastSymptoms =
@@ -42,7 +43,7 @@ class SymptomService with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Fetches all symptoms associated with a specific pet ID
+  /// Fetches all symptoms from Firestore associated with a specific pet ID
   Future<List<Symptom>> getAllSymptomsByPetID({required String petID}) async {
     try {
       // Query Firestore for documents in the "symptoms" collection where "petID" field matches the provided petID
@@ -75,6 +76,23 @@ class SymptomService with ChangeNotifier {
       AppLogger.e("[SYMP] Error fetching symptoms for pet ID $petID: $e", e);
       return []; // Return an empty list on error
     }
+  }
+
+  /// Fetches all symptoms locally
+  ///
+  /// I swear why aren't the symptoms like just a hashmap goddamnit
+  List<Symptom> getSymptomsFromIDs(List<String> symptomIDs) {
+    // most efficient, since length of desired IDs << total symptoms, is to
+    // go through each desired ID and find that symptom
+    final List<Symptom> symptoms = [];
+
+    // too lazy to use maps - or is that actually faster
+    for (String id in symptomIDs) {
+      symptoms.addAll(_currentSymptoms.where((symptom) => symptom.oid == id));
+      symptoms.addAll(_pastSymptoms.where((symptom) => symptom.oid == id));
+    }
+
+    return symptoms;
   }
 
   /// Update Medication Routines
@@ -114,6 +132,29 @@ class SymptomService with ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  /// Updates the symptom with the given id locally and in firebase
+  Future<void> updateSymptom({
+    required String id,
+  }) async {
+    AppLogger.d("[SYMP] Updating symptom with id $id");
+
+    final List<Symptom> foundSymptoms = getSymptomsFromIDs([id]);
+    // exit if empty
+    if (foundSymptoms.isEmpty) {
+      AppLogger.w("[SYMP] No symptoms found with id $id");
+      return;
+    }
+
+    try {
+      // get symptom object
+      final Symptom symptom = foundSymptoms[0];
+
+      // then apply updates
+    } catch (e) {
+      AppLogger.e("[SYMP] Error updating symptom $id", e);
+    }
   }
 
   /// Resets symptomService

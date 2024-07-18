@@ -107,6 +107,58 @@ class MedicationService with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Updates the medication with the given id locally and in firebase
+  Future<void> updateMedication({
+    required String id,
+    String? title,
+    String? clinicName,
+    String? appointmentNumber,
+    String? diagnosis,
+    String? comments,
+    List<String>? symptomsID,
+    List<String>? symptomsName,
+    List<Medication>? medications,
+  }) async {
+    AppLogger.d("[MED] Updating medication routine $id");
+
+    // find medication routine - returns as an iterable, not a list
+    final routines = medicationRoutines.where((routine) => routine.oid == id);
+    // exit if empty
+    if (routines.isEmpty) {
+      AppLogger.w("[MED] No routines found with id $id");
+      return;
+    }
+
+    try {
+      // get routine
+      final routine = routines.first;
+
+      // apply changes
+      routine.title = title ?? routine.title;
+      routine.clinicName = clinicName ?? routine.clinicName;
+      routine.appointmentNumber =
+          appointmentNumber ?? routine.appointmentNumber;
+      routine.diagnosis = diagnosis ?? routine.diagnosis;
+      routine.comments = comments ?? routine.comments;
+      routine.symptomsID = symptomsID ?? routine.symptomsID;
+      routine.symptomsName = symptomsName ?? routine.symptomsName;
+      routine.medications = medications ?? routine.medications;
+
+      // then apply updates to Firestore
+      final routineRef = _firestoreMedicationCollection.doc(id);
+
+      await routineRef.update(routine.toJSON()).then(
+          (value) =>
+              AppLogger.d("[MED] Successfully updated medication routine"),
+          onError: (e) => AppLogger.d(
+              "[MED] Error Updating medication routine $id: $e", e));
+    } catch (e) {
+      AppLogger.e("[MED] Error updating medication routine $id", e);
+    }
+
+    notifyListeners();
+  }
+
   /// Resets medicationService
   ///
   /// clears lists of medication routines

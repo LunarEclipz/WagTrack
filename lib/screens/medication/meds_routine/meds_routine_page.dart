@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/models/medication_model.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/screens/medication/meds_routine/meds_add_routine.dart';
+import 'package:wagtrack/screens/medication/meds_routine/meds_edit_routine.dart';
 import 'package:wagtrack/services/medication_service.dart';
 import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/dialogs.dart';
@@ -70,7 +71,7 @@ class _MedsRoutinePageState extends State<MedsRoutinePage> {
                       );
                     },
                     transitionDuration: const Duration(
-                        milliseconds: 500), // Adjust the duration here
+                        milliseconds: 300), // Adjust the duration here
                     pageBuilder: (context, a, b) => MedsAddRoutine(
                       petData: widget.petData,
                     ),
@@ -242,9 +243,15 @@ class _MedicationRoutineCardState extends State<MedicationRoutineCard> {
                         Row(
                           children: [
                             AppIconButtonSmall(
-                              icon: const Icon(Icons.edit_rounded),
-                              onPressed: () {},
-                            ),
+                                icon: const Icon(Icons.edit_rounded),
+                                onPressed: () => Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, a, b) =>
+                                          MedsEditRoutine(
+                                        routineData: medicationRoutine,
+                                      ),
+                                    ))),
                             AppIconButtonSmall(
                               icon: const Icon(Icons.delete_rounded),
                               onPressed: () => showAppConfirmationDialog(
