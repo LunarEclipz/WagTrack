@@ -27,7 +27,9 @@ class MedicationService with ChangeNotifier {
   void addMedicationRoutines({required MedicationRoutine formData}) {
     AppLogger.d("[MED] Adding Medication Routine to Firebase");
 
-    _firestoreMedicationCollection.add(formData.toJSON());
+    _firestoreMedicationCollection
+        .add(formData.toJSON())
+        .then((docRef) => formData.oid = docRef.id);
     List<MedicationRoutine> medicationRoutines = [
       ..._medicationRoutines,
       ...[formData]
@@ -86,6 +88,11 @@ class MedicationService with ChangeNotifier {
 
   /// Deletes the medication routine with the given id from Firebase
   Future<void> deleteMedicationRoutine({required String id}) async {
+    if (id.isEmpty) {
+      AppLogger.w("[MED] Medication routine id for deletion is empty");
+      return;
+    }
+
     AppLogger.d("[MED] Deleting symptom with id $id");
     try {
       // remove from local med routine lists. needed to reset the UI of the home page!

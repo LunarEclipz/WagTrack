@@ -34,7 +34,9 @@ class PetService with ChangeNotifier {
       pet.imgPath = imgPath;
 
       // WAIT for pet to be added to db!!!
-      await _firestorePetCollection.add(pet.toJSON());
+      await _firestorePetCollection
+          .add(pet.toJSON())
+          .then((docRef) => pet.petID = docRef.id);
 
       AppLogger.i("[PET] Pet added successfully");
       List<Pet> pets = await PetService().getAllPetsByUID(uid: uid);
@@ -106,6 +108,11 @@ class PetService with ChangeNotifier {
 
   /// Deletes the pet with the given id from Firebase
   Future<void> deletePet({required String id}) async {
+    if (id.isEmpty) {
+      AppLogger.w("[PET] Pet id for deletion is empty");
+      return;
+    }
+
     AppLogger.d("[PET] Deleting pet with id $id");
     try {
       // remove from local pet lists. needed to reset the UI of the home page!

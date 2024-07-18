@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:wagtrack/models/symptom_model.dart';
@@ -12,7 +11,7 @@ class SymptomService with ChangeNotifier {
   static final _firestoreSymptomCollection = _db.collection("symptoms");
 
   // Reference to Firebase Storage for potential future storage needs
-  static final Reference _storageRef = GetIt.I<FirebaseStorage>().ref();
+  // static final Reference _storageRef = GetIt.I<FirebaseStorage>().ref();
 
   List<Symptom> _currentSymptoms = [];
   List<Symptom> _pastSymptoms = [];
@@ -22,7 +21,9 @@ class SymptomService with ChangeNotifier {
 
   /// Adds a new symptom document to the "symptoms" collection in Firestore
   void addSymptoms({required Symptom formData}) {
-    _firestoreSymptomCollection.add(formData.toJSON());
+    _firestoreSymptomCollection
+        .add(formData.toJSON())
+        .then((docRef) => formData.oid = docRef.id);
     List<Symptom> symptoms = [
       ...currentSymptoms,
       ...pastSymptoms,
@@ -95,6 +96,11 @@ class SymptomService with ChangeNotifier {
 
   /// Deletes the symptom with the given id from Firebase
   Future<void> deleteSymptom({required String id}) async {
+    if (id.isEmpty) {
+      AppLogger.w("[SYMP] Symptom id for deletion is empty");
+      return;
+    }
+
     AppLogger.d("[SYMP] Deleting symptom with id $id");
     try {
       // remove from local symptom lists. needed to reset the UI of the home page!
