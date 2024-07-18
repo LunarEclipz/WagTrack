@@ -93,6 +93,23 @@ class SymptomService with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Deletes the symptom with the given id from Firebase
+  Future<void> deleteSymptom({required String id}) async {
+    AppLogger.d("[SYMP] Deleting symptom with id $id");
+    try {
+      // remove from local symptom lists. needed to reset the UI of the home page!
+      _currentSymptoms.removeWhere((symptom) => symptom.oid == id);
+      _pastSymptoms.removeWhere((symptom) => symptom.oid == id);
+
+      // delete from firestore
+      await _db.collection('symptoms').doc(id).delete();
+    } catch (e) {
+      AppLogger.e("[SYMP] Error deleting symptom", e);
+    }
+
+    notifyListeners();
+  }
+
   /// Resets symptomService
   ///
   /// clears lists of symptoms

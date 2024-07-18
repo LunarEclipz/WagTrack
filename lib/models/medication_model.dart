@@ -17,7 +17,10 @@ class MedicationRoutine {
 
   late List<Medication> medications;
 
+  /// Id of pet that this medication routine is associated to.
   late String petID;
+
+  /// Document id that represents medication routine.
   late String? oid;
 
   MedicationRoutine({

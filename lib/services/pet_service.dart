@@ -113,7 +113,7 @@ class PetService with ChangeNotifier {
       // delete from firestore
       await _db.collection('pets').doc(id).delete();
     } catch (e) {
-      AppLogger.e("[PET] Error deleting community pet", e);
+      AppLogger.e("[PET] Error deleting pet", e);
     }
 
     notifyListeners();

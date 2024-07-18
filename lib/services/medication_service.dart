@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:wagtrack/models/medication_model.dart';
@@ -14,7 +13,7 @@ class MedicationService with ChangeNotifier {
   static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
 
   // Reference to Firebase Storage for potential future storage needs
-  static final Reference _storageRef = GetIt.I<FirebaseStorage>().ref();
+  // static final Reference _storageRef = GetIt.I<FirebaseStorage>().ref();
 
   List<MedicationRoutine> _medicationRoutines = [];
 
@@ -83,6 +82,22 @@ class MedicationService with ChangeNotifier {
       AppLogger.e("[MED] Error fetching medRoutines for pet ID $petID: $e", e);
       return []; // Return an empty list on error
     }
+  }
+
+  /// Deletes the medication routine with the given id from Firebase
+  Future<void> deleteMedicationRoutine({required String id}) async {
+    AppLogger.d("[MED] Deleting symptom with id $id");
+    try {
+      // remove from local med routine lists. needed to reset the UI of the home page!
+      _medicationRoutines.removeWhere((routine) => routine.oid == id);
+
+      // delete from firestore
+      await _db.collection('medication routines').doc(id).delete();
+    } catch (e) {
+      AppLogger.e("[MED] Error deleting medication routine", e);
+    }
+
+    notifyListeners();
   }
 
   /// Resets medicationService
