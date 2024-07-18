@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/medication_model.dart';
-import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/screens/symptoms/symptoms.dart';
 import 'package:wagtrack/services/medication_service.dart';
@@ -10,21 +9,24 @@ import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 
-class MedsAddRoutine extends StatefulWidget {
-  final Pet petData;
-  const MedsAddRoutine({super.key, required this.petData});
+class MedsEditRoutine extends StatefulWidget {
+  final MedicationRoutine routineData;
+  const MedsEditRoutine({
+    super.key,
+    required this.routineData,
+  });
 
   @override
-  State<MedsAddRoutine> createState() => _MedsAddRoutineState();
+  State<MedsEditRoutine> createState() => _MedsEditRoutineState();
 }
 
-class _MedsAddRoutineState extends State<MedsAddRoutine> {
+class _MedsEditRoutineState extends State<MedsEditRoutine> {
   // Form Keys
   final _medicationFormKey = GlobalKey<FormState>();
   final _routineFormKey = GlobalKey<FormState>();
   final _addInfoFormKey = GlobalKey<FormState>();
 
-  // Text Controllers
+  // Text Controllers - init
   late TextEditingController titleController =
       TextEditingController(text: null);
   late TextEditingController clinicNameController =
@@ -50,7 +52,6 @@ class _MedsAddRoutineState extends State<MedsAddRoutine> {
       AutovalidateMode.onUserInteraction;
 
   // TODO this doesn't work atm
-  // Regarding medication autovalidation turning on immediately after adding a med
   void _resetMedAutovalidateMode() {
     setState(() {
       _overrideMedAutovalidateMode = AutovalidateMode.disabled;
@@ -60,6 +61,33 @@ class _MedsAddRoutineState extends State<MedsAddRoutine> {
     Future.delayed(const Duration(milliseconds: 10), () {
       setState(() {
         _overrideMedAutovalidateMode = AutovalidateMode.onUserInteraction;
+      });
+    });
+  }
+
+  // set up autofilled data
+  @override
+  void initState() {
+    super.initState();
+
+    final routineData = widget.routineData;
+
+    titleController.text = routineData.title;
+    clinicNameController.text = routineData.clinicName;
+    appointmentNumberController.text = routineData.appointmentNumber;
+    diagnosisController.text = routineData.diagnosis;
+    commentsController.text = routineData.comments;
+    medicationList = routineData.medications;
+
+    // To get the symptoms - need to use SymptomService
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      SymptomService symptomService =
+          Provider.of<SymptomService>(context, listen: false);
+
+      // need to ste state after the symptoms are obtained
+      setState(() {
+        symptomsTagged =
+            symptomService.getSymptomsFromIDs(routineData.symptomsID);
       });
     });
   }
@@ -76,7 +104,7 @@ class _MedsAddRoutineState extends State<MedsAddRoutine> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Add Routine',
+          'Edit Routine',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: colorScheme.primary,
@@ -382,22 +410,22 @@ class _MedsAddRoutineState extends State<MedsAddRoutine> {
                   if (routineValidation &&
                       addInfoValidation &&
                       medicationList.isNotEmpty) {
-                    // Create routine
-                    MedicationRoutine formData = MedicationRoutine(
-                        title: titleController.text,
-                        clinicName: clinicNameController.text,
-                        appointmentNumber: appointmentNumberController.text,
-                        diagnosis: diagnosisController.text,
-                        comments: commentsController.text,
-                        symptomsID: symptomsTagged
-                            .map((symptoms) => symptoms.oid!)
-                            .toList(),
-                        symptomsName: symptomsTagged
-                            .map((symptoms) => symptoms.symptom)
-                            .toList(),
-                        medications: medicationList,
-                        petID: widget.petData.petID!);
-                    medicationService.addMedicationRoutines(formData: formData);
+                    // Update routine
+                    medicationService.updateMedication(
+                      id: widget.routineData.oid ?? "",
+                      title: titleController.text,
+                      clinicName: clinicNameController.text,
+                      appointmentNumber: appointmentNumberController.text,
+                      diagnosis: diagnosisController.text,
+                      comments: commentsController.text,
+                      symptomsID: symptomsTagged
+                          .map((symptoms) => symptoms.oid!)
+                          .toList(),
+                      symptomsName: symptomsTagged
+                          .map((symptoms) => symptoms.symptom)
+                          .toList(),
+                      medications: medicationList,
+                    );
 
                     Navigator.pop(context);
                   }
@@ -418,7 +446,7 @@ class _MedsAddRoutineState extends State<MedsAddRoutine> {
                           color: Colors.white,
                         ),
                         Text(
-                          'Add Routine',
+                          'Update Routine',
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ],

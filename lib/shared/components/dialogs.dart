@@ -10,11 +10,17 @@ Future<void> showAppErrorAlertDialog(
     String titleString = 'Unknown Error',
     String contentString = '',
     String closeDialogString = 'Try Again'}) {
+  final TextTheme textStyles = Theme.of(context).textTheme;
+  final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
   return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(titleString),
+          title: Text(
+            titleString,
+            style: textStyles.titleMedium!.copyWith(color: colorScheme.primary),
+          ),
           content: Text(contentString),
           actions: <Widget>[
             TextButton(
@@ -22,6 +28,8 @@ Future<void> showAppErrorAlertDialog(
               child: Text(closeDialogString),
             ),
           ],
+          surfaceTintColor: Colors.white,
+          backgroundColor: Colors.white,
         );
       });
 }
@@ -40,11 +48,17 @@ Future<void> showAppConfirmationDialog(
     String closeDialogString = 'Cancel',
     String continueString = 'Continue',
     Function? continueAction}) {
+  final TextTheme textStyles = Theme.of(context).textTheme;
+  final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
   return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(titleString),
+          title: Text(
+            titleString,
+            style: textStyles.titleMedium!.copyWith(color: colorScheme.primary),
+          ),
           content: Text(contentString),
           actions: <Widget>[
             TextButton(
@@ -59,6 +73,8 @@ Future<void> showAppConfirmationDialog(
               child: Text(continueString),
             ),
           ],
+          surfaceTintColor: Colors.white,
+          backgroundColor: Colors.white,
         );
       });
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/screens/medication/medication_frame.dart';
 import 'package:wagtrack/screens/misc_pages.dart';
+import 'package:wagtrack/screens/pet_details/edit_pet.dart';
 import 'package:wagtrack/screens/pet_details/pet_details.dart';
 import 'package:wagtrack/screens/posts/add_post_page.dart';
 import 'package:wagtrack/screens/posts/pet_posts_page.dart';
@@ -199,7 +200,9 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
                     },
                     transitionDuration: const Duration(
                         milliseconds: 300), // Adjust the duration here
-                    pageBuilder: (context, a, b) => const WorkInProgressPage(),
+                    pageBuilder: (context, a, b) => EditPetPage(
+                      petData: petData,
+                    ),
                   ),
                 );
               },

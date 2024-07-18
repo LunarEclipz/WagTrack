@@ -98,3 +98,36 @@ class _AppButtonLargeState extends State<AppButtonLarge> {
     );
   }
 }
+
+/// Small pressable icon
+class AppIconButtonSmall extends StatefulWidget {
+  /// Icon inside button
+  final Icon icon;
+
+  /// function to be called when the button is pressed
+  final void Function()? onPressed;
+
+  const AppIconButtonSmall({
+    super.key,
+    required this.icon,
+    this.onPressed,
+  });
+
+  @override
+  _AppIconButtonSmallState createState() => _AppIconButtonSmallState();
+}
+
+class _AppIconButtonSmallState extends State<AppIconButtonSmall> {
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // final TextTheme textStyles = Theme.of(context).textTheme;
+
+    return IconButton(
+      icon: widget.icon,
+      onPressed: widget.onPressed,
+      color: colorScheme.primary,
+      padding: EdgeInsets.zero,
+    );
+  }
+}
