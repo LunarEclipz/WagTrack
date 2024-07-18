@@ -9,6 +9,7 @@ import 'package:wagtrack/services/logging.dart';
 class SymptomService with ChangeNotifier {
   // Instance of Firebase Firestore for interacting with the database
   static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
+  static final _firestoreSymptomCollection = _db.collection("symptoms");
 
   // Reference to Firebase Storage for potential future storage needs
   static final Reference _storageRef = GetIt.I<FirebaseStorage>().ref();
@@ -21,7 +22,7 @@ class SymptomService with ChangeNotifier {
 
   /// Adds a new symptom document to the "symptoms" collection in Firestore
   void addSymptoms({required Symptom formData}) {
-    _db.collection("symptoms").add(formData.toJSON());
+    _firestoreSymptomCollection.add(formData.toJSON());
     List<Symptom> symptoms = [
       ...currentSymptoms,
       ...pastSymptoms,
@@ -44,8 +45,7 @@ class SymptomService with ChangeNotifier {
   Future<List<Symptom>> getAllSymptomsByPetID({required String petID}) async {
     try {
       // Query Firestore for documents in the "symptoms" collection where "petID" field matches the provided petID
-      final querySnapshot = await _db
-          .collection("symptoms")
+      final querySnapshot = await _firestoreSymptomCollection
           .where("petID", isEqualTo: petID)
           .get();
 
@@ -80,7 +80,7 @@ class SymptomService with ChangeNotifier {
   void updateMID(
       {required String symptomID, required String mID, required String mName}) {
     AppLogger.d("Updating Session Records");
-    final symptomRef = _db.collection("symptoms").doc(symptomID);
+    final symptomRef = _firestoreSymptomCollection.doc(symptomID);
 
     symptomRef.update({
       "mid": FieldValue.arrayUnion([mID]),
@@ -102,7 +102,7 @@ class SymptomService with ChangeNotifier {
       _pastSymptoms.removeWhere((symptom) => symptom.oid == id);
 
       // delete from firestore
-      await _db.collection('symptoms').doc(id).delete();
+      await _firestoreSymptomCollection.doc(id).delete();
     } catch (e) {
       AppLogger.e("[SYMP] Error deleting symptom", e);
     }

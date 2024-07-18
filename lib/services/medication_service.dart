@@ -11,12 +11,13 @@ class MedicationService with ChangeNotifier {
 
   // Instance of Firebase Firestore for interacting with the database
   static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
+  static final _firestoreMedicationCollection =
+      _db.collection("medication routines");
 
   // Reference to Firebase Storage for potential future storage needs
   // static final Reference _storageRef = GetIt.I<FirebaseStorage>().ref();
 
   List<MedicationRoutine> _medicationRoutines = [];
-
   List<MedicationRoutine> get medicationRoutines => _medicationRoutines;
 
   /// Constructor
@@ -26,7 +27,7 @@ class MedicationService with ChangeNotifier {
   void addMedicationRoutines({required MedicationRoutine formData}) {
     AppLogger.d("[MED] Adding Medication Routine to Firebase");
 
-    _db.collection("medication routines").add(formData.toJSON());
+    _firestoreMedicationCollection.add(formData.toJSON());
     List<MedicationRoutine> medicationRoutines = [
       ..._medicationRoutines,
       ...[formData]
@@ -48,8 +49,7 @@ class MedicationService with ChangeNotifier {
       {required String petID, required bool first}) async {
     try {
       // Query Firestore for documents in the "symptoms" collection where "petID" field matches the provided petID
-      final querySnapshot = await _db
-          .collection("medication routines")
+      final querySnapshot = await _firestoreMedicationCollection
           .where("petID", isEqualTo: petID)
           .get();
 
@@ -92,7 +92,7 @@ class MedicationService with ChangeNotifier {
       _medicationRoutines.removeWhere((routine) => routine.oid == id);
 
       // delete from firestore
-      await _db.collection('medication routines').doc(id).delete();
+      await _firestoreMedicationCollection.doc(id).delete();
     } catch (e) {
       AppLogger.e("[MED] Error deleting medication routine", e);
     }

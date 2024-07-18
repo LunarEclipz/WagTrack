@@ -11,6 +11,8 @@ import 'package:wagtrack/services/logging.dart';
 /// Communication to Firebase for Pet-related data.
 class PetService with ChangeNotifier {
   static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
+  static final _firestorePetCollection = _db.collection("pets");
+
   static final FirebaseStorage _firebaseStorage = GetIt.I<FirebaseStorage>();
   static final Reference _storageRef = _firebaseStorage.ref();
 
@@ -32,14 +34,14 @@ class PetService with ChangeNotifier {
       pet.imgPath = imgPath;
 
       // WAIT for pet to be added to db!!!
-      await _db.collection("pets").add(pet.toJSON());
+      await _firestorePetCollection.add(pet.toJSON());
 
       AppLogger.i("[PET] Pet added successfully");
       List<Pet> pets = await PetService().getAllPetsByUID(uid: uid);
       setPersonalCommunityPets(pets: pets);
     } catch (e) {
       // TODO is there a specific error that you want to catch?
-      _db.collection("pets").add(pet.toJSON());
+      _firestorePetCollection.add(pet.toJSON());
       AppLogger.e("[PET] Error adding pet: $e", e);
     }
 
@@ -111,7 +113,7 @@ class PetService with ChangeNotifier {
       _personalPets.removeWhere((pet) => pet.petID == id);
 
       // delete from firestore
-      await _db.collection('pets').doc(id).delete();
+      await _firestorePetCollection.doc(id).delete();
     } catch (e) {
       AppLogger.e("[PET] Error deleting pet", e);
     }
@@ -155,7 +157,7 @@ class PetService with ChangeNotifier {
   void updateWeightLog(
       {required Pet petData, required List<DateTimeStringPair> weightLog}) {
     AppLogger.d("[PET] Updating Weight Log");
-    final petRef = _db.collection("pets").doc(petData.petID);
+    final petRef = _firestorePetCollection.doc(petData.petID);
 
     petRef.update({
       "weight": weightLog.map((weight) => weight.toJSON()).toList(),
@@ -170,7 +172,7 @@ class PetService with ChangeNotifier {
       {required Pet petData,
       required List<DateTimeStringPair> vaccineRecords}) {
     AppLogger.d("[PET] Updating Vaccine Records");
-    final petRef = _db.collection("pets").doc(petData.petID);
+    final petRef = _firestorePetCollection.doc(petData.petID);
 
     petRef.update({
       "vaccineRecords": vaccineRecords
@@ -189,7 +191,7 @@ class PetService with ChangeNotifier {
       {required Pet petData,
       required List<DateTimeStringPair> sessionRecords}) {
     AppLogger.d("[PET] Updating Session Records");
-    final petRef = _db.collection("pets").doc(petData.petID);
+    final petRef = _firestorePetCollection.doc(petData.petID);
 
     petRef.update({
       "sessionRecords": sessionRecords
