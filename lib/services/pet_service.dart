@@ -169,7 +169,7 @@ class PetService with ChangeNotifier {
     petRef.update({
       "weight": weightLog.map((weight) => weight.toJSON()).toList(),
     }).then((value) => AppLogger.d("[PET] Successfully Updated Weight Log"),
-        onError: (e) => AppLogger.d("[PET] Error Updating Weight Log: $e"));
+        onError: (e) => AppLogger.e("[PET] Error Updating Weight Log: $e"));
 
     notifyListeners();
   }
@@ -188,7 +188,7 @@ class PetService with ChangeNotifier {
     }).then(
         (value) => AppLogger.d("[PET] Successfully Updated Vaccine Records"),
         onError: (e) =>
-            AppLogger.d("[PET] Error Updating Vaccine Records: $e"));
+            AppLogger.e("[PET] Error Updating Vaccine Records: $e"));
 
     notifyListeners();
   }
@@ -207,9 +207,113 @@ class PetService with ChangeNotifier {
     }).then(
         (value) => AppLogger.d("[PET] Successfully Updated Session Records"),
         onError: (e) =>
-            AppLogger.d("[PET] Error Updating Session Records: $e"));
+            AppLogger.e("[PET] Error Updating Session Records: $e"));
 
     notifyListeners();
+  }
+
+  /// Gets a pet from local using the given id. Returns null if no pet is found.
+  Pet? getPetFromLocalWithID({required String petID}) {
+// first find pet
+    final List<Pet> foundPets = [];
+    foundPets.addAll(_personalPets.where((pet) => pet.petID == petID));
+    foundPets.addAll(_communityPets.where((pet) => pet.petID == petID));
+
+    if (foundPets.isEmpty) {
+      // no pet with given ID found
+      return null;
+    }
+
+    return foundPets.first;
+  }
+
+  /// Updates the pet with the given id locally and in firebase
+  Future<void> updatePet({
+    required String id,
+    String? location,
+    String? name,
+    String? description,
+    String? sex,
+    String? species,
+    String? petType,
+    String? idNumber,
+    String? breed,
+    DateTime? birthDate,
+    List<DateTimeStringPair>? weight,
+    List<Caretaker>? caretakers,
+    List<String>? caretakerIDs,
+    List<DateTimeStringPair>? sessionRecords,
+    File? img,
+  }) async {
+    AppLogger.d("[PET] Updating pet $id");
+
+    // we search a list to properly do a null check!
+    final Pet? pet = getPetFromLocalWithID(petID: id);
+    // exit if empty
+    if (pet == null) {
+      AppLogger.w("[PET] No pets found with id $id");
+      return;
+    }
+
+    try {
+      // apply changes
+      pet.location = location ?? pet.location;
+      pet.name = name ?? pet.name;
+      pet.description = description ?? pet.description;
+      pet.sex = sex ?? pet.sex;
+      pet.species = species ?? pet.species;
+      pet.petType = petType ?? pet.petType;
+      pet.idNumber = idNumber ?? pet.idNumber;
+      pet.breed = breed ?? pet.breed;
+      pet.birthDate = birthDate ?? pet.birthDate;
+      pet.weight = weight ?? pet.weight;
+      pet.caretakers = caretakers ?? pet.caretakers;
+      pet.caretakerIDs = caretakerIDs ?? pet.caretakerIDs;
+      pet.sessionRecords = sessionRecords ?? pet.sessionRecords;
+
+      // IMAGE - only if image is present
+      if (img != null) {
+        // upload pet image and wait
+        String? imgPath =
+            await uploadPetImage(image: img, uid: pet.caretakers[0].uid);
+
+        // set pet image path
+        pet.imgPath = imgPath;
+      }
+
+      // then apply updates to Firestore
+      final petDocRef = _firestorePetCollection.doc(id);
+
+      await petDocRef.update(pet.toJSON()).then(
+          (value) => AppLogger.d("[PET] Successfully updated pet $id"),
+          onError: (e) => AppLogger.d("[PET] Error updating pet $id: $e", e));
+    } catch (e) {
+      AppLogger.e("[PET] Error updating pet $id", e);
+    }
+
+    notifyListeners();
+  }
+
+  /// Checks for the role of the given user with the given pet and returns the role
+  /// as a string. Returns `null` if there is no role.
+  ///
+  /// Checks against local pets.
+  String? checkUserPetRole({required String petID, required String userID}) {
+    final checkPet = getPetFromLocalWithID(petID: petID);
+
+    if (checkPet == null) {
+      return null;
+    }
+
+    // now look through pet caretakers
+    final caretakerMatches = checkPet.caretakers.where((c) => c.uid == userID);
+
+    if (caretakerMatches.isEmpty) {
+      // no user found for this pet.
+      return null;
+    }
+
+    return caretakerMatches.first.role;
   }
 
   /// Resets petService

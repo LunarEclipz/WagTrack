@@ -80,7 +80,7 @@ class SymptomService with ChangeNotifier {
 
   /// Fetches all symptoms locally
   ///
-  /// I swear why aren't the symptoms like just a hashmap goddamnit
+  /// I swear why aren't the symptoms like just a hashmap goddamnit TODO
   List<Symptom> getSymptomsFromIDs(List<String> symptomIDs) {
     // most efficient, since length of desired IDs << total symptoms, is to
     // go through each desired ID and find that symptom
@@ -171,9 +171,9 @@ class SymptomService with ChangeNotifier {
       symptomToEdit.endDate = endDate ?? symptomToEdit.endDate;
 
       // then apply updates to Firestore
-      final routineRef = _firestoreSymptomCollection.doc(id);
+      final symptomDocRef = _firestoreSymptomCollection.doc(id);
 
-      await routineRef.update(symptomToEdit.toJSON()).then(
+      await symptomDocRef.update(symptomToEdit.toJSON()).then(
           (value) => AppLogger.d("[SYMP] Successfully updated symptom $id"),
           onError: (e) =>
               AppLogger.d("[SYMP] Error updating symptom $id: $e", e));
