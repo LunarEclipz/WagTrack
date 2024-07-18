@@ -6,8 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 import 'package:wagtrack/models/post_model.dart';
 import 'package:wagtrack/services/logging.dart';
+import 'package:wagtrack/services/user_service.dart';
 
 class PostService with ChangeNotifier {
   // Instance of Firebase Firestore for interacting with the database
@@ -21,6 +23,7 @@ class PostService with ChangeNotifier {
 
   List<Post> get posts => _posts;
 
+  /// Adds Post to Firestore
   void addPost({required Post postData, required List<XFile> imgs}) async {
     AppLogger.d("[POST] Adding Post");
     try {
@@ -45,11 +48,39 @@ class PostService with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Sets internal lists of Personal and Community Pets.
+  /// Sets internal lists of posts.
   void setPosts({required List<Post> posts}) {
     AppLogger.d("[POST] Setting Personal and Community Pets");
     _posts = posts;
     notifyListeners();
+  }
+
+  /// Gets Post from Firestore
+  Future<List<Post>> getAllPostsByPetID({required List<String> petIDs}) async {
+    final List<Post> posts = [];
+
+    try {
+      for (var i = 0; i < petIDs.length; i++) {
+        final querySnapshot = await _db
+            .collection("posts")
+            .where("petID", arrayContains: petIDs[i])
+            .get();
+
+        for (final docSnapshot in querySnapshot.docs) {
+          final postData = docSnapshot.data();
+          final post = Post.fromJson(postData);
+          post.oid = docSnapshot.id;
+          posts.add(post);
+        }
+      }
+      AppLogger.i("[POST] Posts fetched (by uid) successfully");
+      notifyListeners();
+      return posts;
+    } catch (e) {
+      AppLogger.e("[POST] Error fetching posts for PetID $petIDs: $e", e);
+      notifyListeners();
+      return []; // Return an empty list on error
+    }
   }
 
   Future<String?> uploadPostImage(

@@ -84,6 +84,27 @@ class Post {
     };
     return postData;
   }
+
+  static Post fromJson(Map<String, dynamic> json) {
+    Post post = Post(
+      petID: (json["petID"] as List).cast<String>(),
+      petName: (json["petName"] as List).cast<String>(),
+      visibility: json["visibility"] as bool,
+      petImgUrl: (json["petImgUrl"] as List).cast<String>(),
+      likes: json["likes"] as int,
+      saves: json["saves"] as int,
+      category: json["category"] as String,
+      title: json["title"] as String,
+      caption: json["caption"] as String,
+      location: json["location"] as String,
+      date: DateTime.fromMillisecondsSinceEpoch(json["date"] as int),
+      comments: (json["comments"] as List)
+          .map((commentData) => Comment.fromJson(commentData))
+          .toList(),
+      media: (json["media"] as List).cast<String>(),
+    );
+    return post;
+  }
 }
 
 class Comment {
@@ -108,5 +129,15 @@ class Comment {
       "commentorID": commentorID,
     };
     return commentData;
+  }
+
+  static Comment fromJson(Map<String, dynamic> json) {
+    Comment comment = Comment(
+      comment: json["comment"] as String,
+      commentor: json["commentor"] as String,
+      commentorID: json["commentorID"] as String,
+    );
+
+    return comment;
   }
 }

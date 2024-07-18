@@ -10,6 +10,7 @@ import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/medication_service.dart';
 import 'package:wagtrack/services/notification_service.dart';
 import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/services/post_service.dart';
 import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/themes.dart';
@@ -47,6 +48,9 @@ class WagTrackApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => PetService(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => PostService(),
         ),
         ChangeNotifierProvider(
           create: (context) => SymptomService(),

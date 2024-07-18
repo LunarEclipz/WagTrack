@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_launcher_icons/main.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/post_model.dart';
 import 'package:wagtrack/screens/posts/pet_post.dart';
 import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/services/post_service.dart';
 import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/themes.dart';
 
@@ -19,46 +21,23 @@ class PetPostsPage extends StatefulWidget {
 
 class _PetPostsPageState extends State<PetPostsPage> {
   late String filterSelected = "All";
-  late Post dummy1 = Post(
-      oid: "oid",
-      petID: ["petID"],
-      petName: ["Maxx"],
-      visibility: true,
-      petImgUrl: [
-        "https://firebasestorage.googleapis.com/v0/b/wagtrack-41427.appspot.com/o/petProfile%2FLmXcbMc2dsNjLvamMufoAhYZJDu2%2F1000048086.png?alt=media&token=f31e2ebc-358c-4f17-ae39-8407d6916dc3"
-      ],
-      likes: 32,
-      saves: 1,
-      category: "Health",
-      title:
-          "My dog is so crazy, he is having the time of his life! Go... Buddy!",
-      caption: "caption",
-      location: "location",
-      date: DateTime(1, 1, 2024),
-      comments: [],
-      media: [
-        "https://assets3.thrillist.com/v1/image/2721811/335x596/scale;webp=auto;jpeg_quality=60.jpg"
-      ]);
-  late Post dummy2 = Post(
-      oid: "oid",
-      petID: ["petID"],
-      petName: ["Coco Licious Deli Crazy Orphie Tan"],
-      visibility: true,
-      petImgUrl: [
-        "https://firebasestorage.googleapis.com/v0/b/wagtrack-41427.appspot.com/o/petProfile%2FLmXcbMc2dsNjLvamMufoAhYZJDu2%2F1000048086.png?alt=media&token=f31e2ebc-358c-4f17-ae39-8407d6916dc3"
-      ],
-      likes: 3412,
-      saves: 1,
-      category: "Health",
-      title:
-          "My dog is so crazy, he is having the time of his life! Go... Buddy!",
-      caption: "caption",
-      location: "location",
-      date: DateTime(1, 1, 2024),
-      comments: [],
-      media: [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRicMrz0JAkVSzEmUeaaMXd1ZpIZjNjxiBngA&s"
-      ]);
+  late List<Post> posts = [];
+  late List<Post> tempPosts = [];
+  late List<Post> evenPosts = [];
+  late List<Post> oddPosts = [];
+
+  void getAllPosts({required List<String> petIDs}) async {
+    posts =
+        await PostService().getAllPostsByPetID(petIDs: [widget.petData.petID!]);
+    tempPosts = posts;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAllPosts(petIDs: [widget.petData.petID!]);
+  }
+
   @override
   Widget build(BuildContext context) {
     Pet petData = widget.petData;
@@ -66,6 +45,29 @@ class _PetPostsPageState extends State<PetPostsPage> {
     final CustomColors customColors = AppTheme.customColors;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textStyles = Theme.of(context).textTheme;
+    evenPosts = [];
+    oddPosts = [];
+    if (filterSelected == "All") {
+      posts = tempPosts;
+      for (int i = 0; i < posts.length; i++) {
+        if (i % 2 == 0) {
+          evenPosts.add(posts[i]);
+        } else {
+          oddPosts.add(posts[i]);
+        }
+      }
+    } else {
+      posts = tempPosts
+          .where((object) => object.category == filterSelected)
+          .toList();
+      for (int i = 0; i < posts.length; i++) {
+        if (i % 2 == 0) {
+          evenPosts.add(posts[i]);
+        } else {
+          oddPosts.add(posts[i]);
+        }
+      }
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,18 +113,13 @@ class _PetPostsPageState extends State<PetPostsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
-              children: [
-                PetPost(
-                  post: dummy1,
-                  petData: petData,
-                ),
-              ],
-            ),
+                children: List.generate(evenPosts.length, (index) {
+              return PetPost(post: evenPosts[index], petData: petData);
+            })),
             Column(
-              children: [
-                PetPost(post: dummy2, petData: petData),
-              ],
-            ),
+                children: List.generate(oddPosts.length, (index) {
+              return PetPost(post: oddPosts[index], petData: petData);
+            })),
           ],
         )
       ],
