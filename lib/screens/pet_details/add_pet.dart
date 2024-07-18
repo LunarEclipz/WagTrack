@@ -944,7 +944,8 @@ class _AddPetPageState extends State<AddPetPage> {
   }
 
   Future<void> _pickImageFromGallery() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery, maxHeight: 600, maxWidth: 600);
     if (pickedFile != null) {
       setState(() => _imageFile = File(pickedFile.path));
     }
