@@ -243,8 +243,8 @@ List<String> tagFactorsList = [
 ];
 
 List<String> postCategory = [
-  "Diet",
   "Play",
+  "Diet",
   "Lifestyle",
   "Health",
   "Fashion",

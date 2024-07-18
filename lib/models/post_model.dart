@@ -9,17 +9,17 @@ class Post {
   /// Post ID
   String? oid;
 
-  /// ID of Pet this post belongs to
-  late String petID;
+  /// List of Pet IDs this post belongs to
+  late List<String> petID;
 
-  /// Name of Pet this post belongs to
-  late String petName;
+  /// Name of Pets this post belongs to
+  late List<String> petName;
 
   /// Boolean of whether the post is hidden or public
   late bool visibility;
 
   /// Image of Pet this post belongs to
-  late String petImgUrl;
+  late List<String> petImgUrl;
 
   /// Number of likes this post has
   late int likes;
@@ -37,20 +37,20 @@ class Post {
   late String caption;
 
   /// List of Media of this Post
-  List<String> media;
+  late List<String>? media;
 
   /// Location of this Post
   late String location;
 
   /// Date of this Post
-  late String date;
+  late DateTime date;
 
   /// Comments of this Post
   late List<Comment> comments;
 
   /// Constructor
   Post({
-    required this.oid,
+    this.oid,
     required this.petID,
     required this.petName,
     required this.visibility,
@@ -60,7 +60,7 @@ class Post {
     required this.category,
     required this.title,
     required this.caption,
-    required this.media,
+    this.media,
     required this.location,
     required this.date,
     required this.comments,

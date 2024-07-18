@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/post_model.dart';
 
 class PetPost extends StatefulWidget {
   final Post post;
-  const PetPost({super.key, required this.post});
+  final Pet petData;
+
+  const PetPost({super.key, required this.post, required this.petData});
 
   @override
   State<PetPost> createState() => _PetPostState();
@@ -12,12 +15,14 @@ class PetPost extends StatefulWidget {
 
 class _PetPostState extends State<PetPost> {
   late Post post;
+  late Pet pet;
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
 
     post = widget.post;
-    print(post.media[0]);
+    pet = widget.petData;
 
     return SizedBox(
       width: MediaQuery.of(context).size.width / 2,
@@ -27,14 +32,13 @@ class _PetPostState extends State<PetPost> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image
-            if (post.media.isNotEmpty)
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(4.0)),
-                child: Image(
-                  image: NetworkImage(post.media[0]),
-                ),
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(4.0)),
+              child: Image(
+                image: NetworkImage(post.media![0]),
               ),
+            ),
 
             // Title
             Padding(
@@ -49,7 +53,7 @@ class _PetPostState extends State<PetPost> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 //Icon
-                post.petImgUrl == null
+                pet.imgPath == null
                     ? const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: CircleAvatar(
@@ -62,7 +66,7 @@ class _PetPostState extends State<PetPost> {
                           backgroundColor:
                               const Color.fromARGB(255, 41, 41, 41),
                           backgroundImage: Image.network(
-                            post.petImgUrl,
+                            pet.imgPath!,
                             fit: BoxFit.cover,
                             width: double.infinity,
                           ).image,
@@ -73,7 +77,7 @@ class _PetPostState extends State<PetPost> {
                 SizedBox(
                   width: 75,
                   child: Text(
-                    post.petName,
+                    pet.name,
                     style: textStyles.bodySmall,
                   ),
                 ),

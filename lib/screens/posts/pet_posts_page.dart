@@ -21,11 +21,12 @@ class _PetPostsPageState extends State<PetPostsPage> {
   late String filterSelected = "All";
   late Post dummy1 = Post(
       oid: "oid",
-      petID: "petID",
-      petName: "Maxx",
+      petID: ["petID"],
+      petName: ["Maxx"],
       visibility: true,
-      petImgUrl:
-          "https://firebasestorage.googleapis.com/v0/b/wagtrack-41427.appspot.com/o/petProfile%2FLmXcbMc2dsNjLvamMufoAhYZJDu2%2F1000048086.png?alt=media&token=f31e2ebc-358c-4f17-ae39-8407d6916dc3",
+      petImgUrl: [
+        "https://firebasestorage.googleapis.com/v0/b/wagtrack-41427.appspot.com/o/petProfile%2FLmXcbMc2dsNjLvamMufoAhYZJDu2%2F1000048086.png?alt=media&token=f31e2ebc-358c-4f17-ae39-8407d6916dc3"
+      ],
       likes: 32,
       saves: 1,
       category: "Health",
@@ -33,18 +34,19 @@ class _PetPostsPageState extends State<PetPostsPage> {
           "My dog is so crazy, he is having the time of his life! Go... Buddy!",
       caption: "caption",
       location: "location",
-      date: "date",
+      date: DateTime(1, 1, 2024),
       comments: [],
       media: [
         "https://assets3.thrillist.com/v1/image/2721811/335x596/scale;webp=auto;jpeg_quality=60.jpg"
       ]);
   late Post dummy2 = Post(
       oid: "oid",
-      petID: "petID",
-      petName: "Coco Licious Deli Crazy Orphie Tan",
+      petID: ["petID"],
+      petName: ["Coco Licious Deli Crazy Orphie Tan"],
       visibility: true,
-      petImgUrl:
-          "https://firebasestorage.googleapis.com/v0/b/wagtrack-41427.appspot.com/o/petProfile%2FLmXcbMc2dsNjLvamMufoAhYZJDu2%2F1000048086.png?alt=media&token=f31e2ebc-358c-4f17-ae39-8407d6916dc3",
+      petImgUrl: [
+        "https://firebasestorage.googleapis.com/v0/b/wagtrack-41427.appspot.com/o/petProfile%2FLmXcbMc2dsNjLvamMufoAhYZJDu2%2F1000048086.png?alt=media&token=f31e2ebc-358c-4f17-ae39-8407d6916dc3"
+      ],
       likes: 3412,
       saves: 1,
       category: "Health",
@@ -52,7 +54,7 @@ class _PetPostsPageState extends State<PetPostsPage> {
           "My dog is so crazy, he is having the time of his life! Go... Buddy!",
       caption: "caption",
       location: "location",
-      date: "date",
+      date: DateTime(1, 1, 2024),
       comments: [],
       media: [
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRicMrz0JAkVSzEmUeaaMXd1ZpIZjNjxiBngA&s"
@@ -110,20 +112,15 @@ class _PetPostsPageState extends State<PetPostsPage> {
           children: [
             Column(
               children: [
-                PetPost(post: dummy1),
-                PetPost(post: dummy2),
-                PetPost(post: dummy2),
-                PetPost(post: dummy1),
-                PetPost(post: dummy2)
+                PetPost(
+                  post: dummy1,
+                  petData: petData,
+                ),
               ],
             ),
             Column(
               children: [
-                PetPost(post: dummy2),
-                PetPost(post: dummy2),
-                PetPost(post: dummy1),
-                PetPost(post: dummy2),
-                PetPost(post: dummy2)
+                PetPost(post: dummy2, petData: petData),
               ],
             ),
           ],
