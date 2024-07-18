@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/services/symptom_service.dart';
+import 'package:wagtrack/shared/components/button_components.dart';
+import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/themes.dart';
@@ -89,6 +91,7 @@ class _SymptomsPageState extends State<SymptomsPage> {
 }
 
 class SymptomsCard extends StatefulWidget {
+  /// Symptom object
   final Symptom symptom;
   final Function? buttonFn;
   final String? buttonText;
@@ -123,6 +126,7 @@ class _SymptomsCardState extends State<SymptomsCard> {
           child: SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Padding(
+              // padding: const EdgeInsets.only(left: 8, right: 8, top: 8),
               padding: const EdgeInsets.all(8.0),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,6 +221,30 @@ class _SymptomsCardState extends State<SymptomsCard> {
                           //         .copyWith(fontStyle: FontStyle.italic),
                           //   ),
                           // )
+
+                          // EDIT AND DELETE BUTTONS - MOVE TODO?
+                          Row(
+                            children: [
+                              AppIconButtonSmall(
+                                icon: const Icon(Icons.edit_rounded),
+                                onPressed: () {},
+                              ),
+                              AppIconButtonSmall(
+                                icon: const Icon(Icons.delete_rounded),
+                                onPressed: () => showAppConfirmationDialog(
+                                  context: context,
+                                  titleString: 'Confirm Deletion',
+                                  contentString:
+                                      'Are you sure you want to delete this symptom?',
+                                  continueAction: () {
+                                    context
+                                        .read<SymptomService>()
+                                        .deleteSymptom(id: symptom.oid ?? "");
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       crossFadeState: _isExpanded
@@ -224,7 +252,7 @@ class _SymptomsCardState extends State<SymptomsCard> {
                           : CrossFadeState.showFirst,
                       duration: const Duration(milliseconds: 200),
                     ),
-                    const SizedBoxh10(),
+                    // const SizedBoxh10(),
                     if (widget.buttonFn != null)
                       Center(
                         child: InkWell(

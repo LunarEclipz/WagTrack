@@ -5,6 +5,7 @@ import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/screens/medication/meds_routine/meds_add_routine.dart';
 import 'package:wagtrack/services/medication_service.dart';
 import 'package:wagtrack/shared/components/button_components.dart';
+import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
 
@@ -236,7 +237,31 @@ class _MedicationRoutineCardState extends State<MedicationRoutineCard> {
                               ],
                             );
                           }),
-                        )
+                        ),
+                        // EDIT AND DELETE BUTTONS - MOVE TODO?
+                        Row(
+                          children: [
+                            AppIconButtonSmall(
+                              icon: const Icon(Icons.edit_rounded),
+                              onPressed: () {},
+                            ),
+                            AppIconButtonSmall(
+                              icon: const Icon(Icons.delete_rounded),
+                              onPressed: () => showAppConfirmationDialog(
+                                context: context,
+                                titleString: 'Confirm Deletion',
+                                contentString:
+                                    'Are you sure you want to delete this routine?',
+                                continueAction: () {
+                                  context
+                                      .read<MedicationService>()
+                                      .deleteMedicationRoutine(
+                                          id: medicationRoutine.oid ?? "");
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ]),
                   crossFadeState: _isExpanded
                       ? CrossFadeState.showSecond
