@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/symptom_model.dart';
+import 'package:wagtrack/screens/symptoms/edit_symptoms.dart';
 import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/dialogs.dart';
@@ -227,7 +228,15 @@ class _SymptomsCardState extends State<SymptomsCard> {
                             children: [
                               AppIconButtonSmall(
                                 icon: const Icon(Icons.edit_rounded),
-                                onPressed: () {},
+                                onPressed: () => Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, a, b) =>
+                                        EditSymptomsPage(
+                                      symptomData: symptom,
+                                    ),
+                                  ),
+                                ),
                               ),
                               AppIconButtonSmall(
                                 icon: const Icon(Icons.delete_rounded),

@@ -149,9 +149,9 @@ class MedicationService with ChangeNotifier {
 
       await routineRef.update(routine.toJSON()).then(
           (value) =>
-              AppLogger.d("[MED] Successfully updated medication routine"),
+              AppLogger.d("[MED] Successfully updated medication routine $id"),
           onError: (e) => AppLogger.d(
-              "[MED] Error Updating medication routine $id: $e", e));
+              "[MED] Error updating medication routine $id: $e", e));
     } catch (e) {
       AppLogger.e("[MED] Error updating medication routine $id", e);
     }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/shared/components/button_components.dart';
@@ -11,15 +10,18 @@ import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/utils.dart';
 
-class AddSymptomsPage extends StatefulWidget {
-  final Pet petData;
-  const AddSymptomsPage({super.key, required this.petData});
+class EditSymptomsPage extends StatefulWidget {
+  final Symptom symptomData;
+  const EditSymptomsPage({super.key, required this.symptomData});
 
   @override
-  State<AddSymptomsPage> createState() => _AddSymptomsPageState();
+  State<EditSymptomsPage> createState() => _EditSymptomsPageState();
 }
 
-class _AddSymptomsPageState extends State<AddSymptomsPage> {
+class _EditSymptomsPageState extends State<EditSymptomsPage> {
+  // Default values
+  final _unixTime = DateTime.fromMillisecondsSinceEpoch(0);
+
   // Selections
   late String selectedCategory = "General Symptoms";
   late String selectedSymptom = "Lethargy";
@@ -31,7 +33,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
 
   // Date picks
   late DateTime startDateTime;
-  late DateTime endDateTime;
+  late DateTime? endDateTime;
 
   // symptom selections
   late List<String> filteredSymptoms = getSymptomsForCategory(selectedCategory);
@@ -41,6 +43,30 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
   late double _currentSeveritySliderValue = 5;
 
   TextEditingController factorsController = TextEditingController(text: null);
+
+  // set up autofilled data
+  @override
+  void initState() {
+    super.initState();
+
+    final symptomData = widget.symptomData;
+
+    setState(() {
+      selectedCategory = symptomData.category;
+      selectedSymptom = symptomData.symptom;
+      tags = symptomData.tags;
+      isEndDateSet = symptomData.hasEnd;
+      startDateTime = symptomData.startDate;
+      endDateTime = symptomData.endDate;
+
+      factorsController.text = symptomData.factors;
+
+      _currentSeveritySliderValue = symptomData.severity.toDouble();
+
+      // loaded symptom must have start date - so start date is set
+      isStartDateSet = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +84,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              "Add Symptoms",
+              "Edit Symptom",
               // style: textStyles.bodyLarge,
               style: TextStyle(color: Colors.white),
             ),
@@ -251,9 +277,13 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                                             color: colorScheme.primary),
                                       ],
                                     ),
-                                    Text(formatDateTime(endDateTime).time,
+                                    Text(
+                                        formatDateTime(endDateTime ?? _unixTime)
+                                            .time,
                                         style: textStyles.bodyLarge),
-                                    Text(formatDateTime(endDateTime).date,
+                                    Text(
+                                        formatDateTime(endDateTime ?? _unixTime)
+                                            .date,
                                         style: textStyles.labelLarge),
                                   ],
                                 ),
@@ -423,36 +453,26 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                   if (selectedCategory != "" &&
                       selectedSymptom != "" &&
                       isStartDateSet == true) {
-                    Symptom formData = !isEndDateSet
-                        ? Symptom(
-                            petID: widget.petData.petID!,
-                            // Add symptom can only be accessed through PetID
-                            category: selectedCategory,
-                            symptom: selectedSymptom,
-                            factors: factorsController.text,
-                            startDate: startDateTime,
-                            severity: _currentSeveritySliderValue.toInt(),
-                            tags: tags,
-                            hasEnd: isEndDateSet,
-                          )
-                        : Symptom(
-                            petID: widget.petData.petID!,
-                            // Add symptom can only be accessed through PetID
-                            category: selectedCategory,
-                            symptom: selectedSymptom,
-                            factors: factorsController.text,
-                            startDate: startDateTime,
-                            severity: _currentSeveritySliderValue.toInt(),
-                            tags: tags,
-                            hasEnd: isEndDateSet,
-                            endDate: endDateTime);
-                    symptomService.addSymptoms(formData: formData);
+                    // update symptom
+                    symptomService.updateSymptom(
+                      id: widget.symptomData.oid ?? "",
+                      category: selectedCategory,
+                      symptom: selectedSymptom,
+                      factors: factorsController.text,
+                      severity: _currentSeveritySliderValue.toInt(),
+                      tags: tags,
+                      hasEnd: isEndDateSet,
+                      startDate: startDateTime,
+                      endDate: endDateTime,
+                    );
+
+                    // exit
                     Navigator.pop(context);
                   }
                 },
                 width: 300,
                 height: 40,
-                text: 'Add Symptoms',
+                text: 'Update Symptom',
               ),
             ),
           ),

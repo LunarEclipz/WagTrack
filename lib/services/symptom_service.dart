@@ -137,9 +137,18 @@ class SymptomService with ChangeNotifier {
   /// Updates the symptom with the given id locally and in firebase
   Future<void> updateSymptom({
     required String id,
+    String? category,
+    String? symptom,
+    String? factors,
+    int? severity,
+    List<String>? tags,
+    bool? hasEnd,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     AppLogger.d("[SYMP] Updating symptom with id $id");
 
+    // we search a list to properly do a null check!
     final List<Symptom> foundSymptoms = getSymptomsFromIDs([id]);
     // exit if empty
     if (foundSymptoms.isEmpty) {
@@ -149,12 +158,30 @@ class SymptomService with ChangeNotifier {
 
     try {
       // get symptom object
-      final Symptom symptom = foundSymptoms[0];
+      final Symptom symptomToEdit = foundSymptoms[0];
 
-      // then apply updates
+      // apply changes
+      symptomToEdit.category = category ?? symptomToEdit.category;
+      symptomToEdit.symptom = symptom ?? symptomToEdit.symptom;
+      symptomToEdit.factors = factors ?? symptomToEdit.factors;
+      symptomToEdit.severity = severity ?? symptomToEdit.severity;
+      symptomToEdit.tags = tags ?? symptomToEdit.tags;
+      symptomToEdit.hasEnd = hasEnd ?? symptomToEdit.hasEnd;
+      symptomToEdit.startDate = startDate ?? symptomToEdit.startDate;
+      symptomToEdit.endDate = endDate ?? symptomToEdit.endDate;
+
+      // then apply updates to Firestore
+      final routineRef = _firestoreSymptomCollection.doc(id);
+
+      await routineRef.update(symptomToEdit.toJSON()).then(
+          (value) => AppLogger.d("[SYMP] Successfully updated symptom $id"),
+          onError: (e) =>
+              AppLogger.d("[SYMP] Error updating symptom $id: $e", e));
     } catch (e) {
       AppLogger.e("[SYMP] Error updating symptom $id", e);
     }
+
+    notifyListeners();
   }
 
   /// Resets symptomService
