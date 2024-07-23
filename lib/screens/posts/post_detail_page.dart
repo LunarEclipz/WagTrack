@@ -208,7 +208,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                               backgroundColor: post
                                                           .comments[index]
                                                           .commentorID ==
-                                                      uid
+                                                      post.uid
                                                   ? Colors.amber
                                                   : Colors.blue,
                                               child: const Icon(
@@ -240,7 +240,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                                     ),
                                                     if (post.comments[index]
                                                             .commentorID ==
-                                                        uid)
+                                                        post.uid)
                                                       Container(
                                                         decoration: const BoxDecoration(
                                                             color: Colors.amber,
@@ -314,7 +314,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                                                       .subComments[
                                                                           sindex]
                                                                       .commentorID ==
-                                                                  uid
+                                                                  post.uid
                                                               ? Colors.amber
                                                               : Colors.blue,
                                                           child: const Icon(
@@ -355,7 +355,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                                                         .subComments[
                                                                             sindex]
                                                                         .commentorID ==
-                                                                    uid)
+                                                                    post.uid)
                                                                   Container(
                                                                     decoration: const BoxDecoration(
                                                                         color: Colors

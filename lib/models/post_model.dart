@@ -137,7 +137,7 @@ class Comment {
       "comment": comment,
       "commentor": commentor,
       "commentorID": commentorID,
-      "subComments": subComments,
+      "subComments": subComments.map((comment) => comment.toJSON()).toList(),
     };
     return commentData;
   }
