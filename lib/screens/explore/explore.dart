@@ -71,7 +71,8 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
 
     evenPosts = [];
     oddPosts = [];
-
+    forMeevenPosts = [];
+    forMeoddPosts = [];
     if (filterSelected == "All") {
       posts = tempPosts;
       for (int i = 0; i < posts.length; i++) {
@@ -97,20 +98,20 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
       forMe = forMetempPosts;
       for (int i = 0; i < forMe.length; i++) {
         if (i % 2 == 0) {
-          forMeevenPosts.add(posts[i]);
+          forMeevenPosts.add(forMe[i]);
         } else {
-          forMeoddPosts.add(posts[i]);
+          forMeoddPosts.add(forMe[i]);
         }
       }
     } else {
       forMe = forMetempPosts
           .where((object) => object.category == filterSelected)
           .toList();
-      for (int i = 0; i < posts.length; i++) {
+      for (int i = 0; i < forMe.length; i++) {
         if (i % 2 == 0) {
-          forMeevenPosts.add(posts[i]);
+          forMeevenPosts.add(forMe[i]);
         } else {
-          forMeoddPosts.add(posts[i]);
+          forMeoddPosts.add(forMe[i]);
         }
       }
     }
@@ -182,6 +183,7 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
               ),
             ),
             const SizedBoxh10(),
+            // TODO : Zee help me tab bar bug please tolong <3
             SizedBox(
               height: screenHeight,
               width: screenWidth,
