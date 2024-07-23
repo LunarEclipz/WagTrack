@@ -45,6 +45,38 @@ class PostService with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Adds Post to Firestore
+  void updateComment({required Post postData}) async {
+    List<Map<String, dynamic>> comments = postData.toJSON()["comments"];
+
+    AppLogger.d("[POST] Adding Comments");
+    await _db
+        .collection("posts")
+        .doc(postData.oid)
+        .update({"comments": comments}).then(
+            (value) => AppLogger.i("[POST] Comments added successfully"),
+            onError: (e) => AppLogger.e("[POST] Error adding comments: $e", e));
+
+    notifyListeners();
+  }
+
+  /// Adds Post to Firestore
+  /// atomic transaction bug here
+  void updateLikes({
+    required Post postData,
+  }) async {
+    AppLogger.d("[POST] Updating likes");
+    List<String> likes = postData.likes;
+    await _db
+        .collection("posts")
+        .doc(postData.oid)
+        .update({"likes": likes}).then(
+            (value) => AppLogger.i("[POST] likes updated successfully"),
+            onError: (e) => AppLogger.e("[POST] Error adding comments: $e", e));
+
+    notifyListeners();
+  }
+
   /// Sets internal lists of posts.
   void setPosts({required List<Post> listOfPosts}) {
     AppLogger.d("[POST] Setting Posts");

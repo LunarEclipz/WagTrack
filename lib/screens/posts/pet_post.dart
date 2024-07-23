@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/post_model.dart';
 import 'package:wagtrack/screens/posts/post_detail_page.dart';
+import 'package:wagtrack/services/post_service.dart';
+import 'package:wagtrack/services/user_service.dart';
 
 class PetPost extends StatefulWidget {
   final Post post;
@@ -21,6 +24,11 @@ class _PetPostState extends State<PetPost> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
+
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final userService = Provider.of<UserService>(context, listen: false);
+    var uid = userService.user.uid;
 
     post = widget.post;
     pet = widget.petData;
@@ -113,7 +121,27 @@ class _PetPostState extends State<PetPost> {
                     width: 40,
                     child: Column(
                       children: [
-                        const Icon(Icons.favorite, color: Colors.pink),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              if (post.likes.contains(uid)) {
+                                post.likes.remove(uid);
+                              } else {
+                                post.likes.add(uid);
+                              }
+                              PostService().updateLikes(postData: post);
+                            });
+                          },
+                          child: Icon(
+                            post.likes.contains(uid)
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
+                            size: 30,
+                            color: post.likes.contains(uid)
+                                ? colorScheme.primary
+                                : Colors.black,
+                          ),
+                        ),
                         Text(
                           post.likes.length.toString(),
                           style: textStyles.bodySmall,

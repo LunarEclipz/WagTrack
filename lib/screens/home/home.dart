@@ -158,12 +158,23 @@ class BuildPetCard extends StatefulWidget {
 }
 
 class _PetCardState extends State<BuildPetCard> {
+  late String likes;
+  late String posts;
+
   @override
   Widget build(BuildContext context) {
     Pet petData = widget.petData;
     final TextTheme textStyles = Theme.of(context).textTheme;
     final CustomColors customColors = AppTheme.customColors;
-
+    try {
+      likes = widget.revPosts
+          .map((item) => item.likes.length)
+          .reduce((a, b) => a + b)
+          .toString();
+    } catch (e) {
+      likes = "0";
+    }
+    posts = widget.revPosts.length.toString();
     // print(petData.toJSON());
     return InkWell(
       onTap: () {
@@ -230,7 +241,7 @@ class _PetCardState extends State<BuildPetCard> {
                               child: Column(
                                 children: <Widget>[
                                   Text(
-                                    widget.revPosts.length.toString(),
+                                    posts,
                                     style: textStyles.bodyLarge!
                                         .copyWith(color: Colors.white),
                                   ),
@@ -249,7 +260,7 @@ class _PetCardState extends State<BuildPetCard> {
                               child: Column(
                                 children: <Widget>[
                                   Text(
-                                    petData.fans.toString(),
+                                    likes,
                                     style: textStyles.bodyLarge!
                                         .copyWith(color: Colors.white),
                                   ),

@@ -43,6 +43,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     final postService = Provider.of<PostService>(context, listen: false);
     uid = userService.user.uid;
     name = userService.user.name!;
+    liked = post.likes.contains(uid);
 
     return Scaffold(
         resizeToAvoidBottomInset: true,
@@ -420,28 +421,28 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
+                            const Row(
                               children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      saved = !saved;
-                                    });
-                                  },
-                                  child: Icon(
-                                    saved
-                                        ? Icons.bookmark_rounded
-                                        : Icons.bookmark_border_rounded,
-                                    size: 30,
-                                    color: saved
-                                        ? colorScheme.primary
-                                        : Colors.black,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 20,
-                                ),
-                                const Icon(
+                                // InkWell(
+                                //   onTap: () {
+                                //     setState(() {
+                                //       saved = !saved;
+                                //     });
+                                //   },
+                                //   child: Icon(
+                                //     saved
+                                //         ? Icons.bookmark_rounded
+                                //         : Icons.bookmark_border_rounded,
+                                //     size: 30,
+                                //     color: saved
+                                //         ? colorScheme.primary
+                                //         : Colors.black,
+                                //   ),
+                                // ),
+                                // const SizedBox(
+                                //   width: 20,
+                                // ),
+                                Icon(
                                   Icons.share_rounded,
                                   size: 30,
                                 )
@@ -483,7 +484,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                 InkWell(
                                   onTap: () {
                                     setState(() {
-                                      liked = !liked;
+                                      if (liked) {
+                                        post.likes.remove(uid);
+                                      } else {
+                                        post.likes.add(uid);
+                                      }
+                                      PostService().updateLikes(postData: post);
                                     });
                                   },
                                   child: Icon(
@@ -510,6 +516,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                             commentorID: uid,
                                             subComments: []));
                                         commentController.text = "";
+                                        PostService()
+                                            .updateComment(postData: post);
                                       });
                                     }
                                     if (commentController.text != "" &&
@@ -522,6 +530,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                           commentorID: replyTouid,
                                         ));
                                         commentController.text = "";
+                                        PostService()
+                                            .updateComment(postData: post);
                                       });
                                     }
                                   },
