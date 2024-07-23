@@ -81,6 +81,9 @@ class AppTextFormField extends StatefulWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
 
+  /// Whether this text field is expandable. Also set maxLines to `null` (no limit)
+  final bool expands;
+
   /// Creates a standard text form field for WagTrack.
   const AppTextFormField({
     super.key,
@@ -97,6 +100,7 @@ class AppTextFormField extends StatefulWidget {
     this.isObscurable = false,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.expands = false,
   });
 
   @override
@@ -200,6 +204,10 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
       validator: widget.validator ?? defaultValidator,
       autovalidateMode: widget.autovalidateMode,
       textAlignVertical: TextAlignVertical.top,
+      // for setting multiline
+      maxLines: widget.expands ? null : 1,
+      minLines: widget.expands ? 1 : null,
+      // decoration parameters
       decoration: InputDecoration(
         // isDense: true,
         hintText: hintText,
