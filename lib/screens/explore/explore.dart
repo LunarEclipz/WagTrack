@@ -32,7 +32,7 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     final petService = Provider.of<PetService>(context, listen: false);
     personalPets = petService.personalPets;
     communityPets = petService.communityPets;
@@ -49,24 +49,9 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
 
   void getAllPosts({required List<String> petIDs}) async {
     posts = await PostService().getAllPostsByPetID(petIDs: petIDs);
-
-    List<Post> uniqueList = [];
-    for (int i = 0; i < posts.length; i++) {
-      bool isUnique = true;
-      for (int j = i + 1; j < posts.length; j++) {
-        if (posts[i].oid == posts[j].oid) {
-          isUnique = false;
-          break; // Exit inner loop if duplicate found
-        }
-      }
-      if (isUnique) {
-        uniqueList.add(posts[i]);
-      }
-    }
-    uniqueList.sort((b, a) => a.date.compareTo(b.date));
     setState(() {
-      posts = uniqueList;
-      tempPosts = uniqueList;
+      posts = posts;
+      tempPosts = posts;
     });
   }
 
@@ -76,6 +61,7 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+
     evenPosts = [];
     oddPosts = [];
 
@@ -122,11 +108,11 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
                   'For Me',
                   style: TextStyle(fontSize: 20),
                 )),
-                Tab(
-                    child: Text(
-                  'Following',
-                  style: TextStyle(fontSize: 20),
-                )),
+                // Tab(
+                //     child: Text(
+                //   'Following',
+                //   style: TextStyle(fontSize: 20),
+                // )),
                 Tab(
                     child: Text(
                   'My Posts',
@@ -179,11 +165,11 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
                     padding: EdgeInsets.all(8.0),
                     child: SizedBox(),
                   ),
-                  // Following
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: SizedBox(),
-                  ),
+                  // // Following
+                  // const Padding(
+                  //   padding: EdgeInsets.all(8.0),
+                  //   child: SizedBox(),
+                  // ),
                   // My Posts
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

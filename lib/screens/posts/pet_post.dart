@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/post_model.dart';
+import 'package:wagtrack/screens/posts/post_detail_page.dart';
 
 class PetPost extends StatefulWidget {
   final Post post;
@@ -24,80 +25,107 @@ class _PetPostState extends State<PetPost> {
     post = widget.post;
     pet = widget.petData;
 
-    return SizedBox(
-      width: MediaQuery.of(context).size.width / 2,
-      child: Card(
-        color: Colors.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image
-            ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(4.0)),
-              child: Image(
-                image: NetworkImage(post.media![0]),
-              ),
-            ),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(1.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-            // Title
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-              child: Text(
-                post.title,
-                style: textStyles.bodyMedium,
-              ),
+              return SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              );
+            },
+            transitionDuration:
+                const Duration(milliseconds: 500), // Adjust the duration here
+            pageBuilder: (context, a, b) => PostDetailPage(
+              postData: post,
             ),
-            // Icon, Name, Likes
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                //Icon
-                pet.imgPath == null
-                    ? const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: CircleAvatar(
-                          backgroundColor: Color.fromARGB(255, 41, 41, 41),
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CircleAvatar(
-                          backgroundColor:
-                              const Color.fromARGB(255, 41, 41, 41),
-                          backgroundImage: Image.network(
-                            pet.imgPath!,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          ).image,
-                        ),
-                      ),
+          ),
+        );
+      },
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width / 2,
+        child: Card(
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(4.0)),
+                child: Image(
+                  image: NetworkImage(post.media![0]),
+                ),
+              ),
 
-                // Name
-                SizedBox(
-                  width: 75,
-                  child: Text(
-                    pet.name,
-                    style: textStyles.bodySmall,
-                  ),
+              // Title
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                child: Text(
+                  post.title,
+                  style: textStyles.bodyMedium,
                 ),
-                // Likes
-                SizedBox(
-                  width: 40,
-                  child: Column(
-                    children: [
-                      const Icon(Icons.favorite, color: Colors.pink),
-                      Text(
-                        post.likes.toString(),
-                        style: textStyles.bodySmall,
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+              ),
+              // Icon, Name, Likes
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  //Icon
+                  pet.imgPath == null
+                      ? const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircleAvatar(
+                            backgroundColor: Color.fromARGB(255, 41, 41, 41),
+                          ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircleAvatar(
+                            backgroundColor:
+                                const Color.fromARGB(255, 41, 41, 41),
+                            backgroundImage: Image.network(
+                              pet.imgPath!,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ).image,
+                          ),
+                        ),
+
+                  // Name
+                  SizedBox(
+                    width: 75,
+                    child: Text(
+                      pet.name,
+                      style: textStyles.bodySmall,
+                    ),
                   ),
-                ),
-              ],
-            )
-          ],
+                  // Likes
+                  SizedBox(
+                    width: 40,
+                    child: Column(
+                      children: [
+                        const Icon(Icons.favorite, color: Colors.pink),
+                        Text(
+                          post.likes.length.toString(),
+                          style: textStyles.bodySmall,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

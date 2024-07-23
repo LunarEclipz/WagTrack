@@ -9,6 +9,9 @@ class Post {
   /// Post ID
   String? oid;
 
+  /// User's ID
+  String uid;
+
   /// List of Pet IDs this post belongs to
   late List<String> petID;
 
@@ -22,10 +25,10 @@ class Post {
   late List<String> petImgUrl;
 
   /// Number of likes this post has
-  late int likes;
+  late List<String> likes;
 
   /// Number of saves this post has
-  late int saves;
+  late List<String> saves;
 
   /// Category of this Post
   late String category;
@@ -51,6 +54,7 @@ class Post {
   /// Constructor
   Post({
     this.oid,
+    required this.uid,
     required this.petID,
     required this.petName,
     required this.visibility,
@@ -69,6 +73,7 @@ class Post {
   Map<String, dynamic> toJSON() {
     final postData = {
       "petID": petID,
+      "uid": uid,
       "petName": petName,
       "petImgUrl": petImgUrl,
       "visibility": visibility,
@@ -91,8 +96,9 @@ class Post {
       petName: (json["petName"] as List).cast<String>(),
       visibility: json["visibility"] as bool,
       petImgUrl: (json["petImgUrl"] as List).cast<String>(),
-      likes: json["likes"] as int,
-      saves: json["saves"] as int,
+      likes: (json["likes"] as List).cast<String>(),
+      saves: (json["saves"] as List).cast<String>(),
+      uid: json["uid"] as String,
       category: json["category"] as String,
       title: json["title"] as String,
       caption: json["caption"] as String,
@@ -117,7 +123,50 @@ class Comment {
   /// ID of Commentor
   late String commentorID;
 
+  /// List of Sub Comments
+  late List<SubComment> subComments;
+
   Comment(
+      {required this.comment,
+      required this.commentor,
+      required this.commentorID,
+      required this.subComments});
+
+  Map<String, dynamic> toJSON() {
+    final commentData = {
+      "comment": comment,
+      "commentor": commentor,
+      "commentorID": commentorID,
+      "subComments": subComments,
+    };
+    return commentData;
+  }
+
+  static Comment fromJson(Map<String, dynamic> json) {
+    Comment comment = Comment(
+      comment: json["comment"] as String,
+      commentor: json["commentor"] as String,
+      commentorID: json["commentorID"] as String,
+      subComments: (json["subComments"] as List)
+          .map((subCommentsData) => SubComment.fromJson(subCommentsData))
+          .toList(),
+    );
+
+    return comment;
+  }
+}
+
+class SubComment {
+  /// Content of Comment
+  late String comment;
+
+  /// Name of Commentor
+  late String commentor;
+
+  /// ID of Commentor
+  late String commentorID;
+
+  SubComment(
       {required this.comment,
       required this.commentor,
       required this.commentorID});
@@ -131,13 +180,13 @@ class Comment {
     return commentData;
   }
 
-  static Comment fromJson(Map<String, dynamic> json) {
-    Comment comment = Comment(
+  static SubComment fromJson(Map<String, dynamic> json) {
+    SubComment subComment = SubComment(
       comment: json["comment"] as String,
       commentor: json["commentor"] as String,
       commentorID: json["commentorID"] as String,
     );
 
-    return comment;
+    return subComment;
   }
 }
