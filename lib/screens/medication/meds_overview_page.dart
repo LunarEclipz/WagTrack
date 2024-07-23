@@ -32,6 +32,7 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final PetService petService = context.watch<PetService>();
 
+    // DO NOT wrap this in an unconstrained container
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -148,6 +149,8 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
             ),
           ),
           const SizedBoxh20(),
+
+          // list of vaccines
           if (petData.vaccineRecords.isNotEmpty)
             Column(
               children: List.generate(petData.vaccineRecords.length, (index) {
@@ -175,7 +178,7 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
                   ),
                 );
               }),
-            )
+            ),
         ],
       ),
     );

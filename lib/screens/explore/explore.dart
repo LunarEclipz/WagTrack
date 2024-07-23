@@ -19,6 +19,8 @@ class Explore extends StatefulWidget {
 class _ExploreState extends State<Explore> with TickerProviderStateMixin {
   late final TabController _tabController;
 
+  int _selectedTab = 0;
+
   late List<Post> posts = [];
   late List<Post> tempPosts = [];
   late List<Post> evenPosts = [];
@@ -148,6 +150,11 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
                   style: TextStyle(fontSize: 20),
                 ))
               ],
+              onTap: (index) {
+                setState(() {
+                  _selectedTab = index;
+                });
+              },
             ), // Filter
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
@@ -183,61 +190,111 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
               ),
             ),
             const SizedBoxh10(),
-            // TODO : Zee help me tab bar bug please tolong <3
-            SizedBox(
-              height: screenHeight,
-              width: screenWidth,
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  // For Me
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                          children:
-                              List.generate(forMeevenPosts.length, (index) {
-                        return PetPost(
-                          post: forMeevenPosts[index],
-                        );
-                      })),
-                      Column(
-                          children:
-                              List.generate(forMeoddPosts.length, (index) {
-                        return PetPost(
-                          post: forMeoddPosts[index],
-                        );
-                      })),
-                    ],
-                  ),
-                  // // Following
-                  // const Padding(
-                  //   padding: EdgeInsets.all(8.0),
-                  //   child: SizedBox(),
-                  // ),
-                  // My Posts
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                          children: List.generate(evenPosts.length, (index) {
-                        return PetPost(
-                          post: evenPosts[index],
-                        );
-                      })),
-                      Column(
-                          children: List.generate(oddPosts.length, (index) {
-                        return PetPost(
-                          post: oddPosts[index],
-                        );
-                      })),
-                    ],
-                  ),
-                ],
-              ),
+
+            Builder(
+              builder: (_) {
+                switch (_selectedTab) {
+                  case 0:
+                    // For Me
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                            children:
+                                List.generate(forMeevenPosts.length, (index) {
+                          return PetPost(
+                            post: forMeevenPosts[index],
+                          );
+                        })),
+                        Column(
+                            children:
+                                List.generate(forMeoddPosts.length, (index) {
+                          return PetPost(
+                            post: forMeoddPosts[index],
+                          );
+                        })),
+                      ],
+                    );
+                  case 1:
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                            children: List.generate(evenPosts.length, (index) {
+                          return PetPost(
+                            post: evenPosts[index],
+                          );
+                        })),
+                        Column(
+                            children: List.generate(oddPosts.length, (index) {
+                          return PetPost(
+                            post: oddPosts[index],
+                          );
+                        })),
+                      ],
+                    );
+                  default:
+                    return Container();
+                }
+              },
             ),
+
+            // SizedBox(
+            //   height: screenHeight,
+            //   width: screenWidth,
+            //   child: TabBarView(
+            //     controller: _tabController,
+            //     children: [
+            //       // For Me
+            //       Row(
+            //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: [
+            //           Column(
+            //               children:
+            //                   List.generate(forMeevenPosts.length, (index) {
+            //             return PetPost(
+            //               post: forMeevenPosts[index],
+            //             );
+            //           })),
+            //           Column(
+            //               children:
+            //                   List.generate(forMeoddPosts.length, (index) {
+            //             return PetPost(
+            //               post: forMeoddPosts[index],
+            //             );
+            //           })),
+            //         ],
+            //       ),
+            //       // // Following
+            //       // const Padding(
+            //       //   padding: EdgeInsets.all(8.0),
+            //       //   child: SizedBox(),
+            //       // ),
+            //       // My Posts
+            //       Row(
+            //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: [
+            //           Column(
+            //               children: List.generate(evenPosts.length, (index) {
+            //             return PetPost(
+            //               post: evenPosts[index],
+            //             );
+            //           })),
+            //           Column(
+            //               children: List.generate(oddPosts.length, (index) {
+            //             return PetPost(
+            //               post: oddPosts[index],
+            //             );
+            //           })),
+            //         ],
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         )
       ],
