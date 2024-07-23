@@ -118,11 +118,11 @@ class _PetPostsPageState extends State<PetPostsPage> {
           children: [
             Column(
                 children: List.generate(evenPosts.length, (index) {
-              return PetPost(post: evenPosts[index], petData: petData);
+              return PetPost(post: evenPosts[index]);
             })),
             Column(
                 children: List.generate(oddPosts.length, (index) {
-              return PetPost(post: oddPosts[index], petData: petData);
+              return PetPost(post: oddPosts[index]);
             })),
           ],
         )

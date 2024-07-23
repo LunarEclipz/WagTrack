@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:wagtrack/models/post_model.dart';
 import 'package:wagtrack/services/post_service.dart';
 import 'package:wagtrack/services/user_service.dart';
@@ -146,6 +147,32 @@ class _PostDetailPageState extends State<PostDetailPage> {
                             const SizedBoxh20(),
                             const SizedBoxh20(),
                             const SizedBoxh20(),
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              runSpacing: 10,
+                              spacing: 10,
+                              children:
+                                  List.generate(post.petImgUrl.length, (index) {
+                                return post.petImgUrl[index] == null
+                                    ? const CircleAvatar(
+                                        radius: 30,
+                                        backgroundColor:
+                                            Color.fromARGB(255, 41, 41, 41),
+                                      )
+                                    : CircleAvatar(
+                                        radius: 30,
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 41, 41, 41),
+                                        backgroundImage: Image.network(
+                                          post.petImgUrl[index],
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                        ).image,
+                                      );
+                              }),
+                            ),
+                            const SizedBoxh10(),
+
                             // Comment Section Starts
                             Text(
                               "${post.comments.length} comments",
@@ -421,7 +448,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Row(
+                            Row(
                               children: [
                                 // InkWell(
                                 //   onTap: () {
@@ -442,9 +469,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                 // const SizedBox(
                                 //   width: 20,
                                 // ),
-                                Icon(
-                                  Icons.share_rounded,
-                                  size: 30,
+                                InkWell(
+                                  onTap: () {
+                                    Share.share('${post.media}');
+                                  },
+                                  child: const Icon(
+                                    Icons.share_rounded,
+                                    size: 30,
+                                  ),
                                 )
                               ],
                             ),

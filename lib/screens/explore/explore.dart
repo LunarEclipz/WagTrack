@@ -23,7 +23,10 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
   late List<Post> tempPosts = [];
   late List<Post> evenPosts = [];
   late List<Post> oddPosts = [];
-
+  late List<Post> forMe = [];
+  late List<Post> forMetempPosts = [];
+  late List<Post> forMeevenPosts = [];
+  late List<Post> forMeoddPosts = [];
   List<Pet> personalPets = [];
   List<Pet> communityPets = [];
   List<Pet> allPets = [];
@@ -49,9 +52,13 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
 
   void getAllPosts({required List<String> petIDs}) async {
     posts = await PostService().getAllPostsByPetID(petIDs: petIDs);
+    List<Post> forMePosts = await PostService().getAllPostsByTime();
+
     setState(() {
       posts = posts;
       tempPosts = posts;
+      forMe = forMePosts;
+      forMetempPosts = forMePosts;
     });
   }
 
@@ -86,12 +93,33 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
         }
       }
     }
+    if (filterSelected == "All") {
+      forMe = forMetempPosts;
+      for (int i = 0; i < forMe.length; i++) {
+        if (i % 2 == 0) {
+          forMeevenPosts.add(posts[i]);
+        } else {
+          forMeoddPosts.add(posts[i]);
+        }
+      }
+    } else {
+      forMe = forMetempPosts
+          .where((object) => object.category == filterSelected)
+          .toList();
+      for (int i = 0; i < posts.length; i++) {
+        if (i % 2 == 0) {
+          forMeevenPosts.add(posts[i]);
+        } else {
+          forMeoddPosts.add(posts[i]);
+        }
+      }
+    }
     return AppScrollableNoPaddingPage(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 0.0),
           child: Text(
-            "Expore",
+            "Explore",
             style: textStyles.headlineMedium,
           ),
         ),
@@ -161,9 +189,25 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
                 controller: _tabController,
                 children: [
                   // For Me
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: SizedBox(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                          children:
+                              List.generate(forMeevenPosts.length, (index) {
+                        return PetPost(
+                          post: forMeevenPosts[index],
+                        );
+                      })),
+                      Column(
+                          children:
+                              List.generate(forMeoddPosts.length, (index) {
+                        return PetPost(
+                          post: forMeoddPosts[index],
+                        );
+                      })),
+                    ],
                   ),
                   // // Following
                   // const Padding(
@@ -178,20 +222,14 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
                       Column(
                           children: List.generate(evenPosts.length, (index) {
                         return PetPost(
-                            post: evenPosts[index],
-                            petData: allPets
-                                .where((pet) =>
-                                    evenPosts[index].petID.contains(pet.petID!))
-                                .first);
+                          post: evenPosts[index],
+                        );
                       })),
                       Column(
                           children: List.generate(oddPosts.length, (index) {
                         return PetPost(
-                            post: oddPosts[index],
-                            petData: allPets
-                                .where((pet) =>
-                                    oddPosts[index].petID.contains(pet.petID!))
-                                .first);
+                          post: oddPosts[index],
+                        );
                       })),
                     ],
                   ),

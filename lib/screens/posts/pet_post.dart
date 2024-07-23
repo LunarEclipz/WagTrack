@@ -9,9 +9,13 @@ import 'package:wagtrack/services/user_service.dart';
 
 class PetPost extends StatefulWidget {
   final Post post;
-  final Pet petData;
+  // final Pet petData;
 
-  const PetPost({super.key, required this.post, required this.petData});
+  const PetPost({
+    super.key,
+    required this.post,
+    // required this.petData,
+  });
 
   @override
   State<PetPost> createState() => _PetPostState();
@@ -19,7 +23,6 @@ class PetPost extends StatefulWidget {
 
 class _PetPostState extends State<PetPost> {
   late Post post;
-  late Pet pet;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +34,7 @@ class _PetPostState extends State<PetPost> {
     var uid = userService.user.uid;
 
     post = widget.post;
-    pet = widget.petData;
+    // pet = widget.petData;
 
     return InkWell(
       onTap: () {
@@ -88,7 +91,7 @@ class _PetPostState extends State<PetPost> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   //Icon
-                  pet.imgPath == null
+                  post.petImgUrl.isEmpty
                       ? const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: CircleAvatar(
@@ -101,7 +104,7 @@ class _PetPostState extends State<PetPost> {
                             backgroundColor:
                                 const Color.fromARGB(255, 41, 41, 41),
                             backgroundImage: Image.network(
-                              pet.imgPath!,
+                              post.petImgUrl.first,
                               fit: BoxFit.cover,
                               width: double.infinity,
                             ).image,
@@ -112,7 +115,7 @@ class _PetPostState extends State<PetPost> {
                   SizedBox(
                     width: 75,
                     child: Text(
-                      pet.name,
+                      post.petName[0],
                       style: textStyles.bodySmall,
                     ),
                   ),

@@ -317,6 +317,7 @@ class _AddPostPageState extends State<AddPostPage> {
 
                     // Caption
                     AppTextFormField(
+                      expands: true,
                       controller: captionController,
                       hintText: 'Caption',
                       prefixIcon: const Icon(Icons.description_rounded),

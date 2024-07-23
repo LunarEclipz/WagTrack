@@ -129,6 +129,37 @@ class PostService with ChangeNotifier {
     }
   }
 
+  /// Gets For Me Posts from Firestore
+  Future<List<Post>> getAllPostsByTime() async {
+    List<Post> allPosts = [];
+
+    try {
+      final querySnapshot = await _db
+          .collection("posts")
+          .where("date",
+              isGreaterThan: DateTime.now()
+                  .subtract(const Duration(days: 30))
+                  .millisecondsSinceEpoch)
+          .get();
+
+      for (final docSnapshot in querySnapshot.docs) {
+        final postData = docSnapshot.data();
+        final post = Post.fromJson(postData);
+        post.oid = docSnapshot.id;
+        allPosts.add(post);
+      }
+      allPosts.sort((b, a) => a.date.compareTo(b.date));
+      AppLogger.i("[POST] For Me Posts fetched (by uid) successfully");
+      _posts = allPosts;
+      notifyListeners();
+      return allPosts;
+    } catch (e) {
+      AppLogger.e("[POST] Error fetching For Me posts : $e", e);
+      notifyListeners();
+      return []; // Return an empty list on error
+    }
+  }
+
   Future<String?> uploadPostImage(
       {required XFile? image, required String petID}) async {
     AppLogger.d("[PET] Uploading pet image");
