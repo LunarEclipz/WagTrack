@@ -137,6 +137,8 @@ class _AppSettingsState extends State<AppSettings> {
         style: textStyles.bodyLarge,
         child: AppScrollablePage(children: [
           // SECTION: PERSONAL INFORMATION
+          // Text('${MediaQuery.of(context).size.height}'),
+          // Text('${MediaQuery.of(context).viewInsets.bottom}'),
           Text(
             'Personal Information',
             style: textStyles.headlineMedium,
