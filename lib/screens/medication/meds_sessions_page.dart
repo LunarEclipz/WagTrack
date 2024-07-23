@@ -20,7 +20,11 @@ class MedsSessionsPage extends StatefulWidget {
 class _MedsSessionsPageState extends State<MedsSessionsPage> {
   late TextEditingController apptController = TextEditingController();
 
-  late bool apptDate = false;
+  // Form key for appt date input
+  final _apptDateFormKey = GlobalKey<FormState>();
+  bool showDateRequired = false;
+
+  late bool isApptDateSet = false;
   late DateTime apptDateTime;
   @override
   Widget build(BuildContext context) {
@@ -51,11 +55,11 @@ class _MedsSessionsPageState extends State<MedsSessionsPage> {
                   maxTime: DateTime(2040, 1, 1), onConfirm: (date) {
                 setState(() {
                   apptDateTime = date;
-                  apptDate = true;
+                  isApptDateSet = true;
                 });
               }, onCancel: () {
                 setState(() {
-                  apptDate = false;
+                  isApptDateSet = false;
                 });
               }, currentTime: DateTime.now(), locale: LocaleType.en);
             },
@@ -69,17 +73,29 @@ class _MedsSessionsPageState extends State<MedsSessionsPage> {
                       padding: const EdgeInsets.all(
                         8,
                       ),
-                      child: apptDate == false
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: isApptDateSet == false
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Set Appointment Date",
-                                  style: textStyles.bodyLarge!
-                                      .copyWith(color: colorScheme.primary),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Set Appointment Date",
+                                      style: textStyles.bodyLarge!
+                                          .copyWith(color: colorScheme.primary),
+                                    ),
+                                    Icon(Icons.calendar_month_rounded,
+                                        size: 20, color: colorScheme.primary),
+                                  ],
                                 ),
-                                Icon(Icons.calendar_month_rounded,
-                                    size: 20, color: colorScheme.primary),
+                                if (showDateRequired)
+                                  Text(
+                                    "Required*",
+                                    style: textStyles.bodyMedium!
+                                        .copyWith(color: colorScheme.primary),
+                                  ),
                               ],
                             )
                           : Column(
@@ -110,15 +126,25 @@ class _MedsSessionsPageState extends State<MedsSessionsPage> {
             ),
           ),
           const SizedBoxh10(),
-          AppTextFormField(
-            controller: apptController,
-            hintText: 'Appointment Name',
-            prefixIcon: const Icon(Icons.calendar_month_rounded),
+          Form(
+            key: _apptDateFormKey,
+            child: AppTextFormField(
+              controller: apptController,
+              hintText: 'Appointment Name',
+              prefixIcon: const Icon(Icons.calendar_month_rounded),
+            ),
           ),
           const SizedBoxh10(),
           InkWell(
             onTap: () async {
-              if (apptController.text != "" && apptDate) {
+              if (!isApptDateSet) {
+                // naughty naughty
+                setState(() {
+                  showDateRequired = true;
+                });
+              }
+
+              if (_apptDateFormKey.currentState!.validate() && isApptDateSet) {
                 List<DateTimeStringPair> apptData = petData.sessionRecords;
                 apptData.add(DateTimeStringPair(
                     dateTime: apptDateTime, value: apptController.text));
@@ -127,6 +153,12 @@ class _MedsSessionsPageState extends State<MedsSessionsPage> {
                 setState(() {
                   petData.weight = apptData;
                   apptController.text = "";
+
+                  FocusScope.of(context).unfocus();
+
+                  // reset bools
+                  showDateRequired = false;
+                  isApptDateSet = false;
                 });
               }
             },
@@ -140,7 +172,7 @@ class _MedsSessionsPageState extends State<MedsSessionsPage> {
                     color: colorScheme.primary,
                   ),
                   Text(
-                    ' Add appt',
+                    ' Add Appointment',
                     style: textStyles.bodyMedium!
                         .copyWith(color: colorScheme.primary),
                   ),
@@ -149,6 +181,8 @@ class _MedsSessionsPageState extends State<MedsSessionsPage> {
             ),
           ),
           const SizedBoxh20(),
+
+          // list of sessions
           if (petData.sessionRecords.isNotEmpty)
             Column(
               children: List.generate(

@@ -115,6 +115,7 @@ class PetService with ChangeNotifier {
 
     AppLogger.d("[PET] Deleting pet with id $id");
     try {
+      // TODO also need to delete associated meds and symptoms?
       // remove from local pet lists. needed to reset the UI of the home page!
       _communityPets.removeWhere((pet) => pet.petID == id);
       _personalPets.removeWhere((pet) => pet.petID == id);
