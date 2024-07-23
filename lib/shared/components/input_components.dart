@@ -55,6 +55,9 @@ class AppTextFormField extends StatefulWidget {
   /// Whether or not to append the default "optional" UI item to the field
   ///
   /// Also sets validator to be empty (disabled) if no other validator is set.
+  ///
+  /// Not required for just general optional fields. Mostly a decorative feature
+  /// implemented together with the validator.
   final bool showOptional;
 
   /// Whether or not to append the default "required" UI item to the field
