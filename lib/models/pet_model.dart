@@ -160,3 +160,9 @@ class DateTimeStringPair {
     );
   }
 }
+
+class PetSet {
+  late String name;
+  late String petID;
+  late String imgPath;
+}

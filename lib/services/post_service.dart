@@ -6,10 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
-import 'package:provider/provider.dart';
 import 'package:wagtrack/models/post_model.dart';
 import 'package:wagtrack/services/logging.dart';
-import 'package:wagtrack/services/user_service.dart';
 
 class PostService with ChangeNotifier {
   // Instance of Firebase Firestore for interacting with the database
@@ -20,7 +18,6 @@ class PostService with ChangeNotifier {
   static final FirebaseStorage _firebaseStorage = GetIt.I<FirebaseStorage>();
 
   List<Post> _posts = [];
-
   List<Post> get posts => _posts;
 
   /// Adds Post to Firestore
@@ -49,15 +46,15 @@ class PostService with ChangeNotifier {
   }
 
   /// Sets internal lists of posts.
-  void setPosts({required List<Post> posts}) {
-    AppLogger.d("[POST] Setting Personal and Community Pets");
-    _posts = posts;
+  void setPosts({required List<Post> listOfPosts}) {
+    AppLogger.d("[POST] Setting Posts");
+    _posts = listOfPosts;
     notifyListeners();
   }
 
   /// Gets Post from Firestore
   Future<List<Post>> getAllPostsByPetID({required List<String> petIDs}) async {
-    final List<Post> posts = [];
+    List<Post> allPosts = [];
 
     try {
       for (var i = 0; i < petIDs.length; i++) {
@@ -70,12 +67,29 @@ class PostService with ChangeNotifier {
           final postData = docSnapshot.data();
           final post = Post.fromJson(postData);
           post.oid = docSnapshot.id;
-          posts.add(post);
+          allPosts.add(post);
         }
       }
+
+      List<Post> uniqueList = [];
+      for (int i = 0; i < allPosts.length; i++) {
+        bool isUnique = true;
+        for (int j = i + 1; j < allPosts.length; j++) {
+          if (allPosts[i].oid == allPosts[j].oid) {
+            isUnique = false;
+            break; // Exit inner loop if duplicate found
+          }
+        }
+        if (isUnique) {
+          uniqueList.add(allPosts[i]);
+        }
+      }
+      uniqueList.sort((b, a) => a.date.compareTo(b.date));
+      allPosts = uniqueList;
       AppLogger.i("[POST] Posts fetched (by uid) successfully");
+      _posts = allPosts;
       notifyListeners();
-      return posts;
+      return allPosts;
     } catch (e) {
       AppLogger.e("[POST] Error fetching posts for PetID $petIDs: $e", e);
       notifyListeners();
@@ -110,5 +124,10 @@ class PostService with ChangeNotifier {
       AppLogger.w("[POST] Image is null");
       return null;
     }
+  }
+
+  List<Post> getPostsByPetId(
+      {required String targetPetID, required List<Post> posts}) {
+    return posts.where((post) => post.petID.contains(targetPetID)).toList();
   }
 }
