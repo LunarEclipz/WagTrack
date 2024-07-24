@@ -46,8 +46,8 @@ class NotificationService with ChangeNotifier {
   /// Current maximum Id of notifications
   int notificationsMaxId = 0;
 
-  // Notification details
-  late NotificationDetails mainNotificationDetails;
+  // Standard otification details to be used;
+  late final NotificationDetails _mainNotificationDetails;
 
   /// Constructor to create notification service.
   ///
@@ -57,6 +57,8 @@ class NotificationService with ChangeNotifier {
   }
 
   /// Initialises the notification service. Has async functions in here.
+  ///
+  /// sets `isReady` to `true` after it completes.
   Future<void> initialize() async {
     // https://medium.com/@MarvelApps_/flutter-local-notification-d52aa41c065f
     // https://medium.com/@gauravswarankar/local-push-notification-flutter-32cc99f900a5
@@ -64,11 +66,11 @@ class NotificationService with ChangeNotifier {
     AppLogger.d("[NOTIF] Initializing notification service...");
 
     try {
-      // TODO: only works for Android????
+      // TODO: Only more or less set up for Android at the moment
       // iOS settings https://blog.codemagic.io/flutter-local-notifications/
       // Initializing notification settings for Android
       const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+          AndroidInitializationSettings('app_icon');
       const InitializationSettings initializationSettings =
           InitializationSettings(android: initializationSettingsAndroid);
 
@@ -103,7 +105,7 @@ class NotificationService with ChangeNotifier {
         priority: Priority.high,
       );
 
-      mainNotificationDetails =
+      _mainNotificationDetails =
           const NotificationDetails(android: androidNotificationDetails);
 
       // load notifications from local storage
@@ -158,7 +160,7 @@ class NotificationService with ChangeNotifier {
         newNotif.id,
         newNotif.title,
         newNotif.body,
-        mainNotificationDetails,
+        _mainNotificationDetails,
       );
 
       // Save notification to storage
@@ -216,7 +218,7 @@ class NotificationService with ChangeNotifier {
         newNotif.title,
         newNotif.body,
         scheduledDate,
-        mainNotificationDetails,
+        _mainNotificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
