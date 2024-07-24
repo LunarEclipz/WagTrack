@@ -85,6 +85,9 @@ class AppTextFormField extends StatefulWidget {
   final String? Function(String?)? validator;
 
   /// Whether this text field is expandable. Also set maxLines to `null` (no limit)
+  /// and sets input type to multiline (so the return button creates a new line)
+  ///
+  /// Should probably rename this to "multiline"
   final bool expands;
 
   /// Creates a standard text form field for WagTrack.
@@ -203,7 +206,8 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
       enabled: widget.enabled,
       controller: widget.controller,
       obscureText: _obscuretext,
-      keyboardType: widget.keyboardType,
+      keyboardType:
+          widget.expands ? TextInputType.multiline : widget.keyboardType,
       validator: widget.validator ?? defaultValidator,
       autovalidateMode: widget.autovalidateMode,
       textAlignVertical: TextAlignVertical.top,
