@@ -3,10 +3,13 @@
 /// `socialComment`, `socialLike`, `medicalAlert`, `medicalClear`, `debug`,
 /// `noType`
 enum NotificationType implements Comparable<NotificationType> {
-  socialComment("socialComment", 20),
-  socialLike("socialLike", 21),
-  medicalAlert("medicalAlert", 10),
-  medicalClear("medicalClear", 11),
+  socialComment("socialComment", 70),
+  socialLike("socialLike", 71),
+  medication("medication", 30),
+  medicalGreen("medicalGreen", 10),
+  medicalYellow("medicalYellow", 12),
+  medicalOrange("medicalOrange", 14),
+  medicalRed("medicalRed", 18),
   debug("debug", 1),
   noType("noType", 0);
 
@@ -25,10 +28,18 @@ enum NotificationType implements Comparable<NotificationType> {
         return socialComment;
       case "socialLike":
         return socialLike;
-      case "medicalAlert":
-        return medicalAlert;
-      case "medicalClear":
-        return medicalClear;
+      case "medicalClear" || "medicalGreen":
+        // medicalClear is deprecated
+        return medicalGreen;
+      case "medicalYellow":
+        return medicalYellow;
+      case "medicalOrange":
+        return medicalOrange;
+      case "medicalAlert" || "medicalRed":
+        // medicalAlert is deprecated
+        return medicalRed;
+      case "medication":
+        return medication;
       case "debug":
         return debug;
       default:

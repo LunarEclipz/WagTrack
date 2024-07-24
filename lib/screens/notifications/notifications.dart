@@ -139,16 +139,30 @@ class _NotificationCardState extends State<NotificationCard> {
         return const Icon(Icons.question_mark);
       case NotificationType.debug:
         return const Icon(Icons.construction);
-      case NotificationType.medicalAlert:
-        return Icon(
-          Icons.error,
-          color: colorScheme.primary,
-        );
-      case NotificationType.medicalClear:
+      case NotificationType.medicalGreen:
         return Icon(
           Icons.check_circle,
           color: customColors.green,
         );
+      case NotificationType.medicalYellow:
+        return Icon(
+          // Icons.thermostat,
+          Icons.error,
+          color: Colors.yellow[600],
+        );
+      case NotificationType.medicalOrange:
+        return Icon(
+          // Icons.thermostat,
+          Icons.error,
+          color: Colors.orange[700],
+        );
+      case NotificationType.medicalRed:
+        return Icon(
+          Icons.error,
+          color: colorScheme.primary,
+        );
+      case NotificationType.medication:
+        return const Icon(Icons.medication);
       case NotificationType.socialComment:
         return const Icon(Icons.chat);
       case NotificationType.socialLike:
