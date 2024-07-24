@@ -32,6 +32,9 @@ dependencies:
   string_validator: ^1.1.0
   carousel_slider: ^4.2.1
   share_plus: ^9.0.0
+  flutter_map: ^7.0.2
+  url_launcher: ^6.3.0
+  latlong2: ^0.9.1
 
 # Config for Flutter launcher icons
 flutter_launcher_icons:
