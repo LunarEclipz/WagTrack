@@ -2,6 +2,9 @@
 ///
 /// `socialComment`, `socialLike`, `medicalAlert`, `medicalClear`, `debug`,
 /// `noType`
+///
+/// TODO Actually, severity could just be val % 10 - the higher the number in the
+/// first index, the more severe!!
 enum NotificationType implements Comparable<NotificationType> {
   socialComment("socialComment", 70),
   socialLike("socialLike", 71),
@@ -17,9 +20,9 @@ enum NotificationType implements Comparable<NotificationType> {
   final String string;
 
   /// Arbitrary integer used to represent each type, used for sorting.
-  final int num;
+  final int val;
 
-  const NotificationType(this.string, this.num);
+  const NotificationType(this.string, this.val);
 
   /// Creates `NotificationType` from given string, defaults to `noType`
   static NotificationType fromString(String string) {
@@ -48,7 +51,7 @@ enum NotificationType implements Comparable<NotificationType> {
   }
 
   @override
-  int compareTo(NotificationType other) => num - other.num;
+  int compareTo(NotificationType other) => val - other.val;
 }
 
 /// Severity level of notifications [UNUSED, INCOMPLETE]
