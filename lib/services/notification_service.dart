@@ -58,6 +58,9 @@ class NotificationService with ChangeNotifier {
 
   /// Initialises the notification service. Has async functions in here.
   Future<void> initialize() async {
+    // https://medium.com/@MarvelApps_/flutter-local-notification-d52aa41c065f
+    // https://medium.com/@gauravswarankar/local-push-notification-flutter-32cc99f900a5
+    // https://pub.dev/packages/flutter_local_notifications
     AppLogger.d("[NOTIF] Initializing notification service...");
 
     try {
@@ -79,7 +82,7 @@ class NotificationService with ChangeNotifier {
 
       // TODO This whole part just doesn't cooperate with stubbing in testing
       // So fuck it
-      // Off to Gulag with you
+      // Off to Gulag with you?
       final androidFlutterLocalNotificationsPlugin =
           _flutterLocalNotificationsPlugin
               .resolvePlatformSpecificImplementation<
