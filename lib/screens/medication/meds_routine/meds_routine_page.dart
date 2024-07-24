@@ -218,6 +218,7 @@ class _MedicationRoutineCardState extends State<MedicationRoutineCard> {
                         // Medications
                         const SizedBoxh20(),
                         Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: List.generate(
                               medicationRoutine.medications.length, (index) {
                             return Column(
@@ -231,8 +232,15 @@ class _MedicationRoutineCardState extends State<MedicationRoutineCard> {
                                   "Quantity : ${medicationRoutine.medications[index].quantity}",
                                   style: textStyles.bodyMedium,
                                 ),
+                                if (medicationRoutine
+                                    .medications[index].desc.isNotEmpty)
+                                  Text(
+                                    medicationRoutine.medications[index].desc,
+                                    style: textStyles.bodyMedium,
+                                  ),
                                 Text(
-                                  medicationRoutine.medications[index].desc,
+                                  medicationRoutine.medications[index]
+                                      .frequencyString(),
                                   style: textStyles.bodyMedium,
                                 ),
                               ],

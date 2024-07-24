@@ -256,8 +256,8 @@ void main() {
       verify(() => mockSharedPreferences.setInt(any(), any())).called(1);
 
       // verify that notificationList only has mockNotif
-      expect(notificationService.notificationList.length, 1);
-      expect(notificationService.notificationList[0], mockNotif);
+      expect(notificationService.notificationShowList.length, 1);
+      expect(notificationService.notificationShowList[0], mockNotif);
 
       // verify that notificationsMaxId is incremented
       expect(notificationService.notificationsMaxId, 1);
@@ -282,7 +282,7 @@ void main() {
       verifyNever(() => mockSharedPreferences.setInt(any(), any()));
 
       // verify that notificationList is empty
-      expect(notificationService.notificationList.length, 0);
+      expect(notificationService.notificationShowList.length, 0);
 
       // verify that notificationsMaxId is not incremented
       expect(notificationService.notificationsMaxId, 0);
@@ -299,7 +299,7 @@ void main() {
       final mockNotif = createMockAppNotification();
       final notificationString = mockNotif.toJSONString();
 
-      notificationService.notificationList.add(mockNotif);
+      notificationService.notificationShowList.add(mockNotif);
       notificationService.notificationsMaxId = 1;
 
       when(() => mockSharedPreferences.setStringList(any(), any()))
@@ -344,10 +344,11 @@ void main() {
       await notificationService.loadNotifications();
 
       // 1 notif in notificationList
-      expect(notificationService.notificationList.length, mockNotifs.length);
+      expect(
+          notificationService.notificationShowList.length, mockNotifs.length);
       // same notifications are found
       for (AppNotification notif in mockNotifs) {
-        expect(notificationService.notificationList.contains(notif), true);
+        expect(notificationService.notificationShowList.contains(notif), true);
       }
     });
   });
@@ -366,17 +367,18 @@ void main() {
       ];
 
       // copies elements without copying reference
-      notificationService.notificationList =
+      notificationService.notificationShowList =
           mockNotifs.map((notif) => notif).toList();
 
       notificationService.sortNotifications();
 
       // same number of notifs in notificationList
-      expect(notificationService.notificationList.length, mockNotifs.length);
+      expect(
+          notificationService.notificationShowList.length, mockNotifs.length);
       // check for order:
-      expect(notificationService.notificationList[0], mockNotifs[2]);
-      expect(notificationService.notificationList[1], mockNotifs[0]);
-      expect(notificationService.notificationList[2], mockNotifs[1]);
+      expect(notificationService.notificationShowList[0], mockNotifs[2]);
+      expect(notificationService.notificationShowList[1], mockNotifs[0]);
+      expect(notificationService.notificationShowList[2], mockNotifs[1]);
     });
   });
 
@@ -394,8 +396,8 @@ void main() {
       AppLogger.d(dtNow.toIso8601String());
       AppLogger.d(futureNotif.notificationTime.toIso8601String());
 
-      notificationService.notificationList.add(pastNotif);
-      notificationService.notificationList.add(futureNotif);
+      notificationService.notificationShowList.add(pastNotif);
+      notificationService.notificationShowList.add(futureNotif);
 
       when(() => mockSharedPreferences.setStringList(any(), any()))
           .thenAnswer((_) async => true);
@@ -405,9 +407,9 @@ void main() {
       await notificationService.deleteAllNotifications();
 
       // 1 notif in notificationList
-      expect(notificationService.notificationList.length, 1);
+      expect(notificationService.notificationShowList.length, 1);
       // notifications is the future notification
-      expect(notificationService.notificationList[0], futureNotif);
+      expect(notificationService.notificationShowList[0], futureNotif);
     });
 
     test(
@@ -416,8 +418,8 @@ void main() {
       final pastNotif = createMockAppNotification(notificationTime: dtPast);
       final futureNotif = createMockAppNotification(notificationTime: dtFuture);
 
-      notificationService.notificationList.add(pastNotif);
-      notificationService.notificationList.add(futureNotif);
+      notificationService.notificationShowList.add(pastNotif);
+      notificationService.notificationShowList.add(futureNotif);
 
       when(() => mockSharedPreferences.setStringList(any(), any()))
           .thenAnswer((_) async => true);
@@ -427,9 +429,9 @@ void main() {
       await notificationService.deleteAllNotifications(
           retainFutureNotifications: false);
 
-      AppLogger.d(notificationService.notificationList);
+      AppLogger.d(notificationService.notificationShowList);
 
-      expect(notificationService.notificationList.isEmpty, true);
+      expect(notificationService.notificationShowList.isEmpty, true);
     });
   });
 
@@ -482,7 +484,7 @@ void main() {
 
       // same notifications are found
       for (AppNotification notif in mockNotifs) {
-        expect(notificationService.notificationList.contains(notif), true);
+        expect(notificationService.notificationShowList.contains(notif), true);
       }
     });
   });

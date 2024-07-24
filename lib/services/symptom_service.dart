@@ -41,7 +41,8 @@ class SymptomService with ChangeNotifier {
       ...[formData]
     ];
 
-    // create new symptom notification for this symptom IF it is an ongoing symptom
+    /// create new symptom notification for this symptom IF it is an ongoing symptom
+    /// or if (somehow) the end date is set to the future...
     if (formData.endDate == null ||
         DateTime.now().compareTo(formData.endDate!) == -1) {
       createSymptomNotification(formData);
@@ -219,7 +220,7 @@ class SymptomService with ChangeNotifier {
     final type = symptomData.level.notifType;
 
     final pet = _petService.getPetFromLocalWithID(petID: symptomData.petID);
-    final petName = pet?.name ?? "";
+    final petName = pet?.name ?? "Your Pet";
 
     /// Title
     final title = '${symptomData.level.desc}: $petName';

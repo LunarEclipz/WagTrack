@@ -36,6 +36,7 @@ dependencies:
   url_launcher: ^6.3.0
   latlong2: ^0.9.1
   flutter_timezone: ^2.1.0
+  uuid: ^4.4.2
 
 # Config for Flutter launcher icons
 flutter_launcher_icons:

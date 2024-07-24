@@ -8,6 +8,7 @@ import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
+import 'package:wagtrack/shared/themes.dart';
 
 class MedsEditRoutine extends StatefulWidget {
   final MedicationRoutine routineData;
@@ -23,6 +24,7 @@ class MedsEditRoutine extends StatefulWidget {
 class _MedsEditRoutineState extends State<MedsEditRoutine> {
   // Form Keys
   final _medicationFormKey = GlobalKey<FormState>();
+  final _medicationFreqFormKey = GlobalKey<FormState>();
   final _routineFormKey = GlobalKey<FormState>();
   final _addInfoFormKey = GlobalKey<FormState>();
 
@@ -43,6 +45,15 @@ class _MedsEditRoutineState extends State<MedsEditRoutine> {
       TextEditingController(text: null);
   late TextEditingController medDescController =
       TextEditingController(text: null);
+
+  /// Controllers for medication frequency
+  final TextEditingController _dosageCountController = TextEditingController();
+  final TextEditingController _intervalValueController =
+      TextEditingController();
+  late String _selectedInterval = "day";
+  bool takeAsNeeded = true;
+
+  /// Lists
   late List<Symptom> symptomsTagged = [];
   late List<Medication> medicationList = [];
 
@@ -146,7 +157,7 @@ class _MedsEditRoutineState extends State<MedsEditRoutine> {
               ),
             ),
 
-            // SECTION: Medications
+            // SECTION: Medications =======================================================
             const SizedBoxh20(),
             Text(
               'Medications',
@@ -189,25 +200,54 @@ class _MedsEditRoutineState extends State<MedsEditRoutine> {
                 ],
               ),
             ),
+            const SizedBoxh10(),
+
+            // setting the frequency
+            _medicationFrequencyForm(context),
+            Text(
+              'Leave empty if the medication is meant to be taken as needed.',
+              style: textStyles.bodyMedium,
+            ),
 
             const SizedBoxh10(),
 
             // "Add Medication" Button
             InkWell(
               onTap: () {
-                if (_medicationFormKey.currentState!.validate()) {
+                bool medValidation =
+                    _medicationFormKey.currentState!.validate();
+                bool medFreqValidation =
+                    _medicationFreqFormKey.currentState!.validate();
+
+                if (medValidation && medFreqValidation) {
+                  int? dosageCount = _dosageCountController.text.isEmpty
+                      ? null
+                      : int.parse(_dosageCountController.text);
+                  int? intervalValue = _intervalValueController.text.isEmpty
+                      ? null
+                      : int.parse(_intervalValueController.text);
+
                   setState(() {
                     medicationList.add(Medication(
-                        name: medNameController.text,
-                        quantity: medQuantityController.text,
-                        desc: medDescController.text));
+                      name: medNameController.text,
+                      quantity: medQuantityController.text,
+                      desc: medDescController.text,
+                      dosageCount: dosageCount,
+                      intervalValue: intervalValue,
+                      intervalUnit: _selectedInterval,
+                    ));
 
                     // reset controllers
                     medNameController.text = "";
                     medQuantityController.text = "";
                     medDescController.text = "";
+                    _dosageCountController.text = "";
+                    _intervalValueController.text = "";
 
-                    // temporarily reset autovalidationmode
+                    // reset asNeeded
+                    takeAsNeeded = true;
+
+                    // temporarily reset autovalidationmode. not really working
                     _resetMedAutovalidateMode();
 
                     // unfocus fields
@@ -459,5 +499,90 @@ class _MedsEditRoutineState extends State<MedsEditRoutine> {
         ),
       ),
     );
+  }
+
+  // Misc components
+  Widget _medicationFrequencyForm(BuildContext context) {
+    final TextTheme textStyles = Theme.of(context).textTheme;
+
+    return Form(
+      key: _medicationFreqFormKey,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            'Take',
+            style: textStyles.bodyLarge!
+                .copyWith(color: AppTheme.customColors.secondaryText),
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            // height: 50,
+            // width: 20,
+            child: AppTextFormField(
+              controller: _dosageCountController,
+              hintText: '',
+              validator: (value) =>
+                  (value != null && value.isNotEmpty && !_isInt(value))
+                      ? ""
+                      : null,
+              autovalidateMode: AutovalidateMode.disabled,
+            ),
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Text(
+            'times every',
+            style: textStyles.bodyLarge!
+                .copyWith(color: AppTheme.customColors.secondaryText),
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            // height: 50,
+            // width: 20,
+            child: AppTextFormField(
+              controller: _intervalValueController,
+              hintText: '',
+              validator: (value) =>
+                  (value != null && value.isNotEmpty && !_isInt(value))
+                      ? ""
+                      : null,
+              autovalidateMode: AutovalidateMode.disabled,
+            ),
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          SizedBox(
+              width: 100,
+              height: 80,
+              child: AppDropdown(
+                optionsList: const <String>[
+                  'minute',
+                  'hour',
+                  'day',
+                  'month',
+                  'year'
+                ],
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedInterval = newValue!;
+                  });
+                },
+                selectedText: _selectedInterval,
+              ))
+        ],
+      ),
+    );
+  }
+
+  // TODO Temporary numeric validators
+  bool _isInt(String str) {
+    return int.tryParse(str) != null;
   }
 }

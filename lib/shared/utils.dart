@@ -51,3 +51,13 @@ String timeAgo(DateTime dateTime) {
     return '$years year${years > 1 ? 's' : ''} ago';
   }
 }
+
+/// Converts a given `Duration` into a string
+String formatDuration(Duration duration) {
+  int days = duration.inDays;
+  int hours = duration.inHours.remainder(24);
+  int minutes = duration.inMinutes.remainder(60);
+  int seconds = duration.inSeconds.remainder(60);
+
+  return "${days}d ${hours}h ${minutes}m ${seconds}s";
+}
