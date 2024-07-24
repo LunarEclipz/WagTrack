@@ -4,10 +4,12 @@ import 'package:get_it/get_it.dart';
 import 'package:wagtrack/models/medication_model.dart';
 import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/notification_service.dart';
+import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/services/symptom_service.dart';
 
 /// Communication to Firebase for Medication-related data.
 class MedicationService with ChangeNotifier {
+  final PetService _petService;
   final SymptomService _symptomService;
   final NotificationService _notificationService;
 
@@ -23,7 +25,11 @@ class MedicationService with ChangeNotifier {
   List<MedicationRoutine> get medicationRoutines => _medicationRoutines;
 
   /// Constructor
-  MedicationService(this._symptomService, this._notificationService);
+  MedicationService(
+    this._petService,
+    this._symptomService,
+    this._notificationService,
+  );
 
   /// Adds a new medication document to the "medication" collection in Firestore
   void addMedicationRoutines({required MedicationRoutine formData}) {

@@ -135,7 +135,7 @@ SymptomLevel classifySymptom({required String name, required int severity}) {
         return SymptomLevel.red;
       } else if (severity >= matchingSymptom['orange']) {
         return SymptomLevel.orange;
-      } else if (severity >= matchingSymptom['orange']) {
+      } else if (severity >= matchingSymptom['yellow']) {
         return SymptomLevel.yellow;
       } else {
         return SymptomLevel.green;

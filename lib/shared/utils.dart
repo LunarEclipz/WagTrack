@@ -34,6 +34,10 @@ String timeAgo(DateTime dateTime) {
     final hrs = difference.inHours;
     return '$hrs hour${hrs > 1 ? 's' : ''} ago';
   } else if (difference.inDays < 7) {
+    if (difference.inDays == 1) {
+      return 'Yesterday';
+    }
+
     final days = difference.inDays;
     return '$days day${days > 1 ? 's' : ''} ago';
   } else if (difference.inDays < 30) {

@@ -4,9 +4,12 @@ import 'package:get_it/get_it.dart';
 import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/notification_service.dart';
+import 'package:wagtrack/services/pet_service.dart';
+import 'package:wagtrack/shared/utils.dart';
 
 /// Communication to Firebase for Symptom-related data.
 class SymptomService with ChangeNotifier {
+  final PetService _petService;
   final NotificationService _notificationService;
 
   // Instance of Firebase Firestore for interacting with the database
@@ -17,7 +20,7 @@ class SymptomService with ChangeNotifier {
   // static final Reference _storageRef = GetIt.I<FirebaseStorage>().ref();
 
   /// Constructor for `SymptomService`
-  SymptomService(this._notificationService);
+  SymptomService(this._petService, this._notificationService);
 
   List<Symptom> _currentSymptoms = [];
   List<Symptom> _pastSymptoms = [];
@@ -26,6 +29,8 @@ class SymptomService with ChangeNotifier {
   List<Symptom> get pastSymptoms => _pastSymptoms;
 
   /// Adds a new symptom document to the "symptoms" collection in Firestore
+  ///
+  /// Also creates a new symptom notification
   void addSymptom({required Symptom formData}) {
     _firestoreSymptomCollection
         .add(formData.toJSON())
@@ -35,6 +40,13 @@ class SymptomService with ChangeNotifier {
       ...pastSymptoms,
       ...[formData]
     ];
+
+    // create new symptom notification for this symptom IF it is an ongoing symptom
+    if (formData.endDate == null ||
+        DateTime.now().compareTo(formData.endDate!) == -1) {
+      createSymptomNotification(formData);
+    }
+
     setPastCurrentSymptoms(symptoms: symptoms);
   }
 
@@ -197,5 +209,26 @@ class SymptomService with ChangeNotifier {
     AppLogger.t("[SYMP] Resetting symptom service");
     _currentSymptoms = [];
     _pastSymptoms = [];
+  }
+
+  /// Creates a new symptom notification. Takes in a `Symptom`.
+  ///
+  /// For now: Shows a new notification now with type determined on the symptom'
+  /// severity
+  void createSymptomNotification(Symptom symptomData) {
+    final type = symptomData.level.notifType;
+
+    final pet = _petService.getPetFromLocalWithID(petID: symptomData.petID);
+    final petName = pet?.name ?? "";
+
+    /// Title
+    final title = '${symptomData.level.desc}: $petName';
+
+    /// Body
+    final body =
+        '${symptomData.symptom} of severity level ${symptomData.severity}. \n'
+        'Started ${timeAgo(symptomData.startDate).toLowerCase()}.';
+
+    _notificationService.showNotification(title, body, type);
   }
 }

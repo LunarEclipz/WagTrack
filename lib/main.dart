@@ -54,11 +54,13 @@ class WagTrackApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => SymptomService(
+            Provider.of<PetService>(context, listen: false),
             Provider.of<NotificationService>(context, listen: false),
           ),
         ),
         ChangeNotifierProvider(
           create: (context) => MedicationService(
+            Provider.of<PetService>(context, listen: false),
             Provider.of<SymptomService>(context, listen: false),
             Provider.of<NotificationService>(context, listen: false),
           ),

@@ -146,7 +146,7 @@ class NotificationService with ChangeNotifier {
   /// Requests permissions. OS-specific. Not part of full initialization as it
   /// is meant to be run as the user is logged into the main home screen.
   Future<void> requestPermissions() async {
-    if (Platform.isIOS || Platform.isMacOS) {
+    if (Platform.isIOS) {
       await _flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
               IOSFlutterLocalNotificationsPlugin>()
