@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/notification_enums.dart';
@@ -56,6 +57,8 @@ class _NotificationsState extends State<Notifications> {
 
     final notificationService = context.watch<NotificationService>();
     final notificationList = notificationService.getNotifications();
+    final recurringNotificationList =
+        notificationService.recurringNotificationList;
 
     final maxNotifCount = notificationService.maxNotificationCount;
 
@@ -66,13 +69,53 @@ class _NotificationsState extends State<Notifications> {
           style: textStyles.headlineMedium,
         ),
         const SizedBoxh10(),
-        Text(
-          '''Placeholder page. All notifications will be placeholders. 
-Maximum of $maxNotifCount notifications shown.''',
-          style: textStyles.bodySmall,
-        ),
 
         // SECTION: BUTTONS
+        _showDebugButtons(),
+
+        // SECTION: notifications
+        const SizedBoxh10(),
+        ListView.separated(
+          itemBuilder: (BuildContext context, int index) =>
+              NotificationCard(notificationList[index]),
+          separatorBuilder: (BuildContext context, int index) =>
+              const SizedBoxh10(),
+          itemCount: notificationList.length,
+          physics: const ClampingScrollPhysics(),
+          shrinkWrap: true,
+        ),
+
+        // SECTION: under notifications
+        const SizedBoxh10(),
+        Text('A maximum of $maxNotifCount notifications shown. '
+            'Configure this in settings (WIP).'),
+
+        const SizedBoxh10(),
+        // SECTION: RECURRING NOTIFICATIONS
+        Text(
+          'Recurring Notifications',
+          style: textStyles.titleMedium!.copyWith(color: colorScheme.secondary),
+        ),
+        ListView.separated(
+          itemBuilder: (BuildContext context, int index) =>
+              RecurringNotificationCard(recurringNotificationList[index]),
+          separatorBuilder: (BuildContext context, int index) =>
+              const SizedBoxh10(),
+          itemCount: recurringNotificationList.length,
+          physics: const ClampingScrollPhysics(),
+          shrinkWrap: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _showDebugButtons() {
+    if (kReleaseMode) {
+      return Container();
+    }
+
+    return Column(
+      children: [
         const SizedBoxh10(),
         Row(
           children: [
@@ -95,28 +138,12 @@ Maximum of $maxNotifCount notifications shown.''',
             ),
           ],
         ),
-
-        // SECTION: notifications
-        const SizedBoxh10(),
-        ListView.separated(
-          itemBuilder: (BuildContext context, int index) =>
-              NotificationCard(notificationList[index]),
-          separatorBuilder: (BuildContext context, int index) =>
-              const SizedBoxh10(),
-          itemCount: notificationList.length,
-          physics: const ClampingScrollPhysics(),
-          shrinkWrap: true,
-        ),
-
-        // SECTION: under notifications
-        const SizedBoxh10(),
-        Text('A maximum of $maxNotifCount notifications shown. '
-            'Configure this in settings (WIP).')
       ],
     );
   }
 }
 
+/// Card for standard show notifications
 class NotificationCard extends StatefulWidget {
   final AppNotification notif;
 
@@ -139,16 +166,30 @@ class _NotificationCardState extends State<NotificationCard> {
         return const Icon(Icons.question_mark);
       case NotificationType.debug:
         return const Icon(Icons.construction);
-      case NotificationType.medicalAlert:
-        return Icon(
-          Icons.error,
-          color: colorScheme.primary,
-        );
-      case NotificationType.medicalClear:
+      case NotificationType.medicalGreen:
         return Icon(
           Icons.check_circle,
           color: customColors.green,
         );
+      case NotificationType.medicalYellow:
+        return Icon(
+          // Icons.thermostat,
+          Icons.error,
+          color: Colors.yellow[600],
+        );
+      case NotificationType.medicalOrange:
+        return Icon(
+          // Icons.thermostat,
+          Icons.error,
+          color: Colors.orange[700],
+        );
+      case NotificationType.medicalRed:
+        return Icon(
+          Icons.error,
+          color: colorScheme.primary,
+        );
+      case NotificationType.medication:
+        return const Icon(Icons.medication);
       case NotificationType.socialComment:
         return const Icon(Icons.chat);
       case NotificationType.socialLike:
@@ -167,7 +208,7 @@ class _NotificationCardState extends State<NotificationCard> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final AppNotification notif = widget.notif;
 
@@ -258,13 +299,195 @@ class _NotificationCardState extends State<NotificationCard> {
                       setState(_toggleExpansion);
                       context
                           .read<NotificationService>()
-                          .deleteSymptom(id: notif.id);
+                          .deleteNotification(id: notif.id);
                     },
                   ),
                   Text(
                     // timeAgo(notif.notificationTime),
                     '${formatDateTime(notif.notificationTime).date} '
                     '${formatDateTime(notif.notificationTime).time}',
+                    style: textStyles.bodySmall!
+                        .copyWith(color: AppTheme.customColors.secondaryText),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          crossFadeState: _isExpanded
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
+          duration: const Duration(milliseconds: 100),
+        ),
+      ),
+    );
+  }
+}
+
+/// Card for recurring notifications
+class RecurringNotificationCard extends StatefulWidget {
+  final AppRecurringNotification notif;
+
+  const RecurringNotificationCard(this.notif, {super.key});
+
+  @override
+  State<RecurringNotificationCard> createState() =>
+      _RecurringNotificationCardState();
+}
+
+class _RecurringNotificationCardState extends State<RecurringNotificationCard> {
+  bool _isExpanded = false;
+
+  Widget getIconForType(BuildContext context, NotificationType type) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final CustomColors customColors =
+        Theme.of(context).extension<CustomColors>()!;
+
+    switch (type) {
+      case NotificationType.noType:
+        return const Icon(Icons.question_mark);
+      case NotificationType.debug:
+        return const Icon(Icons.construction);
+      case NotificationType.medicalGreen:
+        return Icon(
+          Icons.check_circle,
+          color: customColors.green,
+        );
+      case NotificationType.medicalYellow:
+        return Icon(
+          // Icons.thermostat,
+          Icons.error,
+          color: Colors.yellow[600],
+        );
+      case NotificationType.medicalOrange:
+        return Icon(
+          // Icons.thermostat,
+          Icons.error,
+          color: Colors.orange[700],
+        );
+      case NotificationType.medicalRed:
+        return Icon(
+          Icons.error,
+          color: colorScheme.primary,
+        );
+      case NotificationType.medication:
+        return const Icon(Icons.medication);
+      case NotificationType.socialComment:
+        return const Icon(Icons.chat);
+      case NotificationType.socialLike:
+        return const Icon(Icons.favorite);
+      default:
+        return const Icon(Icons.info);
+    }
+  }
+
+  void _toggleExpansion() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textStyles = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final AppRecurringNotification notif = widget.notif;
+
+    return InkWell(
+      onTap: _toggleExpansion,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: AnimatedCrossFade(
+          firstChild: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  getIconForType(context, notif.type),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notif.title ?? "",
+                          style: textStyles.bodyLarge,
+                        ),
+                        Text(
+                          notif.body ?? "",
+                          style: textStyles.bodyMedium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'Every ${formatDuration(notif.interval)}',
+                    style: textStyles.bodySmall!
+                        .copyWith(color: AppTheme.customColors.secondaryText),
+                  ),
+                ],
+              )
+            ],
+          ),
+          secondChild: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  getIconForType(context, notif.type),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notif.title ?? "",
+                          style: textStyles.bodyLarge,
+                        ),
+                        Text(
+                          notif.body ?? "",
+                          style: textStyles.bodyMedium,
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  AppIconButtonSmall(
+                    icon: Icon(
+                      Icons.delete_rounded,
+                      color: AppTheme.customColors.secondaryText,
+                    ),
+                    onPressed: () {
+                      setState(_toggleExpansion);
+                      context
+                          .read<NotificationService>()
+                          .deleteNotification(id: notif.id);
+                    },
+                  ),
+                  Text(
+                    'Started '
+                    '${formatDateTime(notif.startTime).date} '
+                    '${formatDateTime(notif.startTime).time}, '
+                    'Every ${formatDuration(notif.interval)}',
                     style: textStyles.bodySmall!
                         .copyWith(color: AppTheme.customColors.secondaryText),
                   ),

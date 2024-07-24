@@ -448,7 +448,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                             // end date is set
                             hasEnd: isEndDateSet,
                             endDate: endDateTime);
-                    symptomService.addSymptoms(formData: formData);
+                    symptomService.addSymptom(formData: formData);
                     Navigator.pop(context);
                   }
                 },

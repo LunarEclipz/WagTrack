@@ -2,12 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:wagtrack/models/medication_model.dart';
+import 'package:wagtrack/models/notification_enums.dart';
 import 'package:wagtrack/services/logging.dart';
+import 'package:wagtrack/services/notification_service.dart';
+import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/services/symptom_service.dart';
 
 /// Communication to Firebase for Medication-related data.
 class MedicationService with ChangeNotifier {
+  final PetService _petService;
   final SymptomService _symptomService;
+  final NotificationService _notificationService;
 
   // Instance of Firebase Firestore for interacting with the database
   static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
@@ -21,7 +26,11 @@ class MedicationService with ChangeNotifier {
   List<MedicationRoutine> get medicationRoutines => _medicationRoutines;
 
   /// Constructor
-  MedicationService(this._symptomService);
+  MedicationService(
+    this._petService,
+    this._symptomService,
+    this._notificationService,
+  );
 
   /// Adds a new medication document to the "medication" collection in Firestore
   void addMedicationRoutines({required MedicationRoutine formData}) {
@@ -34,6 +43,13 @@ class MedicationService with ChangeNotifier {
       ..._medicationRoutines,
       ...[formData]
     ];
+
+    /// goes through medications and creates new recurring notifications:
+    AppLogger.t("[MED] Creating recurring notifications for medications");
+    for (Medication med in formData.medications) {
+      createRecurringNotificationFromMedication(med, petID: formData.petID);
+    }
+
     getAllMedicationRoutineByPetID(petID: formData.petID, first: true);
     setMedicationRoutines(medicationRoutines: medicationRoutines);
   }
@@ -93,7 +109,7 @@ class MedicationService with ChangeNotifier {
       return;
     }
 
-    AppLogger.d("[MED] Deleting symptom with id $id");
+    AppLogger.d("[MED] Deleting medication routine $id");
     try {
       // remove from local med routine lists. needed to reset the UI of the home page!
       _medicationRoutines.removeWhere((routine) => routine.oid == id);
@@ -144,6 +160,8 @@ class MedicationService with ChangeNotifier {
       routine.symptomsName = symptomsName ?? routine.symptomsName;
       routine.medications = medications ?? routine.medications;
 
+      // TODO need to check medications for differences and update recurring med notifs accordingly
+
       // then apply updates to Firestore
       final routineRef = _firestoreMedicationCollection.doc(id);
 
@@ -165,5 +183,63 @@ class MedicationService with ChangeNotifier {
   void resetService() {
     AppLogger.t("[MEDS] Resetting medication service");
     _medicationRoutines = [];
+  }
+
+  /// Sets up a new recurring notification that starts now from the given
+  /// `Medication`
+  void createRecurringNotificationFromMedication(Medication medData,
+      {required String petID}) {
+    const type = NotificationType.medication;
+
+    final pet = _petService.getPetFromLocalWithID(petID: petID);
+    final petName = pet?.name ?? "Your Pet";
+
+    /// Title
+    final title = '${medData.name} for $petName';
+
+    /// Body
+    const body = "";
+
+    /// Interval
+    Duration interval;
+    if (medData.intervalUnit == null ||
+        medData.intervalValue == null ||
+        medData.dosageCount == null ||
+        medData.takeAsNeeded) {
+      // as needed frequency
+      return;
+    }
+
+    switch (medData.intervalUnit!.toLowerCase()) {
+      case 'minute':
+      case 'minutes':
+        interval = Duration(minutes: medData.intervalValue!);
+      case 'hour':
+      case 'hours':
+        interval = Duration(hours: medData.intervalValue!);
+      case 'day':
+      case 'days':
+        interval = Duration(days: medData.intervalValue!);
+      case 'week':
+      case 'weeks':
+        interval =
+            Duration(days: medData.intervalValue! * 7); // 1 week = 7 days
+      case 'month':
+      case 'months':
+        interval = Duration(
+            days: medData.intervalValue! * 30); // Approximate 30 days per month
+      case 'year':
+      case 'years':
+        interval = Duration(
+            days:
+                medData.intervalValue! * 365); // Approximate 365 days per year
+      default:
+        return;
+    }
+
+    // divide interval by dosageCount
+    interval = Duration(seconds: interval.inSeconds ~/ medData.dosageCount!);
+
+    _notificationService.showRecurringNotification(title, body, interval, type);
   }
 }

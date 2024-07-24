@@ -34,6 +34,10 @@ String timeAgo(DateTime dateTime) {
     final hrs = difference.inHours;
     return '$hrs hour${hrs > 1 ? 's' : ''} ago';
   } else if (difference.inDays < 7) {
+    if (difference.inDays == 1) {
+      return 'Yesterday';
+    }
+
     final days = difference.inDays;
     return '$days day${days > 1 ? 's' : ''} ago';
   } else if (difference.inDays < 30) {
@@ -46,4 +50,14 @@ String timeAgo(DateTime dateTime) {
     final years = (difference.inDays / 365).floor();
     return '$years year${years > 1 ? 's' : ''} ago';
   }
+}
+
+/// Converts a given `Duration` into a string
+String formatDuration(Duration duration) {
+  int days = duration.inDays;
+  int hours = duration.inHours.remainder(24);
+  int minutes = duration.inMinutes.remainder(60);
+  int seconds = duration.inSeconds.remainder(60);
+
+  return "${days}d ${hours}h ${minutes}m ${seconds}s";
 }
