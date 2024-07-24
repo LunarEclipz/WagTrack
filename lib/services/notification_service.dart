@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:wagtrack/models/notification_model.dart';
 import 'package:wagtrack/models/notification_params.dart';
@@ -37,17 +41,21 @@ class NotificationService with ChangeNotifier {
   /// UI elements from bein shown while loading is incomplete..
   bool isReady = false;
 
-  /// Maxmium number of notifications stored, default = 10.
-  int maxNotificationCount = 10;
+  /// Maxmium number of notifications stored, default = 100.
+  int maxNotificationCount = 100;
 
   /// List of local notifications
   List<AppNotification> notificationList = [];
 
-  /// Current maximum Id of notifications
+  /// Current maximum Id of notifications. Used to determine the id of new notifs
   int notificationsMaxId = 0;
 
-  // Standard otification details to be used;
+  // Standard notification details to be used;
   late final NotificationDetails _mainNotificationDetails;
+
+  /// whether notifications (in the operating system) are enabled.
+  /// Doesn't seem to work for iOS.
+  bool _notificationsEnabled = false;
 
   /// Constructor to create notification service.
   ///
@@ -56,44 +64,54 @@ class NotificationService with ChangeNotifier {
     initialize();
   }
 
-  /// Initialises the notification service. Has async functions in here.
+  /// Initialises the notification service. Is async.
   ///
   /// sets `isReady` to `true` after it completes.
   Future<void> initialize() async {
-    // https://medium.com/@MarvelApps_/flutter-local-notification-d52aa41c065f
-    // https://medium.com/@gauravswarankar/local-push-notification-flutter-32cc99f900a5
-    // https://pub.dev/packages/flutter_local_notifications
+    /// https://medium.com/@MarvelApps_/flutter-local-notification-d52aa41c065f
+    /// https://medium.com/@gauravswarankar/local-push-notification-flutter-32cc99f900a5
+    /// https://pub.dev/packages/flutter_local_notifications
+    /// iOS settings https://blog.codemagic.io/flutter-local-notifications/
+    ///
+    /// Unsure if fully set up for iOS (untested)
+    /// Notification actions are currently not supported.
+    ///
+    /// currently also not setting up channels.
+    ///
+    /// Future TODO:
+    /// - allow user to press notification to go to a page (use payloads)
+
+    if (isReady) {
+      // already initialised, no need to reinit
+      return;
+    }
+
     AppLogger.d("[NOTIF] Initializing notification service...");
+
+    // CONFIG TIME ZONES
+    await _configureLocalTimeZone();
 
     try {
       // TODO: Only more or less set up for Android at the moment
-      // iOS settings https://blog.codemagic.io/flutter-local-notifications/
-      // Initializing notification settings for Android
-      const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('app_icon');
-      const InitializationSettings initializationSettings =
-          InitializationSettings(android: initializationSettingsAndroid);
 
-      // Initialize notification channels
-      const AndroidNotificationChannel mainChannel = AndroidNotificationChannel(
-        'main_channel', // channel ID
-        'Main Notifications', // channel name
-        description: 'Main WagTrack app notifications',
-        importance: Importance.high,
+      /// Set up initialization settings
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('notification_icon_main');
+
+      const DarwinInitializationSettings initializationSettingsDarwin =
+          DarwinInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
       );
 
-      // TODO This whole part just doesn't cooperate with stubbing in testing
-      // So fuck it
-      // Off to Gulag with you?
-      final androidFlutterLocalNotificationsPlugin =
-          _flutterLocalNotificationsPlugin
-              .resolvePlatformSpecificImplementation<
-                  AndroidFlutterLocalNotificationsPlugin>();
+      const InitializationSettings initializationSettings =
+          InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsDarwin,
+      );
 
-      await androidFlutterLocalNotificationsPlugin
-          ?.createNotificationChannel(mainChannel);
-
-      // init flutter local notifs
+      // initialize with settings
       await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
       // Setup notification details
@@ -122,6 +140,43 @@ class NotificationService with ChangeNotifier {
       AppLogger.e("[NOTIF] Error initalizing notification service: $e", e);
     }
   }
+
+  // CONFIG Methods
+
+  /// Requests permissions. OS-specific. Not part of full initialization as it
+  /// is meant to be run as the user is logged into the main home screen.
+  Future<void> requestPermissions() async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              MacOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    } else if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          _flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin>();
+
+      final bool? grantedNotificationPermission =
+          await androidImplementation?.requestNotificationsPermission();
+      _notificationsEnabled = grantedNotificationPermission ?? false;
+    }
+    AppLogger.d("[NOTIF] Notifications permissions requested.");
+  }
+
+  // USAGE methods
 
   /// Shows notification now.
   ///
@@ -228,7 +283,7 @@ class NotificationService with ChangeNotifier {
       // Save scheduled notification to storage
       saveNotification(newNotif);
 
-      // Doesn't notify
+      // Doesn't notify listeners, not necessary
 
       AppLogger.i("[NOTIF] Succesfully scheduled $newNotif");
     } catch (e) {
@@ -455,4 +510,11 @@ class NotificationService with ChangeNotifier {
     AppLogger.t("[NOTIF] Resetting notification service");
     notificationList = [];
   }
+}
+
+// Misc
+Future<void> _configureLocalTimeZone() async {
+  tz.initializeTimeZones();
+  final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+  tz.setLocalLocation(tz.getLocation(timeZoneName));
 }

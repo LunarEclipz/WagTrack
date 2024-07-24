@@ -9,6 +9,7 @@ import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
+import 'package:wagtrack/shared/utils.dart';
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});
@@ -99,22 +100,27 @@ Maximum of $maxNotifCount notifications shown.''',
         const SizedBoxh10(),
         ListView.separated(
           itemBuilder: (BuildContext context, int index) =>
-              NotificationBox(notificationList[index]),
+              NotificationCard(notificationList[index]),
           separatorBuilder: (BuildContext context, int index) =>
               const SizedBoxh10(),
           itemCount: notificationList.length,
           physics: const ClampingScrollPhysics(),
           shrinkWrap: true,
         ),
+
+        // SECTION: under notifications
+        const SizedBoxh10(),
+        Text('A maximum of $maxNotifCount notifications shown. '
+            'Configure this in settings (WIP).')
       ],
     );
   }
 }
 
-class NotificationBox extends StatelessWidget {
+class NotificationCard extends StatelessWidget {
   final AppNotification notif;
 
-  const NotificationBox(this.notif, {super.key});
+  const NotificationCard(this.notif, {super.key});
 
   Widget getIconForType(BuildContext context, NotificationType type) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -150,6 +156,8 @@ class NotificationBox extends StatelessWidget {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    // doesn't show title string
+
     return InkWell(
       onTap: () {},
       child: Container(
@@ -158,18 +166,32 @@ class NotificationBox extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(5),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
             children: [
-              getIconForType(context, notif.type),
-              const SizedBox(
-                width: 10,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  getIconForType(context, notif.type),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                      child: Text(
+                    notif.body!,
+                    style: textStyles.bodyLarge,
+                  ))
+                ],
               ),
-              Expanded(
-                  child: Text(
-                notif.body!,
-                style: textStyles.bodyMedium,
-              ))
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    timeAgo(notif.notificationTime),
+                    style: textStyles.bodySmall!
+                        .copyWith(color: AppTheme.customColors.secondaryText),
+                  ),
+                ],
+              )
             ],
           )),
     );
