@@ -467,6 +467,36 @@ class NotificationService with ChangeNotifier {
     }
   }
 
+  /// Deletes the notification with the given integer `id` from the _notificationsShowList.
+  /// By default, updates notifications
+  /// in shared preferences.
+  ///
+  /// Doesn't delete empty (id=-1) notifications
+  Future<void> deleteSymptom({
+    required int id,
+    bool updateStorage = true,
+  }) async {
+    if (id < 0) {
+      AppLogger.d("[NOTIF] Will not delete empty notification");
+      return;
+    }
+
+    AppLogger.d("[NOTIF] Deleting notification with id $id");
+    try {
+      // remove from notification list
+      notificationList.removeWhere((notif) => notif.id == id);
+
+      // update shared prefs
+      if (updateStorage) {
+        await saveAllNotificationsToDevice();
+      }
+    } catch (e) {
+      AppLogger.e("[NOTIF] Error deleting notification", e);
+    }
+
+    notifyListeners();
+  }
+
   /// Deletes all notifications. By default, retains notifications that have not been notified
   /// and updates notifications in shared preferences.
   Future<void> deleteAllNotifications({
