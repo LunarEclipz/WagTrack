@@ -3,6 +3,10 @@ import 'dart:convert';
 import 'package:wagtrack/models/notification_enums.dart';
 import 'package:wagtrack/services/logging.dart';
 
+/// This is a class that wraps values used to represent a notification, that is
+/// a notification that needs to be shown at a certain time.
+///
+/// For recurring notifications see `AppRecurringNotification`
 class AppNotification {
   // id of notification
   final int id;

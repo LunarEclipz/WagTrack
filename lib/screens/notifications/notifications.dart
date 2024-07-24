@@ -9,6 +9,7 @@ import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
+import 'package:wagtrack/shared/utils.dart';
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});
@@ -99,22 +100,34 @@ Maximum of $maxNotifCount notifications shown.''',
         const SizedBoxh10(),
         ListView.separated(
           itemBuilder: (BuildContext context, int index) =>
-              NotificationBox(notificationList[index]),
+              NotificationCard(notificationList[index]),
           separatorBuilder: (BuildContext context, int index) =>
               const SizedBoxh10(),
           itemCount: notificationList.length,
           physics: const ClampingScrollPhysics(),
           shrinkWrap: true,
         ),
+
+        // SECTION: under notifications
+        const SizedBoxh10(),
+        Text('A maximum of $maxNotifCount notifications shown. '
+            'Configure this in settings (WIP).')
       ],
     );
   }
 }
 
-class NotificationBox extends StatelessWidget {
+class NotificationCard extends StatefulWidget {
   final AppNotification notif;
 
-  const NotificationBox(this.notif, {super.key});
+  const NotificationCard(this.notif, {super.key});
+
+  @override
+  State<NotificationCard> createState() => _NotificationCardState();
+}
+
+class _NotificationCardState extends State<NotificationCard> {
+  bool _isExpanded = false;
 
   Widget getIconForType(BuildContext context, NotificationType type) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -145,33 +158,126 @@ class NotificationBox extends StatelessWidget {
     }
   }
 
+  void _toggleExpansion() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    final AppNotification notif = widget.notif;
+
     return InkWell(
-      onTap: () {},
+      onTap: _toggleExpansion,
       child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: AnimatedCrossFade(
+          firstChild: Column(
             children: [
-              getIconForType(context, notif.type),
-              const SizedBox(
-                width: 10,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  getIconForType(context, notif.type),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notif.title ?? "",
+                          style: textStyles.bodyLarge,
+                        ),
+                        Text(
+                          notif.body ?? "",
+                          style: textStyles.bodyMedium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      ],
+                    ),
+                  )
+                ],
               ),
-              Expanded(
-                  child: Text(
-                notif.body!,
-                style: textStyles.bodyMedium,
-              ))
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    timeAgo(notif.notificationTime),
+                    style: textStyles.bodySmall!
+                        .copyWith(color: AppTheme.customColors.secondaryText),
+                  ),
+                ],
+              )
             ],
-          )),
+          ),
+          secondChild: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  getIconForType(context, notif.type),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notif.title ?? "",
+                          style: textStyles.bodyLarge,
+                        ),
+                        Text(
+                          notif.body ?? "",
+                          style: textStyles.bodyMedium,
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  AppIconButtonSmall(
+                    icon: Icon(
+                      Icons.delete_rounded,
+                      color: AppTheme.customColors.secondaryText,
+                    ),
+                    onPressed: () {
+                      setState(_toggleExpansion);
+                      context
+                          .read<NotificationService>()
+                          .deleteSymptom(id: notif.id);
+                    },
+                  ),
+                  Text(
+                    // timeAgo(notif.notificationTime),
+                    '${formatDateTime(notif.notificationTime).date} '
+                    '${formatDateTime(notif.notificationTime).time}',
+                    style: textStyles.bodySmall!
+                        .copyWith(color: AppTheme.customColors.secondaryText),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          crossFadeState: _isExpanded
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
+          duration: const Duration(milliseconds: 100),
+        ),
+      ),
     );
   }
 }

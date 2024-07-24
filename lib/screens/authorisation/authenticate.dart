@@ -6,6 +6,7 @@ import 'package:wagtrack/screens/authorisation/authorisation_frame.dart';
 import 'package:wagtrack/screens/misc_pages.dart';
 import 'package:wagtrack/screens/settings/onboarding.dart';
 import 'package:wagtrack/services/auth_service.dart';
+import 'package:wagtrack/services/notification_service.dart';
 
 class Authenticate extends StatefulWidget {
   const Authenticate({super.key});
@@ -55,6 +56,10 @@ class _AuthenticateState extends State<Authenticate> {
                     return const OnboardingScreen();
                   } else {
                     // Has onboarded:
+                    // get notification service to ask you for permissions
+                    context.read<NotificationService>().requestPermissions();
+
+                    // leads you to the main app
                     return const AppWrapper();
                   }
                 } else {
