@@ -32,7 +32,6 @@ class _ReportsState extends State<Reports> {
   LatLngBounds bounds = LatLngBounds(
       const LatLng(1.4571497742692037, 103.63295554087519),
       const LatLng(1.262197454651967, 104.01267050889712));
-  static final MapController _mapController = MapController();
   List<Polygon<HitValue>>? _polygons;
 
   @override
@@ -75,11 +74,13 @@ class _ReportsState extends State<Reports> {
           child: Card(
             color: Colors.white,
             child: FlutterMap(
-              mapController: _mapController,
               options: MapOptions(
                   cameraConstraint:
                       CameraConstraint.containCenter(bounds: bounds),
                   backgroundColor: Colors.transparent,
+                  initialCenter:
+                      const LatLng(1.365759871533472, 103.8133714773305),
+                  initialZoom: 10,
                   maxZoom: 12,
                   minZoom: 10),
               children: [
@@ -104,7 +105,7 @@ class _ReportsState extends State<Reports> {
             ),
           ),
         ),
-        const SizedBoxh20(),
+        // const SizedBoxh10(),
         NewsCard(
             displayOrgURL: displayOrgURL,
             displayTitle: displayTitle,
@@ -220,9 +221,6 @@ class _ReportsState extends State<Reports> {
   }
 
   setMap() {
-    _mapController.fitCamera(
-      CameraFit.bounds(bounds: bounds),
-    );
     // LatLngBounds("north": 1.5819304717578229, "south": 1.0520882648978884, "east": , "west": 103.57949874688475);
     List<Polygon<HitValue>> polygonList = [];
     for (int i = 0; i < sgGeo["features"].length; i++) {
