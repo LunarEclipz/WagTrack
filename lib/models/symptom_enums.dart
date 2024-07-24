@@ -1,48 +1,36 @@
-enum NotificationType implements Comparable<NotificationType> {
-  socialComment("socialComment", 70),
-  socialLike("socialLike", 71),
-  medication("medication", 30),
-  medicalGreen("medicalGreen", 10),
-  medicalYellow("medicalYellow", 12),
-  medicalOrange("medicalOrange", 14),
-  medicalRed("medicalRed", 18),
-  debug("debug", 1),
-  noType("noType", 0);
+enum SymptomLevel implements Comparable<SymptomLevel> {
+  red("Red", "True Emergency", 100),
+  orange("Orange", "Urgent", 80),
+  yellow("Yellow", "Semi-Urgent", 60),
+  green("Green", "Non-Urgent", 20);
 
-  /// String representation of this `NotificationType`
+  /// String representation of this `SymptomLevel`
   final String string;
 
-  /// Arbitrary integer used to represent each type, used for sorting.
-  final int num;
+  /// More descriptive decription of the symptom level
+  final String desc;
 
-  const NotificationType(this.string, this.num);
+  /// Arbitrary integer used to represent each type, used for sorting.
+  final int val;
+
+  const SymptomLevel(this.string, this.desc, this.val);
 
   /// Creates `NotificationType` from given string, defaults to `noType`
-  static NotificationType fromString(String string) {
+  static SymptomLevel fromString(String string) {
     switch (string) {
-      case "socialComment":
-        return socialComment;
-      case "socialLike":
-        return socialLike;
-      case "medicalClear" || "medicalGreen":
-        // medicalClear is deprecated
-        return medicalGreen;
-      case "medicalYellow":
-        return medicalYellow;
-      case "medicalOrange":
-        return medicalOrange;
-      case "medicalAlert" || "medicalRed":
-        // medicalAlert is deprecated
-        return medicalRed;
-      case "medication":
-        return medication;
-      case "debug":
-        return debug;
+      case "Red":
+        return red;
+      case "Orange":
+        return orange;
+      case "Yellow":
+        return yellow;
+      case "Green":
+        return green;
       default:
-        return noType;
+        return green;
     }
   }
 
   @override
-  int compareTo(NotificationType other) => num - other.num;
+  int compareTo(SymptomLevel other) => val - other.val;
 }

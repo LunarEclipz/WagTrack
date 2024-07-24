@@ -30,13 +30,22 @@ final List<Map<String, dynamic>> petSymptoms = [
         'name': 'Loss of appetite',
         'description': 'Refusal to eat or eat significantly less than usual.'
       },
-      {'name': 'Fever', 'description': 'Higher than normal body temperature.'},
+      {
+        'name': 'Fever',
+        'description': 'Higher than normal body temperature.',
+      },
       {
         'name': 'Weight loss or gain',
         'description': 'Unexplained changes in weight.'
       },
-      {'name': 'Vomiting', 'description': 'Forcing out stomach contents.'},
-      {'name': 'Diarrhoea', 'description': 'Loose or watery stools.'},
+      {
+        'name': 'Vomiting',
+        'description': 'Forcing out stomach contents.',
+      },
+      {
+        'name': 'Diarrhoea',
+        'description': 'Loose or watery stools.',
+      },
       {
         'name': 'Difficulty breathing',
         'description': 'Laboured or rapid breathing.'
@@ -109,12 +118,18 @@ final List<Map<String, dynamic>> petSymptoms = [
   {
     'category': 'Digestive System',
     'symptoms': [
-      {'name': 'Vomiting blood', 'description': 'Red or bloody vomit.'},
+      {
+        'name': 'Vomiting blood',
+        'description': 'Red or bloody vomit.',
+      },
       {
         'name': 'Diarrhoea with blood or mucus',
         'description': 'Presence of blood or mucus in stool.'
       },
-      {'name': 'Constipation', 'description': 'Difficulty passing stool.'},
+      {
+        'name': 'Constipation',
+        'description': 'Difficulty passing stool.',
+      },
       {
         'name': 'Abdominal pain',
         'description': 'Signs of discomfort when touched in the belly area.'
@@ -132,7 +147,10 @@ final List<Map<String, dynamic>> petSymptoms = [
         'name': 'Urinary accidents',
         'description': 'Inability to control urination.'
       },
-      {'name': 'Blood in the urine', 'description': 'Reddish tint to urine.'},
+      {
+        'name': 'Blood in the urine',
+        'description': 'Reddish tint to urine.',
+      },
     ],
   },
   {
