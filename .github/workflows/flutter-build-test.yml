@@ -18,6 +18,12 @@ jobs:
     
     - uses: actions/checkout@v4
     
+    # Setup Java
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+    
     # Setup the flutter environment.
     - uses: subosito/flutter-action@v2
       with:

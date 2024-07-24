@@ -17,10 +17,12 @@ jobs:
     steps:
     
     - uses: actions/checkout@v4
-    # Setup Java environment in order to build the Android app.
-    # - uses: actions/setup-java@v1
-    #   with:
-    #     java-version: '12.x'
+    
+    # Setup Java
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
     
     # Setup the flutter environment.
     - uses: subosito/flutter-action@v2
