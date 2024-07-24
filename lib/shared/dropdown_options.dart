@@ -24,30 +24,75 @@ final List<Map<String, dynamic>> petSymptoms = [
     'symptoms': [
       {
         'name': 'Lethargy',
-        'description': 'Decreased energy or activity level.'
+        'description': 'Decreased energy or activity level.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Loss of appetite',
-        'description': 'Refusal to eat or eat significantly less than usual.'
+        'description': 'Refusal to eat or eat significantly less than usual.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
-      {'name': 'Fever', 'description': 'Higher than normal body temperature.'},
+      {
+        'name': 'Fever',
+        'description': 'Higher than normal body temperature.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
+      },
       {
         'name': 'Weight loss or gain',
-        'description': 'Unexplained changes in weight.'
+        'description': 'Unexplained changes in weight.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
-      {'name': 'Vomiting', 'description': 'Forcing out stomach contents.'},
-      {'name': 'Diarrhoea', 'description': 'Loose or watery stools.'},
+      {
+        'name': 'Vomiting',
+        'description': 'Forcing out stomach contents.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
+      },
+      {
+        'name': 'Diarrhoea',
+        'description': 'Loose or watery stools.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
+      },
       {
         'name': 'Difficulty breathing',
-        'description': 'Laboured or rapid breathing.'
+        'description': 'Laboured or rapid breathing.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Excessive thirst or urination',
-        'description': 'Drinking or urinating more than usual.'
+        'description': 'Drinking or urinating more than usual.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Behavioural changes',
-        'description': 'Unusual aggression, anxiety, hiding, or vocalisation.'
+        'description': 'Unusual aggression, anxiety, hiding, or vocalisation.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
     ],
   },
@@ -56,19 +101,35 @@ final List<Map<String, dynamic>> petSymptoms = [
     'symptoms': [
       {
         'name': 'Itching',
-        'description': 'Excessive scratching, licking, or biting at the skin.'
+        'description': 'Excessive scratching, licking, or biting at the skin.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Hair loss',
-        'description': 'Patchy bald spots or overall thinning fur.'
+        'description': 'Patchy bald spots or overall thinning fur.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Redness, swelling, or irritation',
-        'description': 'Inflammation on the skin\'s surface.'
+        'description': 'Inflammation on the skin\'s surface.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Rashes or bumps',
-        'description': 'Skin abnormalities like pimples or scabs.'
+        'description': 'Skin abnormalities like pimples or scabs.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
     ],
   },
@@ -77,15 +138,27 @@ final List<Map<String, dynamic>> petSymptoms = [
     'symptoms': [
       {
         'name': 'Squinting or redness',
-        'description': 'Discomfort or irritation in the eyes.'
+        'description': 'Discomfort or irritation in the eyes.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Discharge',
-        'description': 'Pus or watery drainage from the eyes.'
+        'description': 'Pus or watery drainage from the eyes.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Cloudy eyes',
-        'description': 'Loss of transparency in the lens.'
+        'description': 'Loss of transparency in the lens.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
     ],
   },
@@ -94,30 +167,64 @@ final List<Map<String, dynamic>> petSymptoms = [
     'symptoms': [
       {
         'name': 'Head shaking or tilting',
-        'description': 'Signs of discomfort or pain in the ear.'
+        'description': 'Signs of discomfort or pain in the ear.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Redness, swelling, or discharge',
-        'description': 'Inflammation or infection in the ear canal.'
+        'description': 'Inflammation or infection in the ear canal.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Bad odour',
-        'description': 'Unpleasant smell coming from the ears.'
+        'description': 'Unpleasant smell coming from the ears.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
     ],
   },
   {
     'category': 'Digestive System',
     'symptoms': [
-      {'name': 'Vomiting blood', 'description': 'Red or bloody vomit.'},
+      {
+        'name': 'Vomiting blood',
+        'description': 'red or bloody vomit.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
+      },
       {
         'name': 'Diarrhoea with blood or mucus',
-        'description': 'Presence of blood or mucus in stool.'
+        'description': 'Presence of blood or mucus in stool.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
-      {'name': 'Constipation', 'description': 'Difficulty passing stool.'},
+      {
+        'name': 'Constipation',
+        'description': 'Difficulty passing stool.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
+      },
       {
         'name': 'Abdominal pain',
-        'description': 'Signs of discomfort when touched in the belly area.'
+        'description': 'Signs of discomfort when touched in the belly area.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
     ],
   },
@@ -126,13 +233,28 @@ final List<Map<String, dynamic>> petSymptoms = [
     'symptoms': [
       {
         'name': 'Straining to urinate',
-        'description': 'Difficulty passing urine.'
+        'description': 'Difficulty passing urine.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Urinary accidents',
-        'description': 'Inability to control urination.'
+        'description': 'Inability to control urination.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
-      {'name': 'Blood in the urine', 'description': 'Reddish tint to urine.'},
+      {
+        'name': 'Blood in the urine',
+        'description': 'Reddish tint to urine.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
+      },
     ],
   },
   {
@@ -140,15 +262,27 @@ final List<Map<String, dynamic>> petSymptoms = [
     'symptoms': [
       {
         'name': 'Limping or lameness',
-        'description': 'Difficulty walking or putting weight on a leg.'
+        'description': 'Difficulty walking or putting weight on a leg.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Swelling or stiffness',
-        'description': 'Inflammation or pain in joints or muscles.'
+        'description': 'Inflammation or pain in joints or muscles.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Difficulty getting up or down',
-        'description': 'Struggling with basic movements.'
+        'description': 'Struggling with basic movements.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
     ],
   },
@@ -157,16 +291,35 @@ final List<Map<String, dynamic>> petSymptoms = [
     'symptoms': [
       {
         'name': 'Seizures',
-        'description': 'Uncontrolled shaking or jerking movements.'
+        'description': 'Uncontrolled shaking or jerking movements.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
-      {'name': 'Head tremors', 'description': 'Shaking of the head.'},
+      {
+        'name': 'Head tremors',
+        'description': 'Shaking of the head.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
+      },
       {
         'name': 'Disorientation or confusion',
-        'description': 'Seeming lost or unaware of surroundings.'
+        'description': 'Seeming lost or unaware of surroundings.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
       {
         'name': 'Walking in circles',
-        'description': 'Repetitive circling behaviour.'
+        'description': 'Repetitive circling behaviour.',
+        'red': 7,
+        'orange': 5,
+        'yellow': 3,
+        'green': 0,
       },
     ],
   },
