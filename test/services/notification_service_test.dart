@@ -4,8 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart';
+import 'package:wagtrack/models/notification_enums.dart';
 import 'package:wagtrack/models/notification_model.dart';
-import 'package:wagtrack/models/notification_params.dart';
 import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/services/notification_service.dart';
 

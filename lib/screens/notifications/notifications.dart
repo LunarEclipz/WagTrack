@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wagtrack/models/notification_enums.dart';
 import 'package:wagtrack/models/notification_model.dart';
-import 'package:wagtrack/models/notification_params.dart';
 import 'package:wagtrack/services/notification_service.dart';
 import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';

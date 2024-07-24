@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:wagtrack/models/notification_params.dart';
+import 'package:wagtrack/models/notification_enums.dart';
 import 'package:wagtrack/services/logging.dart';
 
 class AppNotification {

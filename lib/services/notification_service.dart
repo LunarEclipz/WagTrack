@@ -3,8 +3,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:wagtrack/models/notification_enums.dart';
 import 'package:wagtrack/models/notification_model.dart';
-import 'package:wagtrack/models/notification_params.dart';
 import 'package:wagtrack/services/logging.dart';
 
 /// Modes to sort notifications by.
