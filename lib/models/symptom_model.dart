@@ -1,4 +1,5 @@
 import 'package:wagtrack/models/pet_model.dart';
+import 'package:wagtrack/models/symptom_enums.dart';
 
 class PetSymptomModel {
   late Pet pet;
@@ -42,6 +43,9 @@ class Symptom {
   /// medication mNames
   List<String> mName;
 
+  /// Level of symptom. set in the constructor or when the symptom is modified.
+  late SymptomLevel level;
+
   Symptom(
       {required this.category,
       required this.symptom,
@@ -56,7 +60,10 @@ class Symptom {
       List<String>? mName,
       required this.hasEnd})
       : mid = mid ?? [],
-        mName = mName ?? [];
+        mName = mName ?? [] {
+    // now set up the symptom level
+    level = classifySymptom(name: symptom, severity: severity);
+  }
 
 // Converts Object to JSON for uploading into Firebase
   Map<String, dynamic> toJSON() {
@@ -94,4 +101,14 @@ class Symptom {
           (json['mName'] as List).cast<String>(), // Convert tags to String list
     );
   }
+}
+
+/// Symptom classifier that takes in the symptom `name` and `severity`
+/// and classifies it based on the triage
+/// https://www.fourpawspetvet.com/sites/site-7145/images/main.jpg
+/// But not actually lmao lmao lmao :P
+///
+/// returns a symptomLevel
+SymptomLevel classifySymptom({required String name, required int severity}) {
+  return SymptomLevel.green;
 }
