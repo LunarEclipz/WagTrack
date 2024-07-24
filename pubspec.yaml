@@ -35,6 +35,7 @@ dependencies:
   flutter_map: ^7.0.2
   url_launcher: ^6.3.0
   latlong2: ^0.9.1
+  flutter_timezone: ^2.1.0
 
 # Config for Flutter launcher icons
 flutter_launcher_icons:
