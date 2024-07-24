@@ -3,15 +3,21 @@ import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/services/logging.dart';
+import 'package:wagtrack/services/notification_service.dart';
 
 /// Communication to Firebase for Symptom-related data.
 class SymptomService with ChangeNotifier {
+  final NotificationService _notificationService;
+
   // Instance of Firebase Firestore for interacting with the database
   static final FirebaseFirestore _db = GetIt.I<FirebaseFirestore>();
   static final _firestoreSymptomCollection = _db.collection("symptoms");
 
   // Reference to Firebase Storage for potential future storage needs
   // static final Reference _storageRef = GetIt.I<FirebaseStorage>().ref();
+
+  /// Constructor for `SymptomService`
+  SymptomService(this._notificationService);
 
   List<Symptom> _currentSymptoms = [];
   List<Symptom> _pastSymptoms = [];
