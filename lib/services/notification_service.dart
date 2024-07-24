@@ -486,6 +486,9 @@ class NotificationService with ChangeNotifier {
       // remove from notification list
       notificationList.removeWhere((notif) => notif.id == id);
 
+      // remove from flutter local notifs
+      _flutterLocalNotificationsPlugin.cancel(id);
+
       // update shared prefs
       if (updateStorage) {
         await saveAllNotificationsToDevice();

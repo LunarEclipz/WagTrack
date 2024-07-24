@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/notification_enums.dart';
@@ -66,13 +67,37 @@ class _NotificationsState extends State<Notifications> {
           style: textStyles.headlineMedium,
         ),
         const SizedBoxh10(),
-        Text(
-          '''Placeholder page. All notifications will be placeholders. 
-Maximum of $maxNotifCount notifications shown.''',
-          style: textStyles.bodySmall,
-        ),
 
         // SECTION: BUTTONS
+        _showDebugButtons(),
+
+        // SECTION: notifications
+        const SizedBoxh10(),
+        ListView.separated(
+          itemBuilder: (BuildContext context, int index) =>
+              NotificationCard(notificationList[index]),
+          separatorBuilder: (BuildContext context, int index) =>
+              const SizedBoxh10(),
+          itemCount: notificationList.length,
+          physics: const ClampingScrollPhysics(),
+          shrinkWrap: true,
+        ),
+
+        // SECTION: under notifications
+        const SizedBoxh10(),
+        Text('A maximum of $maxNotifCount notifications shown. '
+            'Configure this in settings (WIP).')
+      ],
+    );
+  }
+
+  Widget _showDebugButtons() {
+    if (kReleaseMode) {
+      return Container();
+    }
+
+    return Column(
+      children: [
         const SizedBoxh10(),
         Row(
           children: [
@@ -95,23 +120,6 @@ Maximum of $maxNotifCount notifications shown.''',
             ),
           ],
         ),
-
-        // SECTION: notifications
-        const SizedBoxh10(),
-        ListView.separated(
-          itemBuilder: (BuildContext context, int index) =>
-              NotificationCard(notificationList[index]),
-          separatorBuilder: (BuildContext context, int index) =>
-              const SizedBoxh10(),
-          itemCount: notificationList.length,
-          physics: const ClampingScrollPhysics(),
-          shrinkWrap: true,
-        ),
-
-        // SECTION: under notifications
-        const SizedBoxh10(),
-        Text('A maximum of $maxNotifCount notifications shown. '
-            'Configure this in settings (WIP).')
       ],
     );
   }
