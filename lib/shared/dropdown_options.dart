@@ -1,13 +1,10 @@
 // For Milestone 1, our location will be the following 5. In future, we
 // may transit to using postal codes.
 
-List<String> locationList = <String>[
-  "North",
-  "North East",
-  "South",
-  "West",
-  "Central"
-];
+import 'package:wagtrack/shared/sg_mrt.dart';
+
+List<String> locationList =
+    sgMrt.map((obg) => obg["Station Name"] as String).toList();
 
 List<String> sexList = <String>[
   "Female",

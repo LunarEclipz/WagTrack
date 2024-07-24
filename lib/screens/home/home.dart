@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/post_model.dart';
+import 'package:wagtrack/screens/home/pet_resources.dart';
 import 'package:wagtrack/screens/pet_details/pet_details_wrapper.dart';
 import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/services/post_service.dart';
@@ -86,7 +87,29 @@ class _HomeState extends State<Home> {
         title: "Pet Care Resources",
         text: "Pet Care Resources at Your Fingertips! Click to learn more ...",
         color: AppTheme.customColors.pastelBlue,
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                const begin = Offset(1.0, 0.0);
+                const end = Offset.zero;
+                const curve = Curves.ease;
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+
+                return SlideTransition(
+                  position: animation.drive(tween),
+                  child: child,
+                );
+              },
+              transitionDuration:
+                  const Duration(milliseconds: 300), // Adjust the duration here
+              pageBuilder: (context, a, b) => const PetCareResourcesPage(),
+            ),
+          );
+        },
       ),
       const SizedBoxh20(),
       Text(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wagtrack/models/report_model.dart';
+import 'package:wagtrack/screens/reports/news_card.dart';
 import 'package:wagtrack/screens/reports/reports.dart';
 import 'package:wagtrack/shared/background_img.dart';
 import 'package:wagtrack/shared/utils.dart';

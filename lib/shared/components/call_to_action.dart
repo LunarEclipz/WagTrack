@@ -21,7 +21,7 @@ class CallToActionButton extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        onTap;
+        onTap();
       },
       child: Card(
         color: color,

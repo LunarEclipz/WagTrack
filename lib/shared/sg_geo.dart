@@ -58,7 +58,7 @@ Map<String, dynamic> sgGeo = {
       "properties": {
         "source": "https://simplemaps.com",
         "id": "SG05",
-        "name": "South West"
+        "name": "West"
       },
       "id": 1
     },
@@ -115,7 +115,7 @@ Map<String, dynamic> sgGeo = {
       "properties": {
         "source": "https://simplemaps.com",
         "id": "SG01",
-        "name": "Central Singapore"
+        "name": "Central"
       },
       "id": 2
     },
@@ -162,7 +162,7 @@ Map<String, dynamic> sgGeo = {
       "properties": {
         "source": "https://simplemaps.com",
         "id": "SG04",
-        "name": "South East"
+        "name": "East"
       },
       "id": 3
     },
@@ -249,7 +249,7 @@ Map<String, dynamic> sgGeo = {
       "properties": {
         "source": "https://simplemaps.com",
         "id": "SG03",
-        "name": "North West"
+        "name": "North"
       },
       "id": 5
     }

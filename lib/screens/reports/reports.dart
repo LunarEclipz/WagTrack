@@ -3,11 +3,13 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wagtrack/models/report_model.dart';
+import 'package:wagtrack/screens/reports/news_card.dart';
 import 'package:wagtrack/screens/reports/report_news.dart';
 import 'package:wagtrack/services/news_service.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/sg_geo.dart';
+import 'package:wagtrack/shared/sg_mrt.dart';
 import 'package:wagtrack/shared/utils.dart';
 
 typedef HitValue = ({String title, String subtitle});
@@ -33,6 +35,7 @@ class _ReportsState extends State<Reports> {
       const LatLng(1.4571497742692037, 103.63295554087519),
       const LatLng(1.262197454651967, 104.01267050889712));
   List<Polygon<HitValue>>? _polygons;
+  late List<Marker> customMarkers = [];
 
   @override
   void initState() {
@@ -70,7 +73,7 @@ class _ReportsState extends State<Reports> {
         const SizedBoxh10(),
         SizedBox(
           width: MediaQuery.of(context).size.width,
-          height: 200,
+          height: 300,
           child: Card(
             color: Colors.white,
             child: FlutterMap(
@@ -81,7 +84,7 @@ class _ReportsState extends State<Reports> {
                   initialCenter:
                       const LatLng(1.365759871533472, 103.8133714773305),
                   initialZoom: 10,
-                  maxZoom: 12,
+                  maxZoom: 14,
                   minZoom: 10),
               children: [
                 TapRegion(
@@ -101,6 +104,8 @@ class _ReportsState extends State<Reports> {
                     ),
                   ),
                 ),
+                if (customMarkers.isNotEmpty)
+                  MarkerLayer(markers: customMarkers)
               ],
             ),
           ),
@@ -221,7 +226,28 @@ class _ReportsState extends State<Reports> {
   }
 
   setMap() {
-    // LatLngBounds("north": 1.5819304717578229, "south": 1.0520882648978884, "east": , "west": 103.57949874688475);
+    // Set Markers
+    List<Marker> tempMarkers = [];
+    for (int i = 0; i < sgMrt.length; i++) {
+      tempMarkers.add(Marker(
+        point: LatLng(sgMrt[i]["Lat"], sgMrt[i]["Lng"]),
+        child: GestureDetector(
+            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Tapped ${sgMrt[i]["Station Name"]}'),
+                    duration: const Duration(seconds: 1),
+                    showCloseIcon: true,
+                  ),
+                ),
+            child:
+                CircleAvatar(backgroundColor: Colors.amber.withOpacity(0.1))),
+      ));
+    }
+    setState(() {
+      customMarkers = tempMarkers;
+    });
+
+    // Set Map
     List<Polygon<HitValue>> polygonList = [];
     for (int i = 0; i < sgGeo["features"].length; i++) {
       var objectICoords = sgGeo["features"][i]["geometry"]["coordinates"];
@@ -248,124 +274,5 @@ class _ReportsState extends State<Reports> {
     setState(() {
       _polygons = polygonList;
     });
-  }
-}
-
-class NewsCard extends StatefulWidget {
-  final String displayTitle;
-  final String displayOrgURL;
-
-  final String displayCaption;
-  final String displayDate;
-  final String displayURL;
-  const NewsCard({
-    super.key,
-    required this.displayTitle,
-    required this.displayOrgURL,
-    required this.displayCaption,
-    required this.displayDate,
-    required this.displayURL,
-  });
-
-  @override
-  State<NewsCard> createState() => _NewsCardState();
-}
-
-class _NewsCardState extends State<NewsCard> {
-  bool _isExpanded = false;
-
-  void _toggleExpansion() {
-    setState(() {
-      _isExpanded = !_isExpanded;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final TextTheme textStyles = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    return InkWell(
-      onTap: _toggleExpansion,
-      child: Card(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Image.network(
-                    'https://www.nparks.gov.sg/-/media/avs/images/homepage/logo.jpg?h=708&w=1261&la=en',
-                    height: 50,
-                  ),
-                  Text(
-                    widget.displayDate,
-                    style: textStyles.bodySmall!
-                        .copyWith(fontStyle: FontStyle.italic),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Flexible(
-                    flex: 20,
-                    child: Text(
-                      widget.displayTitle,
-                      style: textStyles.bodyLarge,
-                    ),
-                  ),
-                  Flexible(
-                    flex: 1,
-                    child: _isExpanded
-                        ? const Icon(Icons.expand_less)
-                        : const Icon(Icons.expand_more),
-                  ),
-                ],
-              ),
-              AnimatedCrossFade(
-                firstChild: const SizedBox.shrink(),
-                secondChild: Column(
-                  children: [
-                    const SizedBoxh10(),
-                    Text(widget.displayCaption, style: textStyles.bodyMedium!),
-                    const SizedBoxh10(),
-                    InkWell(
-                      onTap: () async {
-                        final Uri url = Uri.parse(widget.displayURL);
-                        if (!await launchUrl(url)) {
-                          throw Exception('Could not launch $url');
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.link,
-                            color: colorScheme.primary,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text("Read more ...",
-                              style: textStyles.bodySmall!
-                                  .copyWith(color: colorScheme.primary)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                crossFadeState: _isExpanded
-                    ? CrossFadeState.showSecond
-                    : CrossFadeState.showFirst,
-                duration: const Duration(milliseconds: 200),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }
