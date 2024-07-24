@@ -9,6 +9,7 @@ import 'package:wagtrack/screens/pet_details/pet_details.dart';
 import 'package:wagtrack/screens/posts/add_post_page.dart';
 import 'package:wagtrack/screens/posts/pet_posts_page.dart';
 import 'package:wagtrack/screens/symptoms/add_symptoms.dart';
+import 'package:wagtrack/screens/symptoms/help_symptoms.dart';
 import 'package:wagtrack/screens/symptoms/symptoms.dart';
 import 'package:wagtrack/shared/background_img.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -97,7 +98,7 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
                     },
                     transitionDuration: const Duration(
                         milliseconds: 300), // Adjust the duration here
-                    pageBuilder: (context, a, b) => const WorkInProgressPage(),
+                    pageBuilder: (context, a, b) => const HelpSymptoms(),
                   ),
                 );
               },
