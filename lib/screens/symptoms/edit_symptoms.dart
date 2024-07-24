@@ -520,7 +520,7 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
                         endDate: now,
                       );
 
-                      symptomService.addSymptoms(
+                      symptomService.addSymptom(
                         formData: Symptom(
                           petID: widget.symptomData.petID,
                           // Add symptom can only be accessed through PetID

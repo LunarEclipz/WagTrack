@@ -26,7 +26,7 @@ class SymptomService with ChangeNotifier {
   List<Symptom> get pastSymptoms => _pastSymptoms;
 
   /// Adds a new symptom document to the "symptoms" collection in Firestore
-  void addSymptoms({required Symptom formData}) {
+  void addSymptom({required Symptom formData}) {
     _firestoreSymptomCollection
         .add(formData.toJSON())
         .then((docRef) => formData.oid = docRef.id);
