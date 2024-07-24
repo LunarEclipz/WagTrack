@@ -132,6 +132,8 @@ class _SymptomsCardState extends State<SymptomsCard> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text('DEBUG: ${widget.symptom.level.name}, '
+                        '${widget.symptom.level.desc}'),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

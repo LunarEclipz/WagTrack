@@ -1,5 +1,6 @@
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/symptom_enums.dart';
+import 'package:wagtrack/shared/dropdown_options.dart';
 
 class PetSymptomModel {
   late Pet pet;
@@ -110,5 +111,37 @@ class Symptom {
 ///
 /// returns a symptomLevel
 SymptomLevel classifySymptom({required String name, required int severity}) {
+  if (petSymptoms.isEmpty) {
+    return SymptomLevel.green; // Handle empty petSymptoms list
+  }
+
+  for (var category in petSymptoms) {
+    final Map<String, dynamic> matchingSymptom =
+        category['symptoms'].firstWhere((symptom) => symptom['name'] == name,
+            orElse: () => {
+                  'name': '',
+                  'description': '',
+                  // 'red': 7,
+                  // 'orange': 5,
+                  // 'yellow': 3,
+                  // 'green': 0,
+                }); // Return empty map if none found
+
+    if (matchingSymptom.containsKey('red') &&
+        matchingSymptom.containsKey('orange') &&
+        matchingSymptom.containsKey('yellow') &&
+        matchingSymptom.containsKey('green')) {
+      if (severity >= matchingSymptom['red']) {
+        return SymptomLevel.red;
+      } else if (severity >= matchingSymptom['orange']) {
+        return SymptomLevel.orange;
+      } else if (severity >= matchingSymptom['orange']) {
+        return SymptomLevel.yellow;
+      } else {
+        return SymptomLevel.green;
+      }
+    }
+  }
+
   return SymptomLevel.green;
 }

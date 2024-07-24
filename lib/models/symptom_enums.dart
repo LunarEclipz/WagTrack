@@ -1,5 +1,5 @@
 enum SymptomLevel implements Comparable<SymptomLevel> {
-  red("Red", "True Emergency", 100),
+  red("Red", "Emergency", 100),
   orange("Orange", "Urgent", 80),
   yellow("Yellow", "Semi-Urgent", 60),
   green("Green", "Non-Urgent", 20);

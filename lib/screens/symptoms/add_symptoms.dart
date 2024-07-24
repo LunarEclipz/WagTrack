@@ -165,7 +165,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          "Started On",
+                                          "Set Start",
                                           style: textStyles.bodyLarge!.copyWith(
                                               color: colorScheme.primary),
                                         ),
@@ -433,6 +433,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                             startDate: startDateTime,
                             severity: _currentSeveritySliderValue.toInt(),
                             tags: tags,
+                            // end date is not set - ongoing
                             hasEnd: isEndDateSet,
                           )
                         : Symptom(
@@ -444,6 +445,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                             startDate: startDateTime,
                             severity: _currentSeveritySliderValue.toInt(),
                             tags: tags,
+                            // end date is set
                             hasEnd: isEndDateSet,
                             endDate: endDateTime);
                     symptomService.addSymptoms(formData: formData);
