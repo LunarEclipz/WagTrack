@@ -59,6 +59,9 @@ class _AuthenticateState extends State<Authenticate> {
                     // get notification service to ask you for permissions
                     context.read<NotificationService>().requestPermissions();
 
+                    // load notifs as well (notifs get wiped otherwise)
+                    context.read<NotificationService>().loadNotifications();
+
                     // leads you to the main app
                     return const AppWrapper();
                   }
