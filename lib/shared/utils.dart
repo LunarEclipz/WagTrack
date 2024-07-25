@@ -54,6 +54,8 @@ String timeAgo(DateTime dateTime) {
 
 /// Converts a given `Duration` into a string of the form
 /// _ day(s) _ hour(s) _ minute(s) _ second(s)
+///
+/// 0 counts are not included.
 String formatDuration(Duration duration) {
   int days = duration.inDays;
   int hours = duration.inHours.remainder(24);
