@@ -158,3 +158,14 @@ class AppTheme {
     pastelBlue: const Color(0xFF7E99DD),
   );
 }
+
+/// Misc Colors
+///
+/// Just putting it here cuz I'm too lazy to put anywhere else
+class SeverityColors {
+  static const Color red = Color(0xFFB01713);
+  static const Color orange = Color.fromARGB(255, 245, 98, 0);
+  static const Color yellow = Colors.amber;
+  // static const Color green = Color(0xFF3FA856);
+  static const Color green = Color.fromARGB(255, 39, 110, 41);
+}

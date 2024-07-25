@@ -6,6 +6,7 @@ import 'package:wagtrack/screens/symptoms/edit_symptoms.dart';
 import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/dialogs.dart';
+import 'package:wagtrack/shared/components/severity_icon.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/themes.dart';
@@ -153,14 +154,9 @@ class _SymptomsCardState extends State<SymptomsCard> {
                               );
                             }),
                           ),
-                        CircleAvatar(
-                          radius: 15,
-                          backgroundColor: colorScheme.primary,
-                          child: Text(
-                            symptom.severity.toString(),
-                            style: textStyles.bodyLarge!
-                                .copyWith(color: Colors.white),
-                          ),
+                        SeverityIcon(
+                          level: symptom.level,
+                          val: symptom.severity,
                         ),
                       ],
                     ),
