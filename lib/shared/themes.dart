@@ -163,8 +163,9 @@ class AppTheme {
 ///
 /// Just putting it here cuz I'm too lazy to put anywhere else
 class SeverityColors {
-  static const Color red = Color(0xFF7B0300);
-  static final Color orange = Colors.orange[700]!;
-  static final Color yellow = Colors.yellow[600]!;
-  static const Color green = Color(0xFF3FA856);
+  static const Color red = Color(0xFFB01713);
+  static const Color orange = Color.fromARGB(255, 245, 98, 0);
+  static const Color yellow = Colors.amber;
+  // static const Color green = Color(0xFF3FA856);
+  static const Color green = Color.fromARGB(255, 39, 110, 41);
 }

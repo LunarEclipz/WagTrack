@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wagtrack/shared/background_img.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
+import 'package:wagtrack/shared/themes.dart';
 
 class HelpSymptoms extends StatefulWidget {
   const HelpSymptoms({super.key});
@@ -14,6 +15,11 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    const Color colorRed = SeverityColors.red;
+    const Color colorOrange = SeverityColors.orange;
+    const Color colorYellow = SeverityColors.yellow;
+    const Color colorGreen = SeverityColors.green;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -58,10 +64,10 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
               ),
               const SizedBoxh10(),
               Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
                   side: BorderSide(
-                    color: colorScheme.primary,
+                    color: colorRed,
                     width: 2.0,
                   ),
                 ),
@@ -75,9 +81,9 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
                       children: [
                         Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.warning,
-                              color: colorScheme.primary,
+                              color: colorRed,
                             ),
                             const SizedBox(
                               width: 20,
@@ -85,8 +91,7 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
                             Text(
                               "True Emergency",
                               style: textStyles.headlineSmall!.copyWith(
-                                  color: colorScheme.primary,
-                                  fontWeight: FontWeight.bold),
+                                  color: colorRed, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -103,7 +108,7 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0)),
                   side: BorderSide(
-                    color: Colors.orange,
+                    color: colorOrange,
                     width: 2.0,
                   ),
                 ),
@@ -117,14 +122,14 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.warning, color: Colors.orange),
+                            const Icon(Icons.warning, color: colorOrange),
                             const SizedBox(
                               width: 20,
                             ),
                             Text(
                               "Urgent",
                               style: textStyles.headlineSmall!.copyWith(
-                                  color: Colors.orange,
+                                  color: colorOrange,
                                   fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -142,7 +147,7 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0)),
                   side: BorderSide(
-                    color: Colors.amber,
+                    color: colorYellow,
                     width: 2.0,
                   ),
                 ),
@@ -158,7 +163,7 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
                           children: [
                             const Icon(
                               Icons.warning,
-                              color: Colors.amber,
+                              color: colorYellow,
                             ),
                             const SizedBox(
                               width: 20,
@@ -166,7 +171,7 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
                             Text(
                               "Semi-Urgent",
                               style: textStyles.headlineSmall!.copyWith(
-                                  color: Colors.amber,
+                                  color: colorYellow,
                                   fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -184,7 +189,7 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0)),
                   side: BorderSide(
-                    color: Color.fromARGB(255, 39, 110, 41),
+                    color: colorGreen,
                     width: 2.0,
                   ),
                 ),
@@ -200,7 +205,7 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
                           children: [
                             const Icon(
                               Icons.warning,
-                              color: Color.fromARGB(255, 39, 110, 41),
+                              color: colorGreen,
                             ),
                             const SizedBox(
                               width: 20,
@@ -208,7 +213,7 @@ class _HelpSymptomsState extends State<HelpSymptoms> {
                             Text(
                               "Standard",
                               style: textStyles.headlineSmall!.copyWith(
-                                  color: const Color.fromARGB(255, 39, 110, 41),
+                                  color: colorGreen,
                                   fontWeight: FontWeight.bold),
                             ),
                           ],
