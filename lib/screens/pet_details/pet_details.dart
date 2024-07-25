@@ -284,20 +284,22 @@ class _PetDetailsState extends State<PetDetails> {
           const SizedBoxh20(),
 
           // DELETE PET BUTTON
-          AppButtonLarge(
-            onTap: () => showAppConfirmationDialog(
-              context: context,
-              titleString: 'Confirm Deletion',
-              contentString:
-                  'Are you sure you want to delete this pet? \nThis action is irreversible!',
-              continueAction: () {
-                _deletePet(id: petData.petID ?? "");
-                Navigator.pop(context);
-              },
+          Center(
+            child: AppButtonLarge(
+              onTap: () => showAppConfirmationDialog(
+                context: context,
+                titleString: 'Confirm Deletion',
+                contentString:
+                    'Are you sure you want to delete this pet? \nThis action is irreversible!',
+                continueAction: () {
+                  _deletePet(id: petData.petID ?? "");
+                  Navigator.pop(context);
+                },
+              ),
+              width: 200,
+              height: 40,
+              text: 'Delete Pet',
             ),
-            width: 250,
-            height: 30,
-            text: 'TEMP UI: Delete Pet',
           ),
         ],
       ),

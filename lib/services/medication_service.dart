@@ -161,6 +161,9 @@ class MedicationService with ChangeNotifier {
       routine.medications = medications ?? routine.medications;
 
       // TODO need to check medications for differences and update recurring med notifs accordingly
+      /// Check medications against routine.medications
+      /// For every new medication, if it is NOT in routine.medications, make new notif
+      /// Then for every previous medication, cancel the notifs ones that are not in new
 
       // then apply updates to Firestore
       final routineRef = _firestoreMedicationCollection.doc(id);
@@ -187,6 +190,8 @@ class MedicationService with ChangeNotifier {
 
   /// Sets up a new recurring notification that starts now from the given
   /// `Medication`
+  ///
+  /// TODO add log mesages and try catch
   void createRecurringNotificationFromMedication(Medication medData,
       {required String petID}) {
     const type = NotificationType.medication;
