@@ -303,7 +303,7 @@ class _RecurringNotificationCardState extends State<RecurringNotificationCard> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final AppRecurringNotification notif = widget.notif;
 
@@ -420,9 +420,9 @@ class _RecurringNotificationCardState extends State<RecurringNotificationCard> {
 }
 
 Widget _getIconForType(BuildContext context, NotificationType type) {
-  final ColorScheme colorScheme = Theme.of(context).colorScheme;
-  final CustomColors customColors =
-      Theme.of(context).extension<CustomColors>()!;
+  // final ColorScheme colorScheme = Theme.of(context).colorScheme;
+  // final CustomColors customColors =
+  // Theme.of(context).extension<CustomColors>()!;
 
   switch (type) {
     case NotificationType.noType:
@@ -430,26 +430,26 @@ Widget _getIconForType(BuildContext context, NotificationType type) {
     case NotificationType.debug:
       return const Icon(Icons.construction);
     case NotificationType.medicalGreen:
-      return Icon(
+      return const Icon(
         Icons.check_circle,
-        color: customColors.green,
+        color: SeverityColors.green,
       );
     case NotificationType.medicalYellow:
       return Icon(
         // Icons.thermostat,
         Icons.error,
-        color: Colors.yellow[600],
+        color: SeverityColors.yellow,
       );
     case NotificationType.medicalOrange:
       return Icon(
         // Icons.thermostat,
         Icons.error,
-        color: Colors.orange[700],
+        color: SeverityColors.orange,
       );
     case NotificationType.medicalRed:
-      return Icon(
+      return const Icon(
         Icons.error,
-        color: colorScheme.primary,
+        color: SeverityColors.red,
       );
     case NotificationType.medication:
       return const Icon(Icons.medication);
