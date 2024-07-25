@@ -154,4 +154,28 @@ class Medication {
         '${(intervalValue ?? 0) == 1 ? "" : tempInternalValueWithSpace}'
         '${intervalUnit ?? ""}${intervalValue != 1 ? "s" : ""}';
   }
+
+  /// to check for strict equality
+  @override
+  bool operator ==(Object other) {
+    return other is Medication &&
+        id == other.id &&
+        name == other.name &&
+        quantity == other.quantity &&
+        takeAsNeeded == other.takeAsNeeded &&
+        dosageCount == other.dosageCount &&
+        intervalValue == other.intervalValue &&
+        intervalUnit == other.intervalUnit;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        name,
+        quantity,
+        takeAsNeeded,
+        dosageCount,
+        intervalValue,
+        intervalUnit,
+      );
 }
