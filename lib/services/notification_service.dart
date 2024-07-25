@@ -702,6 +702,9 @@ class NotificationService with ChangeNotifier {
   void resetService() {
     AppLogger.t("[NOTIF] Resetting notification service");
     notificationShowList = [];
+
+    // set isReady to false
+    isReady = false;
   }
 }
 
