@@ -18,7 +18,7 @@ class _DataPolicyPageState extends State<DataPolicyPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Data Policy',
+          'Data Privacy Policy',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: colorScheme.primary,

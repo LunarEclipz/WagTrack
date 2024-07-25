@@ -1,6 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:wagtrack/screens/authorisation/login_tab.dart';
 import 'package:wagtrack/screens/authorisation/register_tab.dart';
+import 'package:wagtrack/screens/settings/data_policy_page.dart';
+import 'package:wagtrack/screens/settings/terms_page.dart';
 
 // import '../mainTemplate.dart';
 
@@ -46,22 +49,42 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 10),
                 Text.rich(
-                    textAlign: TextAlign.center,
-                    TextSpan(style: textStyles.bodyLarge, children: [
+                  textAlign: TextAlign.center,
+                  TextSpan(
+                    style: textStyles.bodyLarge,
+                    children: [
                       const TextSpan(
                           text: 'By signing in you are agreeing to our '),
                       TextSpan(
                         text: 'terms ',
                         style: textStyles.bodyLarge
                             ?.copyWith(color: colorScheme.tertiary),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const TermsPage()),
+                            );
+                          },
                       ),
                       const TextSpan(text: 'and '),
                       TextSpan(
                         text: 'privacy policy ',
                         style: textStyles.bodyLarge
                             ?.copyWith(color: colorScheme.tertiary),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const DataPolicyPage()),
+                            );
+                          },
                       ),
-                    ])),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 10),
                 Container(
                   // height: screenHeight * 0.6,
