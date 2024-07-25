@@ -487,7 +487,7 @@ class _RecurringNotificationCardState extends State<RecurringNotificationCard> {
                     'Started '
                     '${formatDateTime(notif.startTime).date} '
                     '${formatDateTime(notif.startTime).time}, '
-                    'Every ${formatDuration(notif.interval)}',
+                    '\nEvery ${formatDuration(notif.interval)}',
                     style: textStyles.bodySmall!
                         .copyWith(color: AppTheme.customColors.secondaryText),
                   ),
