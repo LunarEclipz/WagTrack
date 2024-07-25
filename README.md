@@ -12,6 +12,8 @@
 4. Install and run on your device.
 5. If a pop-up shows up warning you of installing apps from an unverified source, press `continue`.
 
+Note that if you already have an older version of the app installed, you may have to delete that version and reinstall again if an error pops up during the installation process. 
+
 ### iOS
 
 Installing a test build for iOS is currently unavailable at this time. Choose one of the emulation options below:
@@ -34,7 +36,7 @@ Installing a test build for iOS is currently unavailable at this time. Choose on
 
 1. [Download](https://www.bluestacks.com/download.html) and install Bluestacks. Specific versions (4/5, Android versions) don't matter, just get the right one for your OS.
 2. While BlueStacks is running, go to the 'My Games' tab.
-3. Click on 'Install Locak APK' and locate the APK file.
+3. Click on 'Install Local APK' and locate the APK file.
 
 ---
 
