@@ -7,6 +7,7 @@ import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
+import 'package:wagtrack/shared/components/severity_icon.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/utils.dart';
@@ -435,12 +436,13 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CircleAvatar(
-                              backgroundColor: colorScheme.primary,
-                              child: Text(
-                                _currentSeveritySliderValue.toInt().toString(),
-                                style: const TextStyle(color: Colors.white),
-                              ),
+                            SeverityIcon(
+                              level: classifySymptom(
+                                  name: selectedSymptom,
+                                  severity:
+                                      _currentSeveritySliderValue.toInt()),
+                              val: _currentSeveritySliderValue.toInt(),
+                              isLarge: true,
                             ),
                             const SizedBoxh20(),
                             const Text(

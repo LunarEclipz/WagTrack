@@ -288,3 +288,54 @@ class AppRecurringNotification {
         oid,
       );
 }
+
+/// Converts a recurring frequency (dosageCount, intervalVaue, intervalUnit)
+/// to a `Duration` interval
+///
+/// Returns `null` if there is an error.
+Duration? recurringFrequencyToInterval({
+  required int? dosageCount,
+  required int? intervalValue,
+  required String? intervalUnit,
+}) {
+  if (dosageCount == null || intervalValue == null || intervalUnit == null) {
+    return null;
+  }
+
+  /// Interval
+  Duration interval;
+
+  switch (intervalUnit.toLowerCase()) {
+    case 'minute' || 'minutes':
+      interval = Duration(minutes: intervalValue);
+    case 'hour' || 'hours':
+      interval = Duration(hours: intervalValue);
+    case 'day' || 'days':
+      interval = Duration(days: intervalValue);
+    case 'week' || 'weeks':
+      interval = Duration(days: intervalValue * 7); // 1 week = 7 days
+    case 'month' || 'months':
+      // Approximate 30 days per month
+      interval = Duration(days: intervalValue * 30);
+    case 'year' || 'years':
+      // Approximate 365 days per year
+      interval = Duration(days: intervalValue * 365);
+    default:
+      return null;
+  }
+
+  // divide interval by dosageCount
+  interval = Duration(seconds: interval.inSeconds ~/ dosageCount);
+  return interval;
+}
+
+/// Checks if duration is valid for scheduling recurring notifications.
+///
+/// Valid if it is at least one minute.
+bool isDurationValidForRecurringNotification(Duration? duration) {
+  if (duration == null) {
+    return false;
+  }
+
+  return duration.compareTo(const Duration(minutes: 1)) >= 0;
+}
