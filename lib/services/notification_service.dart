@@ -301,12 +301,8 @@ class NotificationService with ChangeNotifier {
   /// Repeats a notification periodically
   ///
   /// TODO Note: `interval` must be one minute or more!!!!
-  Future<void> showRecurringNotification(
-    String title,
-    String body,
-    Duration interval,
-    NotificationType type,
-  ) async {
+  Future<void> showRecurringNotification(String title, String body,
+      Duration interval, NotificationType type, String? oid) async {
     if (!isReady) {
       AppLogger.w("[NOTIF] Notification service is not ready.");
       return;
@@ -322,6 +318,7 @@ class NotificationService with ChangeNotifier {
         type: type,
         title: title,
         body: body,
+        oid: oid,
       );
 
       // shopw periodically
@@ -467,6 +464,28 @@ class NotificationService with ChangeNotifier {
     }).toList();
   }
 
+  /// Finds a **single** recurring notification from the current list based on the given
+  /// matches (match any), and returns the `AppRecurringNotification`.
+  /// This is most often used to search for the properties of a notification
+  /// without knowing the id.
+  ///
+  /// Returns `null` if no notifications found.
+  AppRecurringNotification? findRecurringNotificationFromLocal({
+    String? oid,
+  }) {
+    // first find notif
+    final List<AppRecurringNotification> found = [];
+    found.addAll(recurringNotificationList
+        .where((notif) => oid == null ? false : notif.oid == oid));
+
+    if (found.isEmpty) {
+      // no notification with given params found
+      return null;
+    }
+
+    return found.first;
+  }
+
   /// Sorts notifications, default is by notified time and in reverse order (newest first)
   ///
   /// Should run everytime:
@@ -563,8 +582,7 @@ class NotificationService with ChangeNotifier {
 
   /// Deletes the notification with the given integer `id` from the _notificationsShowList.
   /// Deletes from both nofitications AND recurring notifications.
-  /// By default, updates notifications
-  /// in shared preferences.
+  /// By default, updates notifications in shared preferences.
   ///
   /// Will also cancel the notification in FLN.
   ///
@@ -593,6 +611,49 @@ class NotificationService with ChangeNotifier {
       }
     } catch (e) {
       AppLogger.e("[NOTIF] Error deleting notification", e);
+    }
+
+    notifyListeners();
+  }
+
+  /// Deletes recurring notification that matches **any** of the given parameters
+  ///
+  /// By default, updates notifications in shared preferences.
+  ///
+  /// Will also cancel the notification in FLN.
+  ///
+  /// Currently searching using `id` does not work. :D
+  Future<void> deleteRecurringNotification({
+    int? id,
+    String? oid,
+    bool updateStorage = true,
+  }) async {
+    AppLogger.d('[NOTIF] Deleting recurring notification based on: '
+        'id: $id, '
+        'oid: $oid');
+    try {
+      // search for notification
+      final foundNotif = findRecurringNotificationFromLocal(oid: oid);
+
+      if (foundNotif == null) {
+        AppLogger.i('[NOTIF] No recurring notification that '
+            'matches the criteria found');
+        return;
+      }
+
+      // remove from notification list
+      recurringNotificationList
+          .removeWhere((notif) => notif.id == foundNotif.id);
+
+      // remove from flutter local notifs
+      _flutterLocalNotificationsPlugin.cancel(foundNotif.id);
+
+      // update shared prefs
+      if (updateStorage) {
+        await saveAllNotificationsToDevice();
+      }
+    } catch (e) {
+      AppLogger.e("[NOTIF] Error deleting recurring notification", e);
     }
 
     notifyListeners();
