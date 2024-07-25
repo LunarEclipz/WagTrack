@@ -155,6 +155,11 @@ class Medication {
         '${intervalUnit ?? ""}${intervalValue != 1 ? "s" : ""}';
   }
 
+  @override
+  String toString() {
+    return 'Med: $id';
+  }
+
   /// to check for strict equality
   @override
   bool operator ==(Object other) {

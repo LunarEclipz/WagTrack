@@ -102,6 +102,26 @@ class MedicationService with ChangeNotifier {
     }
   }
 
+  /// Finds a **single** medication routine from the current list based on the
+  /// given matches (match any), and returns to `MedicationRoutine`
+  ///
+  /// Accepts id, can be an equivalent of a search using id.
+  ///
+  /// Returns `null` of no medication routine found.
+  MedicationRoutine? findMedicationRoutineFromLocal({String? id}) {
+    // first find routine
+    final List<MedicationRoutine> found = [];
+    found.addAll(_medicationRoutines
+        .where((routine) => id == null ? false : routine.oid == id));
+
+    if (found.isEmpty) {
+      // no routine with given params found
+      return null;
+    }
+
+    return found.first;
+  }
+
   /// Deletes the medication routine with the given id from Firebase
   Future<void> deleteMedicationRoutine({required String id}) async {
     if (id.isEmpty) {
@@ -111,7 +131,27 @@ class MedicationService with ChangeNotifier {
 
     AppLogger.d("[MED] Deleting medication routine $id");
     try {
-      // remove from local med routine lists. needed to reset the UI of the home page!
+      /// first find the routine
+      final foundRoutine = findMedicationRoutineFromLocal(id: id);
+
+      if (foundRoutine == null) {
+        AppLogger.i('[MED] No routine with id:$id ' 'found');
+        return;
+      }
+
+      /// Delete recurring notifications set by meds
+      /// same code as in `updateMedicationRoutine()`
+      for (Medication med in foundRoutine.medications) {
+        // cancel based on id of medication
+        // only cancel if the med is not `takeAsNeeded`
+        if (med.takeAsNeeded) {
+          continue;
+        }
+        _notificationService.deleteRecurringNotification(oid: med.id);
+      }
+
+      /// remove routine from local med routine lists.
+      /// needed to reset the UI of the home page!
       _medicationRoutines.removeWhere((routine) => routine.oid == id);
 
       // delete from firestore
@@ -123,8 +163,8 @@ class MedicationService with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Updates the medication with the given id locally and in firebase
-  Future<void> updateMedication({
+  /// Updates the medication routine with the given id locally and in firebase
+  Future<void> updateMedicationRoutine({
     required String id,
     String? title,
     String? clinicName,
@@ -158,12 +198,40 @@ class MedicationService with ChangeNotifier {
       routine.comments = comments ?? routine.comments;
       routine.symptomsID = symptomsID ?? routine.symptomsID;
       routine.symptomsName = symptomsName ?? routine.symptomsName;
-      routine.medications = medications ?? routine.medications;
 
-      // TODO need to check medications for differences and update recurring med notifs accordingly
+      /// Check medications for differences and update recurring med notifs accordingly
       /// Check medications against routine.medications
-      /// For every new medication, if it is NOT in routine.medications, make new notif
-      /// Then for every previous medication, cancel the notifs ones that are not in new
+      if (medications != null) {
+        // only do if new medications ARE being set!
+        final oldMedications = routine.medications;
+        final newMedications = medications;
+
+        /// For every previous medication, cancel the notifs ones that are not in new
+        for (Medication med in oldMedications) {
+          if (newMedications.contains(med)) {
+            continue;
+          }
+
+          // cancel based on id of medication
+          // only cancel if the med is not `takeAsNeeded`
+          if (med.takeAsNeeded) {
+            continue;
+          }
+          _notificationService.deleteRecurringNotification(oid: med.id);
+        }
+
+        /// For every new medication, if it is NOT in oldMedications, make new notif
+        for (Medication med in newMedications) {
+          if (oldMedications.contains(med)) {
+            continue;
+          }
+
+          createRecurringNotificationFromMedication(med, petID: routine.petID);
+        }
+
+        // then only set new medications
+        routine.medications = medications;
+      }
 
       // then apply updates to Firestore
       final routineRef = _firestoreMedicationCollection.doc(id);
@@ -191,7 +259,7 @@ class MedicationService with ChangeNotifier {
   /// Sets up a new recurring notification that starts now from the given
   /// `Medication`
   ///
-  /// TODO add log mesages and try catch
+  /// TODO add log mesages and exception handling
   void createRecurringNotificationFromMedication(Medication medData,
       {required String petID}) {
     const type = NotificationType.medication;
@@ -203,6 +271,7 @@ class MedicationService with ChangeNotifier {
     final title = '${medData.name} for $petName';
 
     /// Body
+    /// TODO Should get the symptom here
     const body = "";
 
     /// Interval
@@ -245,6 +314,12 @@ class MedicationService with ChangeNotifier {
     // divide interval by dosageCount
     interval = Duration(seconds: interval.inSeconds ~/ medData.dosageCount!);
 
-    _notificationService.showRecurringNotification(title, body, interval, type);
+    _notificationService.showRecurringNotification(
+      title,
+      body,
+      interval,
+      type,
+      medData.id,
+    );
   }
 }

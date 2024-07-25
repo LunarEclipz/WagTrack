@@ -215,7 +215,7 @@ class PetService with ChangeNotifier {
 
   /// Gets a pet from local using the given id. Returns null if no pet is found.
   Pet? getPetFromLocalWithID({required String petID}) {
-// first find pet
+    // first find pet
     final List<Pet> foundPets = [];
     foundPets.addAll(_personalPets.where((pet) => pet.petID == petID));
     foundPets.addAll(_communityPets.where((pet) => pet.petID == petID));
