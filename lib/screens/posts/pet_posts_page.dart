@@ -29,7 +29,10 @@ class _PetPostsPageState extends State<PetPostsPage> {
   void getAllPosts({required List<String> petIDs}) async {
     posts =
         await PostService().getAllPostsByPetID(petIDs: [widget.petData.petID!]);
-    tempPosts = posts;
+    setState(() {
+      posts = posts;
+      tempPosts = posts;
+    });
   }
 
   @override
@@ -45,6 +48,7 @@ class _PetPostsPageState extends State<PetPostsPage> {
     final CustomColors customColors = AppTheme.customColors;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textStyles = Theme.of(context).textTheme;
+
     evenPosts = [];
     oddPosts = [];
     if (filterSelected == "All") {
@@ -114,11 +118,11 @@ class _PetPostsPageState extends State<PetPostsPage> {
           children: [
             Column(
                 children: List.generate(evenPosts.length, (index) {
-              return PetPost(post: evenPosts[index], petData: petData);
+              return PetPost(post: evenPosts[index]);
             })),
             Column(
                 children: List.generate(oddPosts.length, (index) {
-              return PetPost(post: oddPosts[index], petData: petData);
+              return PetPost(post: oddPosts[index]);
             })),
           ],
         )

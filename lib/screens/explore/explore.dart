@@ -19,11 +19,16 @@ class Explore extends StatefulWidget {
 class _ExploreState extends State<Explore> with TickerProviderStateMixin {
   late final TabController _tabController;
 
+  int _selectedTab = 0;
+
   late List<Post> posts = [];
   late List<Post> tempPosts = [];
   late List<Post> evenPosts = [];
   late List<Post> oddPosts = [];
-
+  late List<Post> forMe = [];
+  late List<Post> forMetempPosts = [];
+  late List<Post> forMeevenPosts = [];
+  late List<Post> forMeoddPosts = [];
   List<Pet> personalPets = [];
   List<Pet> communityPets = [];
   List<Pet> allPets = [];
@@ -32,7 +37,7 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     final petService = Provider.of<PetService>(context, listen: false);
     personalPets = petService.personalPets;
     communityPets = petService.communityPets;
@@ -49,24 +54,13 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
 
   void getAllPosts({required List<String> petIDs}) async {
     posts = await PostService().getAllPostsByPetID(petIDs: petIDs);
+    List<Post> forMePosts = await PostService().getAllPostsByTime();
 
-    List<Post> uniqueList = [];
-    for (int i = 0; i < posts.length; i++) {
-      bool isUnique = true;
-      for (int j = i + 1; j < posts.length; j++) {
-        if (posts[i].oid == posts[j].oid) {
-          isUnique = false;
-          break; // Exit inner loop if duplicate found
-        }
-      }
-      if (isUnique) {
-        uniqueList.add(posts[i]);
-      }
-    }
-    uniqueList.sort((b, a) => a.date.compareTo(b.date));
     setState(() {
-      posts = uniqueList;
-      tempPosts = uniqueList;
+      posts = posts;
+      tempPosts = posts;
+      forMe = forMePosts;
+      forMetempPosts = forMePosts;
     });
   }
 
@@ -76,9 +70,11 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+
     evenPosts = [];
     oddPosts = [];
-
+    forMeevenPosts = [];
+    forMeoddPosts = [];
     if (filterSelected == "All") {
       posts = tempPosts;
       for (int i = 0; i < posts.length; i++) {
@@ -100,12 +96,33 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
         }
       }
     }
+    if (filterSelected == "All") {
+      forMe = forMetempPosts;
+      for (int i = 0; i < forMe.length; i++) {
+        if (i % 2 == 0) {
+          forMeevenPosts.add(forMe[i]);
+        } else {
+          forMeoddPosts.add(forMe[i]);
+        }
+      }
+    } else {
+      forMe = forMetempPosts
+          .where((object) => object.category == filterSelected)
+          .toList();
+      for (int i = 0; i < forMe.length; i++) {
+        if (i % 2 == 0) {
+          forMeevenPosts.add(forMe[i]);
+        } else {
+          forMeoddPosts.add(forMe[i]);
+        }
+      }
+    }
     return AppScrollableNoPaddingPage(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 0.0),
           child: Text(
-            "Expore",
+            "Explore",
             style: textStyles.headlineMedium,
           ),
         ),
@@ -122,17 +139,22 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
                   'For Me',
                   style: TextStyle(fontSize: 20),
                 )),
-                Tab(
-                    child: Text(
-                  'Following',
-                  style: TextStyle(fontSize: 20),
-                )),
+                // Tab(
+                //     child: Text(
+                //   'Following',
+                //   style: TextStyle(fontSize: 20),
+                // )),
                 Tab(
                     child: Text(
                   'My Posts',
                   style: TextStyle(fontSize: 20),
                 ))
               ],
+              onTap: (index) {
+                setState(() {
+                  _selectedTab = index;
+                });
+              },
             ), // Filter
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
@@ -168,50 +190,111 @@ class _ExploreState extends State<Explore> with TickerProviderStateMixin {
               ),
             ),
             const SizedBoxh10(),
-            SizedBox(
-              height: screenHeight,
-              width: screenWidth,
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  // For Me
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: SizedBox(),
-                  ),
-                  // Following
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: SizedBox(),
-                  ),
-                  // My Posts
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                          children: List.generate(evenPosts.length, (index) {
-                        return PetPost(
+
+            Builder(
+              builder: (_) {
+                switch (_selectedTab) {
+                  case 0:
+                    // For Me
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                            children:
+                                List.generate(forMeevenPosts.length, (index) {
+                          return PetPost(
+                            post: forMeevenPosts[index],
+                          );
+                        })),
+                        Column(
+                            children:
+                                List.generate(forMeoddPosts.length, (index) {
+                          return PetPost(
+                            post: forMeoddPosts[index],
+                          );
+                        })),
+                      ],
+                    );
+                  case 1:
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                            children: List.generate(evenPosts.length, (index) {
+                          return PetPost(
                             post: evenPosts[index],
-                            petData: allPets
-                                .where((pet) =>
-                                    evenPosts[index].petID.contains(pet.petID!))
-                                .first);
-                      })),
-                      Column(
-                          children: List.generate(oddPosts.length, (index) {
-                        return PetPost(
+                          );
+                        })),
+                        Column(
+                            children: List.generate(oddPosts.length, (index) {
+                          return PetPost(
                             post: oddPosts[index],
-                            petData: allPets
-                                .where((pet) =>
-                                    oddPosts[index].petID.contains(pet.petID!))
-                                .first);
-                      })),
-                    ],
-                  ),
-                ],
-              ),
+                          );
+                        })),
+                      ],
+                    );
+                  default:
+                    return Container();
+                }
+              },
             ),
+
+            // SizedBox(
+            //   height: screenHeight,
+            //   width: screenWidth,
+            //   child: TabBarView(
+            //     controller: _tabController,
+            //     children: [
+            //       // For Me
+            //       Row(
+            //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: [
+            //           Column(
+            //               children:
+            //                   List.generate(forMeevenPosts.length, (index) {
+            //             return PetPost(
+            //               post: forMeevenPosts[index],
+            //             );
+            //           })),
+            //           Column(
+            //               children:
+            //                   List.generate(forMeoddPosts.length, (index) {
+            //             return PetPost(
+            //               post: forMeoddPosts[index],
+            //             );
+            //           })),
+            //         ],
+            //       ),
+            //       // // Following
+            //       // const Padding(
+            //       //   padding: EdgeInsets.all(8.0),
+            //       //   child: SizedBox(),
+            //       // ),
+            //       // My Posts
+            //       Row(
+            //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: [
+            //           Column(
+            //               children: List.generate(evenPosts.length, (index) {
+            //             return PetPost(
+            //               post: evenPosts[index],
+            //             );
+            //           })),
+            //           Column(
+            //               children: List.generate(oddPosts.length, (index) {
+            //             return PetPost(
+            //               post: oddPosts[index],
+            //             );
+            //           })),
+            //         ],
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         )
       ],

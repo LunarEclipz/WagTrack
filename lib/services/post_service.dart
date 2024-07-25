@@ -6,10 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
-import 'package:provider/provider.dart';
 import 'package:wagtrack/models/post_model.dart';
 import 'package:wagtrack/services/logging.dart';
-import 'package:wagtrack/services/user_service.dart';
 
 class PostService with ChangeNotifier {
   // Instance of Firebase Firestore for interacting with the database
@@ -20,7 +18,6 @@ class PostService with ChangeNotifier {
   static final FirebaseStorage _firebaseStorage = GetIt.I<FirebaseStorage>();
 
   List<Post> _posts = [];
-
   List<Post> get posts => _posts;
 
   /// Adds Post to Firestore
@@ -48,16 +45,48 @@ class PostService with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Adds Post to Firestore
+  void updateComment({required Post postData}) async {
+    List<Map<String, dynamic>> comments = postData.toJSON()["comments"];
+
+    AppLogger.d("[POST] Adding Comments");
+    await _db
+        .collection("posts")
+        .doc(postData.oid)
+        .update({"comments": comments}).then(
+            (value) => AppLogger.i("[POST] Comments added successfully"),
+            onError: (e) => AppLogger.e("[POST] Error adding comments: $e", e));
+
+    notifyListeners();
+  }
+
+  /// Adds Post to Firestore
+  /// atomic transaction bug here
+  void updateLikes({
+    required Post postData,
+  }) async {
+    AppLogger.d("[POST] Updating likes");
+    List<String> likes = postData.likes;
+    await _db
+        .collection("posts")
+        .doc(postData.oid)
+        .update({"likes": likes}).then(
+            (value) => AppLogger.i("[POST] likes updated successfully"),
+            onError: (e) => AppLogger.e("[POST] Error adding comments: $e", e));
+
+    notifyListeners();
+  }
+
   /// Sets internal lists of posts.
-  void setPosts({required List<Post> posts}) {
-    AppLogger.d("[POST] Setting Personal and Community Pets");
-    _posts = posts;
+  void setPosts({required List<Post> listOfPosts}) {
+    AppLogger.d("[POST] Setting Posts");
+    _posts = listOfPosts;
     notifyListeners();
   }
 
   /// Gets Post from Firestore
   Future<List<Post>> getAllPostsByPetID({required List<String> petIDs}) async {
-    final List<Post> posts = [];
+    List<Post> allPosts = [];
 
     try {
       for (var i = 0; i < petIDs.length; i++) {
@@ -70,14 +99,62 @@ class PostService with ChangeNotifier {
           final postData = docSnapshot.data();
           final post = Post.fromJson(postData);
           post.oid = docSnapshot.id;
-          posts.add(post);
+          allPosts.add(post);
         }
       }
+
+      List<Post> uniqueList = [];
+      for (int i = 0; i < allPosts.length; i++) {
+        bool isUnique = true;
+        for (int j = i + 1; j < allPosts.length; j++) {
+          if (allPosts[i].oid == allPosts[j].oid) {
+            isUnique = false;
+            break; // Exit inner loop if duplicate found
+          }
+        }
+        if (isUnique) {
+          uniqueList.add(allPosts[i]);
+        }
+      }
+      uniqueList.sort((b, a) => a.date.compareTo(b.date));
+      allPosts = uniqueList;
       AppLogger.i("[POST] Posts fetched (by uid) successfully");
+      _posts = allPosts;
       notifyListeners();
-      return posts;
+      return allPosts;
     } catch (e) {
       AppLogger.e("[POST] Error fetching posts for PetID $petIDs: $e", e);
+      notifyListeners();
+      return []; // Return an empty list on error
+    }
+  }
+
+  /// Gets For Me Posts from Firestore
+  Future<List<Post>> getAllPostsByTime() async {
+    List<Post> allPosts = [];
+
+    try {
+      final querySnapshot = await _db
+          .collection("posts")
+          .where("date",
+              isGreaterThan: DateTime.now()
+                  .subtract(const Duration(days: 30))
+                  .millisecondsSinceEpoch)
+          .get();
+
+      for (final docSnapshot in querySnapshot.docs) {
+        final postData = docSnapshot.data();
+        final post = Post.fromJson(postData);
+        post.oid = docSnapshot.id;
+        allPosts.add(post);
+      }
+      allPosts.sort((b, a) => a.date.compareTo(b.date));
+      AppLogger.i("[POST] For Me Posts fetched (by uid) successfully");
+      _posts = allPosts;
+      notifyListeners();
+      return allPosts;
+    } catch (e) {
+      AppLogger.e("[POST] Error fetching For Me posts : $e", e);
       notifyListeners();
       return []; // Return an empty list on error
     }
@@ -110,5 +187,10 @@ class PostService with ChangeNotifier {
       AppLogger.w("[POST] Image is null");
       return null;
     }
+  }
+
+  List<Post> getPostsByPetId(
+      {required String targetPetID, required List<Post> posts}) {
+    return posts.where((post) => post.petID.contains(targetPetID)).toList();
   }
 }

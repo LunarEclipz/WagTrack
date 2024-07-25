@@ -317,6 +317,7 @@ class _AddPostPageState extends State<AddPostPage> {
 
                     // Caption
                     AppTextFormField(
+                      expands: true,
                       controller: captionController,
                       hintText: 'Caption',
                       prefixIcon: const Icon(Icons.description_rounded),
@@ -374,6 +375,7 @@ class _AddPostPageState extends State<AddPostPage> {
                             if (titleController.text != "" &&
                                 captionController.text != "") {
                               Post postData = Post(
+                                  uid: uid!,
                                   petID: selectedPets
                                       .map((item) => item.petID!)
                                       .toList(),
@@ -385,8 +387,8 @@ class _AddPostPageState extends State<AddPostPage> {
                                   petImgUrl: selectedPets
                                       .map((item) => item.imgPath!)
                                       .toList(),
-                                  likes: 0,
-                                  saves: 0,
+                                  likes: [],
+                                  saves: [],
                                   category: selectedPostCategory,
                                   title: titleController.text,
                                   caption: captionController.text,

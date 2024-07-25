@@ -8,6 +8,7 @@ import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/themes.dart';
 import 'package:wagtrack/shared/utils.dart';
 
+/// This page is called "Records" in the App UI
 class MedsOverviewPage extends StatefulWidget {
   final Pet petData;
 
@@ -20,7 +21,11 @@ class MedsOverviewPage extends StatefulWidget {
 class _MedsOverviewPageState extends State<MedsOverviewPage> {
   late TextEditingController vaccineController = TextEditingController();
 
-  late bool vaccineDate = false;
+  // Form key for vaccine input
+  final _vaccineInputFormKey = GlobalKey<FormState>();
+  bool showVaccineDateRequired = false;
+
+  late bool isVaccineDateSet = false;
   late DateTime vaccineDateTime;
 
   @override
@@ -32,6 +37,7 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final PetService petService = context.watch<PetService>();
 
+    // DO NOT wrap this in an unconstrained container
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -51,11 +57,11 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
                   maxTime: DateTime.now(), onConfirm: (date) {
                 setState(() {
                   vaccineDateTime = date;
-                  vaccineDate = true;
+                  isVaccineDateSet = true;
                 });
               }, onCancel: () {
                 setState(() {
-                  vaccineDate = false;
+                  isVaccineDateSet = false;
                 });
               }, currentTime: DateTime.now(), locale: LocaleType.en);
             },
@@ -69,17 +75,29 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
                       padding: const EdgeInsets.all(
                         8,
                       ),
-                      child: vaccineDate == false
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: isVaccineDateSet == false
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Set Vaccination Date",
-                                  style: textStyles.bodyLarge!
-                                      .copyWith(color: colorScheme.primary),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Set Vaccination Date",
+                                      style: textStyles.bodyLarge!
+                                          .copyWith(color: colorScheme.primary),
+                                    ),
+                                    Icon(Icons.vaccines_rounded,
+                                        size: 20, color: colorScheme.primary),
+                                  ],
                                 ),
-                                Icon(Icons.vaccines_rounded,
-                                    size: 20, color: colorScheme.primary),
+                                if (showVaccineDateRequired)
+                                  Text(
+                                    "Required*",
+                                    style: textStyles.bodyMedium!
+                                        .copyWith(color: colorScheme.primary),
+                                  ),
                               ],
                             )
                           : Column(
@@ -109,15 +127,28 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
             ),
           ),
           const SizedBoxh10(),
-          AppTextFormField(
-            controller: vaccineController,
-            hintText: 'Vaccine Name',
-            prefixIcon: const Icon(Icons.vaccines_rounded),
+          Form(
+            key: _vaccineInputFormKey,
+            child: AppTextFormField(
+              controller: vaccineController,
+              hintText: 'Vaccine Name',
+              prefixIcon: const Icon(Icons.vaccines_rounded),
+              autovalidateMode: AutovalidateMode.disabled,
+            ),
           ),
+
           const SizedBoxh10(),
           InkWell(
             onTap: () async {
-              if (vaccineController.text != "" && vaccineDate) {
+              if (!isVaccineDateSet) {
+                // naughty naughty
+                setState(() {
+                  showVaccineDateRequired = true;
+                });
+              }
+
+              if (_vaccineInputFormKey.currentState!.validate() &&
+                  isVaccineDateSet) {
                 List<DateTimeStringPair> vaccineData = petData.vaccineRecords;
                 vaccineData.add(DateTimeStringPair(
                     dateTime: vaccineDateTime, value: vaccineController.text));
@@ -126,6 +157,12 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
                 setState(() {
                   petData.weight = vaccineData;
                   vaccineController.text = "";
+
+                  FocusScope.of(context).unfocus();
+
+                  // reset bools
+                  showVaccineDateRequired = false;
+                  isVaccineDateSet = false;
                 });
               }
             },
@@ -148,6 +185,8 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
             ),
           ),
           const SizedBoxh20(),
+
+          // list of vaccines
           if (petData.vaccineRecords.isNotEmpty)
             Column(
               children: List.generate(petData.vaccineRecords.length, (index) {
@@ -175,7 +214,7 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
                   ),
                 );
               }),
-            )
+            ),
         ],
       ),
     );

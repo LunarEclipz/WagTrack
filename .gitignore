@@ -44,3 +44,4 @@ app.*.map.json
 
 # Miscellaneous
 new_test.dart
+lib/services/example_notifs.*

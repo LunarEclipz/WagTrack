@@ -9,6 +9,7 @@ import 'package:wagtrack/screens/pet_details/pet_details.dart';
 import 'package:wagtrack/screens/posts/add_post_page.dart';
 import 'package:wagtrack/screens/posts/pet_posts_page.dart';
 import 'package:wagtrack/screens/symptoms/add_symptoms.dart';
+import 'package:wagtrack/screens/symptoms/help_symptoms.dart';
 import 'package:wagtrack/screens/symptoms/symptoms.dart';
 import 'package:wagtrack/shared/background_img.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -97,7 +98,7 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
                     },
                     transitionDuration: const Duration(
                         milliseconds: 300), // Adjust the duration here
-                    pageBuilder: (context, a, b) => const WorkInProgressPage(),
+                    pageBuilder: (context, a, b) => const HelpSymptoms(),
                   ),
                 );
               },
@@ -213,7 +214,8 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
             ),
         ],
       ),
-      // Screens
+
+      // Main Screens
       body: BackgroundImageWrapper(
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -275,6 +277,74 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper> {
           ),
         ),
       ),
+      // body: BackgroundImageWrapper(
+      //   child: CustomScrollView(
+      //     slivers: [
+      //       SliverToBoxAdapter(
+      //         child: NavigationBar(
+      //           labelBehavior:
+      //               NavigationDestinationLabelBehavior.onlyShowSelected,
+      //           selectedIndex: currentPageIndex,
+      //           onDestinationSelected: (int index) {
+      //             setState(() {
+      //               currentPageIndex = index;
+      //             });
+      //           },
+      //           destinations: const <Widget>[
+      //             NavigationDestination(
+      //               icon: Icon(Icons.pets),
+      //               label: 'Details',
+      //             ),
+      //             NavigationDestination(
+      //               selectedIcon: Icon(Icons.feed_rounded),
+      //               icon: Icon(Icons.feed_rounded),
+      //               label: 'Posts',
+      //             ),
+      //             NavigationDestination(
+      //               selectedIcon: Icon(Icons.thermostat_rounded),
+      //               icon: Icon(Icons.thermostat_rounded),
+      //               label: 'Symptoms',
+      //             ),
+      //             NavigationDestination(
+      //               selectedIcon: Icon(Icons.medical_information_rounded),
+      //               icon: Icon(Icons.medical_information_rounded),
+      //               label: 'Medications',
+      //             ),
+      //           ],
+      //           backgroundColor: colorScheme.surface,
+      //           shadowColor: Colors.transparent,
+      //           elevation: 0.0,
+      //         ),
+      //       ),
+      //       if (currentPageIndex == 0)
+      //         SliverFillRemaining(
+      //           child: SingleChildScrollView(
+      //             child: PetDetails(
+      //               petData: petData,
+      //             ),
+      //           ),
+      //         ),
+      //       if (currentPageIndex == 1)
+      //         SliverFillRemaining(
+      //           child: PetPostsPage(
+      //             petData: petData,
+      //           ),
+      //         ),
+      //       if (currentPageIndex == 2)
+      //         SliverFillRemaining(
+      //           child: SymptomsPage(
+      //             petData: petData,
+      //           ),
+      //         ),
+      //       if (currentPageIndex == 3)
+      //         SliverFillRemaining(
+      //           child: MedicationFrame(
+      //             petData: petData,
+      //           ),
+      //         ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }

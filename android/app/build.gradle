@@ -27,10 +27,17 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.wagtrack"
-    compileSdk flutter.compileSdkVersion
+
+    // need 34 for FLNP
+    // compileSdk flutter.compileSdkVersion
+    compileSdk 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
+        // Flag to enable support for the new language APIs
+        // needed for FLNP
+        coreLibraryDesugaringEnabled true
+        // Sets Java compatibility to Java 8
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -52,6 +59,8 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -69,4 +78,10 @@ flutter {
 
 dependencies {
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
+
+    // desugaring and fix
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
+    // crash at startup fix: https://github.com/flutter/flutter/issues/110658
+    implementation "androidx.window:window:1.0.0-rc01"
+    implementation "androidx.window:window-java:1.0.0-rc01"
 }

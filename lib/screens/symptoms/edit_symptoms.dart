@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:provider/provider.dart';
@@ -23,8 +24,8 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
   final _unixTime = DateTime.fromMillisecondsSinceEpoch(0);
 
   // Selections
-  late String selectedCategory = "General Symptoms";
-  late String selectedSymptom = "Lethargy";
+  late String selectedCategory = "";
+  late String selectedSymptom = "";
   late String selectedTag = "";
   late List<String> tags = [];
 
@@ -37,12 +38,26 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
 
   // symptom selections
   late List<String> filteredSymptoms = getSymptomsForCategory(selectedCategory);
-  late String filteredSymptomsDesc =
-      "Lethargy: Decreased energy or activity level.";
+  late String filteredSymptomsDesc = "";
 
+  // Severity editing
   late double _currentSeveritySliderValue = 5;
+  late final double? _originalSeverity;
+  bool _showEditSymptoms = false;
+  bool get _hasChangedSeverity {
+    if (_originalSeverity == null) {
+      return false;
+    }
+    return _currentSeveritySliderValue != _originalSeverity;
+  }
 
   TextEditingController factorsController = TextEditingController(text: null);
+
+  void _toggleSeverityExpansion() {
+    setState(() {
+      _showEditSymptoms = !_showEditSymptoms;
+    });
+  }
 
   // set up autofilled data
   @override
@@ -52,8 +67,11 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
     final symptomData = widget.symptomData;
 
     setState(() {
+      // set selections based on symptomData
       selectedCategory = symptomData.category;
       selectedSymptom = symptomData.symptom;
+      filteredSymptomsDesc = getDescBySymptomName(selectedSymptom);
+
       tags = symptomData.tags;
       isEndDateSet = symptomData.hasEnd;
       startDateTime = symptomData.startDate;
@@ -62,6 +80,7 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
       factorsController.text = symptomData.factors;
 
       _currentSeveritySliderValue = symptomData.severity.toDouble();
+      _originalSeverity = _currentSeveritySliderValue;
 
       // loaded symptom must have start date - so start date is set
       isStartDateSet = true;
@@ -84,7 +103,7 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              "Edit Symptom",
+              "Update Symptom",
               // style: textStyles.bodyLarge,
               style: TextStyle(color: Colors.white),
             ),
@@ -97,33 +116,43 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
       ),
       body: AppScrollablePage(
         children: [
+          showDebugInfo(context),
+          // REMOVED FROM EDIT SYMPTOMS XD But still keeping here
+          // Text(
+          //   'Symptoms',
+          //   style: textStyles.headlineMedium,
+          // ),
+          // const SizedBoxh10(),
+          // AppDropdown(
+          //   optionsList: symptomCategories,
+          //   selectedText: selectedCategory,
+          //   onChanged: (String? value) {
+          //     setState(() {
+          //       selectedCategory = value!;
+          //       filteredSymptoms = getSymptomsForCategory(selectedCategory);
+          //     });
+          //   },
+          // ),
+          // const SizedBoxh10(),
+          // AppDropdown(
+          //   optionsList: filteredSymptoms,
+          //   selectedText: selectedSymptom,
+          //   onChanged: (String? value) {
+          //     setState(() {
+          //       selectedSymptom = value!;
+          //       filteredSymptomsDesc = getDescBySymptomName(selectedSymptom);
+          //     });
+          //   },
+          // ),
+          // const SizedBoxh10(),
+          // Text(
+          //   filteredSymptomsDesc,
+          //   style: textStyles.bodyMedium,
+          // ),
           Text(
-            'Symptoms',
-            style: textStyles.headlineMedium,
+            selectedSymptom,
+            style: textStyles.bodyLarge,
           ),
-          const SizedBoxh10(),
-          AppDropdown(
-            optionsList: symptomCategories,
-            selectedText: selectedCategory,
-            onChanged: (String? value) {
-              setState(() {
-                selectedCategory = value!;
-                filteredSymptoms = getSymptomsForCategory(selectedCategory);
-              });
-            },
-          ),
-          const SizedBoxh10(),
-          AppDropdown(
-            optionsList: filteredSymptoms,
-            selectedText: selectedSymptom,
-            onChanged: (String? value) {
-              setState(() {
-                selectedSymptom = value!;
-                filteredSymptomsDesc = getDescBySymptomName(selectedSymptom);
-              });
-            },
-          ),
-          const SizedBoxh10(),
           Text(
             filteredSymptomsDesc,
             style: textStyles.bodyMedium,
@@ -247,7 +276,7 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          "Set End",
+                                          "Ended On",
                                           style: textStyles.bodyLarge!.copyWith(
                                               color: colorScheme.primary),
                                         ),
@@ -256,7 +285,7 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
                                             color: colorScheme.primary),
                                       ],
                                     ),
-                                    Text("Ongoing (default)",
+                                    Text("Ongoing",
                                         style: textStyles.bodyMedium),
                                   ],
                                 )
@@ -372,76 +401,101 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
               );
             }),
           ),
-          const SizedBoxh20(),
-          Text(
-            'Severity',
-            style: textStyles.headlineMedium,
-          ),
           const SizedBoxh10(),
 
-          // Video By AVS START
-          Card(
-            color: Colors.black54,
-            child: SizedBox(
-              height: 200,
-              width: MediaQuery.of(context).size.width,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          InkWell(
+              onTap: _toggleSeverityExpansion,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CircleAvatar(
-                      backgroundColor: colorScheme.primary,
-                      child: Text(
-                        _currentSeveritySliderValue.toInt().toString(),
-                        style: const TextStyle(color: Colors.white),
-                      ),
+                    Text(
+                      'Edit Severity',
+                      style: textStyles.headlineMedium,
                     ),
-                    const SizedBoxh20(),
-                    const Text(
-                      "Pending Video of different symptoms severity from AVS",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    _showEditSymptoms
+                        ? const Icon(Icons.expand_less)
+                        : const Icon(Icons.expand_more)
                   ],
                 ),
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              Flexible(
-                flex: 1,
-                child: Text(
-                  '1',
-                  style: textStyles.bodyLarge,
-                ),
-              ),
-              Flexible(
-                flex: 12,
-                child: Slider(
-                  value: _currentSeveritySliderValue,
-                  max: 10,
-                  divisions: 10,
-                  label: _currentSeveritySliderValue.round().toString(),
-                  onChanged: (double value) {
-                    setState(() {
-                      _currentSeveritySliderValue = value;
-                    });
-                  },
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: Text(
-                  '10',
-                  style: textStyles.bodyLarge,
-                ),
-              ),
-            ],
-          ),
+              )),
 
-          // Video By AVS END
-          const SizedBoxh20(),
+          AnimatedCrossFade(
+              firstChild: const SizedBox.shrink(),
+              secondChild: Column(
+                children: [
+                  Card(
+                    color: Colors.black54,
+                    child: SizedBox(
+                      height: 200,
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: colorScheme.primary,
+                              child: Text(
+                                _currentSeveritySliderValue.toInt().toString(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            const SizedBoxh20(),
+                            const Text(
+                              "Pending Video of different symptoms severity from AVS",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        child: Text(
+                          '1',
+                          style: textStyles.bodyLarge,
+                        ),
+                      ),
+                      Flexible(
+                        flex: 12,
+                        child: Slider(
+                          value: _currentSeveritySliderValue,
+                          max: 10,
+                          divisions: 10,
+                          label: _currentSeveritySliderValue.round().toString(),
+                          onChanged: (double value) {
+                            setState(() {
+                              _currentSeveritySliderValue = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: Text(
+                          '10',
+                          style: textStyles.bodyLarge,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Video By AVS END
+                  const SizedBoxh20(),
+                ],
+              ),
+              crossFadeState: _showEditSymptoms
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 150)),
+
+          // Video By AVS START
+
           const SizedBoxh20(),
 
           SizedBox(
@@ -454,17 +508,50 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
                       selectedSymptom != "" &&
                       isStartDateSet == true) {
                     // update symptom
-                    symptomService.updateSymptom(
-                      id: widget.symptomData.oid ?? "",
-                      category: selectedCategory,
-                      symptom: selectedSymptom,
-                      factors: factorsController.text,
-                      severity: _currentSeveritySliderValue.toInt(),
-                      tags: tags,
-                      hasEnd: isEndDateSet,
-                      startDate: startDateTime,
-                      endDate: endDateTime,
-                    );
+
+                    if (_hasChangedSeverity) {
+                      /// severity changed:
+                      /// set curr symptom to ends today
+                      ///
+                      final now = DateTime.now();
+                      symptomService.updateSymptom(
+                        id: widget.symptomData.oid ?? "",
+                        hasEnd: true,
+                        endDate: now,
+                      );
+
+                      symptomService.addSymptom(
+                        formData: Symptom(
+                          petID: widget.symptomData.petID,
+                          // Add symptom can only be accessed through PetID
+                          category: selectedCategory,
+                          symptom: selectedSymptom,
+                          factors: factorsController.text,
+                          startDate: now,
+                          severity: _currentSeveritySliderValue.toInt(),
+                          tags: tags,
+                          // end date is not set - ongoing
+                          hasEnd: isEndDateSet,
+                        ),
+                      );
+
+                      /// create new symptom that starts now and is ongoing
+                    } else {
+                      /// severity has not changed: normal update
+                      /// most of these fields don't get updated anymore but I'm keeping
+                      /// because lazy
+                      symptomService.updateSymptom(
+                        id: widget.symptomData.oid ?? "",
+                        category: selectedCategory,
+                        symptom: selectedSymptom,
+                        factors: factorsController.text,
+                        severity: _currentSeveritySliderValue.toInt(),
+                        tags: tags,
+                        hasEnd: isEndDateSet,
+                        startDate: startDateTime,
+                        endDate: endDateTime,
+                      );
+                    }
 
                     // exit
                     Navigator.pop(context);
@@ -482,5 +569,26 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
         ],
       ),
     );
+  }
+
+  /// A section used to just show a bunch of debug info
+  Widget showDebugInfo(BuildContext context) {
+    final TextTheme textStyles = Theme.of(context).textTheme;
+    if (!kReleaseMode) {
+      return DefaultTextStyle(
+          style: textStyles.bodySmall!,
+          child: Column(
+            children: [
+              Text(
+                'THIS IS SHOWN IN DEBUG MODE ONLY',
+                style: textStyles.titleSmall,
+              ),
+              Text('severity changed: $_hasChangedSeverity'),
+              const SizedBoxh10()
+            ],
+          ));
+    }
+
+    return Container();
   }
 }

@@ -42,7 +42,7 @@ class AddPetPage extends StatefulWidget {
 }
 
 class _AddPetPageState extends State<AddPetPage> {
-  // Form key for all pet fields
+  /// Form key for all pet fields
   final _petInputFormKey = GlobalKey<FormState>();
 
   late String? uid;

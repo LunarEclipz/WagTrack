@@ -55,6 +55,9 @@ class AppTextFormField extends StatefulWidget {
   /// Whether or not to append the default "optional" UI item to the field
   ///
   /// Also sets validator to be empty (disabled) if no other validator is set.
+  ///
+  /// Not required for just general optional fields. Mostly a decorative feature
+  /// implemented together with the validator.
   final bool showOptional;
 
   /// Whether or not to append the default "required" UI item to the field
@@ -81,6 +84,12 @@ class AppTextFormField extends StatefulWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
 
+  /// Whether this text field is expandable. Also set maxLines to `null` (no limit)
+  /// and sets input type to multiline (so the return button creates a new line)
+  ///
+  /// Should probably rename this to "multiline"
+  final bool expands;
+
   /// Creates a standard text form field for WagTrack.
   const AppTextFormField({
     super.key,
@@ -97,6 +106,7 @@ class AppTextFormField extends StatefulWidget {
     this.isObscurable = false,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.expands = false,
   });
 
   @override
@@ -196,10 +206,15 @@ class _AppTextFormFieldState extends State<AppTextFormField> {
       enabled: widget.enabled,
       controller: widget.controller,
       obscureText: _obscuretext,
-      keyboardType: widget.keyboardType,
+      keyboardType:
+          widget.expands ? TextInputType.multiline : widget.keyboardType,
       validator: widget.validator ?? defaultValidator,
       autovalidateMode: widget.autovalidateMode,
       textAlignVertical: TextAlignVertical.top,
+      // for setting multiline
+      maxLines: widget.expands ? null : 1,
+      minLines: widget.expands ? 1 : null,
+      // decoration parameters
       decoration: InputDecoration(
         // isDense: true,
         hintText: hintText,

@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:wagtrack/models/notification_enums.dart';
 import 'package:wagtrack/models/notification_model.dart';
-import 'package:wagtrack/models/notification_params.dart';
 import 'package:wagtrack/services/logging.dart';
+import 'package:wagtrack/shared/utils.dart';
 
 /// Modes to sort notifications by.
 enum NotificationSortingMode {
@@ -29,6 +34,7 @@ class NotificationService with ChangeNotifier {
 
   // Keys for storing in shared preferences
   final String _notificationsListKey = 'notificationsList';
+  final String _recurringNotificationsListKey = 'recurringNotificationsList';
   final String _notificationsMaxIdKey = 'notificationsMaxId';
 
   /// Whether the service is ready to be used.
@@ -37,17 +43,26 @@ class NotificationService with ChangeNotifier {
   /// UI elements from bein shown while loading is incomplete..
   bool isReady = false;
 
-  /// Maxmium number of notifications stored, default = 10.
-  int maxNotificationCount = 10;
+  /// Maxmium number of show notifications stored, default = 100.
+  ///
+  /// This does not include recurring notifications TODO
+  int maxNotificationCount = 100;
 
   /// List of local notifications
-  List<AppNotification> notificationList = [];
+  List<AppNotification> notificationShowList = [];
 
-  /// Current maximum Id of notifications
+  /// List of recurring notifications
+  List<AppRecurringNotification> recurringNotificationList = [];
+
+  /// Current maximum Id of notifications. Used to determine the id of new notifs
   int notificationsMaxId = 0;
 
-  // Notification details
-  late NotificationDetails mainNotificationDetails;
+  // Standard notification details to be used;
+  late final NotificationDetails _mainNotificationDetails;
+
+  /// whether notifications (in the operating system) are enabled.
+  /// Doesn't seem to work for iOS.
+  bool _notificationsEnabled = false;
 
   /// Constructor to create notification service.
   ///
@@ -56,39 +71,54 @@ class NotificationService with ChangeNotifier {
     initialize();
   }
 
-  /// Initialises the notification service. Has async functions in here.
+  /// Initialises the notification service. Is async.
+  ///
+  /// sets `isReady` to `true` after it completes.
   Future<void> initialize() async {
+    /// https://medium.com/@MarvelApps_/flutter-local-notification-d52aa41c065f
+    /// https://medium.com/@gauravswarankar/local-push-notification-flutter-32cc99f900a5
+    /// https://pub.dev/packages/flutter_local_notifications
+    /// iOS settings https://blog.codemagic.io/flutter-local-notifications/
+    ///
+    /// Unsure if fully set up for iOS (untested)
+    /// Notification actions are currently not supported.
+    ///
+    /// currently also not setting up channels.
+    ///
+    /// Future TODO:
+    /// - allow user to press notification to go to a page (use payloads)
+
+    if (isReady) {
+      // already initialised, no need to reinit
+      return;
+    }
+
     AppLogger.d("[NOTIF] Initializing notification service...");
 
-    try {
-      // TODO: only works for Android????
-      // iOS settings https://blog.codemagic.io/flutter-local-notifications/
-      // Initializing notification settings for Android
-      const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
-      const InitializationSettings initializationSettings =
-          InitializationSettings(android: initializationSettingsAndroid);
+    // CONFIG TIME ZONES
+    await _configureLocalTimeZone();
 
-      // Initialize notification channels
-      const AndroidNotificationChannel mainChannel = AndroidNotificationChannel(
-        'main_channel', // channel ID
-        'Main Notifications', // channel name
-        description: 'Main WagTrack app notifications',
-        importance: Importance.high,
+    try {
+      // TODO: Only more or less set up for Android at the moment
+
+      /// Set up initialization settings
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('notification_icon_main');
+
+      const DarwinInitializationSettings initializationSettingsDarwin =
+          DarwinInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
       );
 
-      // TODO This whole part just doesn't cooperate with stubbing in testing
-      // So fuck it
-      // Off to Gulag with you
-      final androidFlutterLocalNotificationsPlugin =
-          _flutterLocalNotificationsPlugin
-              .resolvePlatformSpecificImplementation<
-                  AndroidFlutterLocalNotificationsPlugin>();
+      const InitializationSettings initializationSettings =
+          InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsDarwin,
+      );
 
-      await androidFlutterLocalNotificationsPlugin
-          ?.createNotificationChannel(mainChannel);
-
-      // init flutter local notifs
+      // initialize with settings
       await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
       // Setup notification details
@@ -100,7 +130,7 @@ class NotificationService with ChangeNotifier {
         priority: Priority.high,
       );
 
-      mainNotificationDetails =
+      _mainNotificationDetails =
           const NotificationDetails(android: androidNotificationDetails);
 
       // load notifications from local storage
@@ -117,6 +147,43 @@ class NotificationService with ChangeNotifier {
       AppLogger.e("[NOTIF] Error initalizing notification service: $e", e);
     }
   }
+
+  // CONFIG Methods
+
+  /// Requests permissions. OS-specific. Not part of full initialization as it
+  /// is meant to be run as the user is logged into the main home screen.
+  Future<void> requestPermissions() async {
+    if (Platform.isIOS) {
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              MacOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    } else if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          _flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin>();
+
+      final bool? grantedNotificationPermission =
+          await androidImplementation?.requestNotificationsPermission();
+      _notificationsEnabled = grantedNotificationPermission ?? false;
+    }
+    AppLogger.d("[NOTIF] Notifications permissions requested.");
+  }
+
+  // USAGE methods
 
   /// Shows notification now.
   ///
@@ -155,7 +222,7 @@ class NotificationService with ChangeNotifier {
         newNotif.id,
         newNotif.title,
         newNotif.body,
-        mainNotificationDetails,
+        _mainNotificationDetails,
       );
 
       // Save notification to storage
@@ -213,7 +280,7 @@ class NotificationService with ChangeNotifier {
         newNotif.title,
         newNotif.body,
         scheduledDate,
-        mainNotificationDetails,
+        _mainNotificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
@@ -223,11 +290,57 @@ class NotificationService with ChangeNotifier {
       // Save scheduled notification to storage
       saveNotification(newNotif);
 
-      // Doesn't notify
+      // Doesn't notify listeners, not necessary
 
       AppLogger.i("[NOTIF] Succesfully scheduled $newNotif");
     } catch (e) {
       AppLogger.e("[NOTIF] Error scheduling notification: $e", e);
+    }
+  }
+
+  /// Repeats a notification periodically
+  ///
+  /// TODO Note: `interval` must be one minute or more!!!!
+  Future<void> showRecurringNotification(
+    String title,
+    String body,
+    Duration interval,
+    NotificationType type,
+  ) async {
+    if (!isReady) {
+      AppLogger.w("[NOTIF] Notification service is not ready.");
+      return;
+    }
+    AppLogger.d(
+        "[NOTIF] Scheduling recurring notification '$title' every ${formatDuration(interval)}");
+    try {
+      // create new recurring notification object
+      final newNotif = AppRecurringNotification(
+        id: notificationsMaxId + 1,
+        startTime: DateTime.now(),
+        interval: interval,
+        type: type,
+        title: title,
+        body: body,
+      );
+
+      // shopw periodically
+      await _flutterLocalNotificationsPlugin.periodicallyShowWithDuration(
+        newNotif.id,
+        newNotif.title,
+        newNotif.body,
+        interval,
+        _mainNotificationDetails,
+      );
+
+      // Save scheduled recurring notification to list and storage
+      saveRecurringNotification(newNotif);
+
+      notifyListeners();
+
+      AppLogger.i("[NOTIF] Succesfully scheduled recurring $newNotif");
+    } catch (e) {
+      AppLogger.e("[NOTIF] Error scheduling recurring notification: $e", e);
     }
   }
 
@@ -244,7 +357,7 @@ class NotificationService with ChangeNotifier {
     if (!notification.isEmpty) {
       // increments max id
       notificationsMaxId++;
-      notificationList.add(notification);
+      notificationShowList.add(notification);
       notifications.add(notification.toJSONString());
       await _prefs.setStringList(_notificationsListKey, notifications);
       await _prefs.setInt(_notificationsMaxIdKey, notificationsMaxId);
@@ -260,14 +373,47 @@ class NotificationService with ChangeNotifier {
     }
   }
 
+  /// Saves one specified recurring notification to device storage (shared preferences).
+  Future<void> saveRecurringNotification(AppRecurringNotification notification,
+      {bool limitNotifs = true}) async {
+    AppLogger.d("[NOTIF] Saving recurring notification: $notification");
+
+    // loads currently saved notifications in shared _prefs
+    List<String> notifications =
+        _prefs.getStringList(_recurringNotificationsListKey) ?? <String>[];
+
+    // only add and save notification if it is nonEmpty.
+    if (!notification.isEmpty) {
+      // increments max id
+      notificationsMaxId++;
+      recurringNotificationList.add(notification);
+      notifications.add(notification.toJSONString());
+      await _prefs.setStringList(_recurringNotificationsListKey, notifications);
+      await _prefs.setInt(_notificationsMaxIdKey, notificationsMaxId);
+
+      // final test = notification.body;
+
+      // makes sure notifications is under the limit.
+      // if (limitNotifs) {
+      //   limitNotifications();
+      // }
+    } else {
+      AppLogger.t("[NOTIF] Empty recurring notification");
+    }
+  }
+
   /// Saves all notifications in service to device storage (shared preferences).
   ///
   /// Also updates maxId
   Future<void> saveAllNotificationsToDevice() async {
     final notificationsJsonString =
-        notificationList.map((notif) => notif.toJSONString()).toList();
+        notificationShowList.map((notif) => notif.toJSONString()).toList();
+    final recurringNotificationsJsonString =
+        recurringNotificationList.map((notif) => notif.toJSONString()).toList();
 
     await _prefs.setStringList(_notificationsListKey, notificationsJsonString);
+    await _prefs.setStringList(
+        _recurringNotificationsListKey, recurringNotificationsJsonString);
     await _prefs.setInt(_notificationsMaxIdKey, notificationsMaxId);
   }
 
@@ -278,11 +424,19 @@ class NotificationService with ChangeNotifier {
       // Get list of notifications as strings
       List<String> notificationStrings =
           _prefs.getStringList(_notificationsListKey) ?? <String>[];
+      List<String> recurringNotificationStrings =
+          _prefs.getStringList(_recurringNotificationsListKey) ?? <String>[];
 
       // Convert to `AppNotification`
-      notificationList = notificationStrings.map((notificationString) {
+      notificationShowList = notificationStrings.map((notificationString) {
         return AppNotification.fromJSONString(notificationString);
       }).toList();
+      recurringNotificationList =
+          recurringNotificationStrings.map((notificationString) {
+        return AppRecurringNotification.fromJSONString(notificationString);
+      }).toList();
+
+      // TODO need to check if recurring notifications are all active
 
       // loads maxId
       notificationsMaxId = _prefs.getInt(_notificationsMaxIdKey) ?? 0;
@@ -307,7 +461,7 @@ class NotificationService with ChangeNotifier {
     // first sort
     sortNotifications(sortingMode: sortingMode, reversed: reversed);
 
-    return notificationList.where((notif) {
+    return notificationShowList.where((notif) {
       // The notification is not a future notification
       return !notif.isFutureNotification;
     }).toList();
@@ -328,38 +482,38 @@ class NotificationService with ChangeNotifier {
       switch (sortingMode) {
         case NotificationSortingMode.id:
           if (reversed) {
-            notificationList.sort((x, y) => x.id - y.id);
+            notificationShowList.sort((x, y) => x.id - y.id);
           } else {
-            notificationList.sort((x, y) => y.id - x.id);
+            notificationShowList.sort((x, y) => y.id - x.id);
           }
         case NotificationSortingMode.timeNotified:
           if (reversed) {
-            notificationList.sort(
+            notificationShowList.sort(
                 (x, y) => y.notificationTime.compareTo(x.notificationTime));
           } else {
-            notificationList.sort(
+            notificationShowList.sort(
                 (x, y) => x.notificationTime.compareTo(y.notificationTime));
           }
         case NotificationSortingMode.timeCreated:
           if (reversed) {
-            notificationList
+            notificationShowList
                 .sort((x, y) => y.createdTime.compareTo(x.createdTime));
           } else {
-            notificationList
+            notificationShowList
                 .sort((x, y) => x.createdTime.compareTo(y.createdTime));
           }
         case NotificationSortingMode.type:
           if (reversed) {
-            notificationList.sort((x, y) => y.type.compareTo(x.type));
+            notificationShowList.sort((x, y) => y.type.compareTo(x.type));
           } else {
-            notificationList.sort((x, y) => x.type.compareTo(y.type));
+            notificationShowList.sort((x, y) => x.type.compareTo(y.type));
           }
         default:
           if (reversed) {
-            notificationList.sort(
+            notificationShowList.sort(
                 (x, y) => y.notificationTime.compareTo(x.notificationTime));
           } else {
-            notificationList.sort(
+            notificationShowList.sort(
                 (x, y) => x.notificationTime.compareTo(y.notificationTime));
           }
       }
@@ -381,7 +535,7 @@ class NotificationService with ChangeNotifier {
   /// it's called for and the numbers of notifications aren't large
   Future<void> limitNotifications({bool updateStorage = true}) async {
     // if witihn length, don't care
-    if (notificationList.length < maxNotificationCount) {
+    if (notificationShowList.length < maxNotificationCount) {
       return;
     }
 
@@ -394,9 +548,9 @@ class NotificationService with ChangeNotifier {
     // then delete
     // while there are more notifications than the limit AND
     // the first notification is NOT an future notification
-    while (notificationList.length > maxNotificationCount &&
-        !notificationList[0].isFutureNotification) {
-      notificationList.removeAt(0);
+    while (notificationShowList.length > maxNotificationCount &&
+        !notificationShowList[0].isFutureNotification) {
+      notificationShowList.removeAt(0);
     }
 
     notifyListeners();
@@ -407,7 +561,45 @@ class NotificationService with ChangeNotifier {
     }
   }
 
-  /// Deletes all notifications. By default, retains notifications that have not been notified
+  /// Deletes the notification with the given integer `id` from the _notificationsShowList.
+  /// Deletes from both nofitications AND recurring notifications.
+  /// By default, updates notifications
+  /// in shared preferences.
+  ///
+  /// Will also cancel the notification in FLN.
+  ///
+  /// Doesn't delete empty (id=-1) notifications
+  Future<void> deleteNotification({
+    required int id,
+    bool updateStorage = true,
+  }) async {
+    if (id < 0) {
+      AppLogger.d("[NOTIF] Will not delete empty notification");
+      return;
+    }
+
+    AppLogger.d("[NOTIF] Deleting notification with id $id");
+    try {
+      // remove from notification list
+      notificationShowList.removeWhere((notif) => notif.id == id);
+      recurringNotificationList.removeWhere((notif) => notif.id == id);
+
+      // remove from flutter local notifs
+      _flutterLocalNotificationsPlugin.cancel(id);
+
+      // update shared prefs
+      if (updateStorage) {
+        await saveAllNotificationsToDevice();
+      }
+    } catch (e) {
+      AppLogger.e("[NOTIF] Error deleting notification", e);
+    }
+
+    notifyListeners();
+  }
+
+  /// Deletes all notifications. Currently does not delete from recurring notifications
+  /// By default, retains notifications that have not been notified
   /// and updates notifications in shared preferences.
   Future<void> deleteAllNotifications({
     bool retainFutureNotifications = true,
@@ -422,12 +614,12 @@ class NotificationService with ChangeNotifier {
     try {
       if (retainFutureNotifications) {
         // keeps future notifications
-        notificationList = notificationList
+        notificationShowList = notificationShowList
             .where((notif) => notif.isFutureNotification)
             .toList();
       } else {
         // clears ALL notifications
-        notificationList = [];
+        notificationShowList = [];
       }
 
       // Update local preferences. All notifications will be removed.
@@ -448,6 +640,13 @@ class NotificationService with ChangeNotifier {
   /// clears lists of notifications
   void resetService() {
     AppLogger.t("[NOTIF] Resetting notification service");
-    notificationList = [];
+    notificationShowList = [];
   }
+}
+
+// Misc
+Future<void> _configureLocalTimeZone() async {
+  tz.initializeTimeZones();
+  final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+  tz.setLocalLocation(tz.getLocation(timeZoneName));
 }
