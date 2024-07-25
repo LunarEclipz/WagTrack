@@ -34,6 +34,9 @@ jobs:
     # I think the default Dart version is too old so you have to run this
     - run: flutter upgrade
     
+    # Run flutter doctor to show information about the toolchain for debug purposes.
+    - run: flutter doctor -v
+
     # Get flutter dependencies.
     - run: flutter pub get
     

@@ -32,6 +32,9 @@ jobs:
     
     # Upgrade flutter
     - run: flutter upgrade
+
+    # Run flutter doctor to show information about the toolchain for debug purposes.
+    - run: flutter doctor -v
     
     # Get flutter dependencies.
     - run: flutter pub get
