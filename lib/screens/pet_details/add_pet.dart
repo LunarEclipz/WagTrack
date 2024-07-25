@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:string_validator/string_validator.dart';
 import 'package:wagtrack/models/pet_model.dart';
 import 'package:wagtrack/models/user_model.dart';
 import 'package:wagtrack/services/auth_service.dart';
@@ -513,7 +512,7 @@ class _AddPetPageState extends State<AddPetPage> {
                         return null;
                       }
 
-                      if (!isNumeric(value) || value[0] == "-") {
+                      if (!_isDouble(value) || value[0] == "-") {
                         // Input string is not numeric
                         // Also checking if negative,
                         // easier than just converting it to a double
@@ -1014,8 +1013,13 @@ class _AddPetPageState extends State<AddPetPage> {
 
     return Container();
   }
+
+  bool _isDouble(String str) {
+    return double.tryParse(str) != null;
+  }
 }
 
+/// Widget used to represent a user in a list of users
 class RoleRow extends StatefulWidget {
   final String username;
   final String role;
