@@ -31,7 +31,7 @@ android {
     // need 34 for FLNP
     // compileSdk flutter.compileSdkVersion
     compileSdk 34
-    ndkVersion flutter.ndkVersion
+    ndkVersion "26.1.10909125"
 
     compileOptions {
         // Flag to enable support for the new language APIs
