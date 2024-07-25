@@ -156,49 +156,6 @@ class NotificationCard extends StatefulWidget {
 class _NotificationCardState extends State<NotificationCard> {
   bool _isExpanded = false;
 
-  Widget getIconForType(BuildContext context, NotificationType type) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final CustomColors customColors =
-        Theme.of(context).extension<CustomColors>()!;
-
-    switch (type) {
-      case NotificationType.noType:
-        return const Icon(Icons.question_mark);
-      case NotificationType.debug:
-        return const Icon(Icons.construction);
-      case NotificationType.medicalGreen:
-        return Icon(
-          Icons.check_circle,
-          color: customColors.green,
-        );
-      case NotificationType.medicalYellow:
-        return Icon(
-          // Icons.thermostat,
-          Icons.error,
-          color: Colors.yellow[600],
-        );
-      case NotificationType.medicalOrange:
-        return Icon(
-          // Icons.thermostat,
-          Icons.error,
-          color: Colors.orange[700],
-        );
-      case NotificationType.medicalRed:
-        return Icon(
-          Icons.error,
-          color: colorScheme.primary,
-        );
-      case NotificationType.medication:
-        return const Icon(Icons.medication);
-      case NotificationType.socialComment:
-        return const Icon(Icons.chat);
-      case NotificationType.socialLike:
-        return const Icon(Icons.favorite);
-      default:
-        return const Icon(Icons.info);
-    }
-  }
-
   void _toggleExpansion() {
     setState(() {
       _isExpanded = !_isExpanded;
@@ -226,7 +183,7 @@ class _NotificationCardState extends State<NotificationCard> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  getIconForType(context, notif.type),
+                  _getIconForType(context, notif.type),
                   const SizedBox(
                     width: 10,
                   ),
@@ -266,7 +223,7 @@ class _NotificationCardState extends State<NotificationCard> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  getIconForType(context, notif.type),
+                  _getIconForType(context, notif.type),
                   const SizedBox(
                     width: 10,
                   ),
@@ -290,6 +247,13 @@ class _NotificationCardState extends State<NotificationCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  Text(
+                    // timeAgo(notif.notificationTime),
+                    '${formatDateTime(notif.notificationTime).date} '
+                    '${formatDateTime(notif.notificationTime).time}',
+                    style: textStyles.bodySmall!
+                        .copyWith(color: AppTheme.customColors.secondaryText),
+                  ),
                   AppIconButtonSmall(
                     icon: Icon(
                       Icons.delete_rounded,
@@ -301,13 +265,6 @@ class _NotificationCardState extends State<NotificationCard> {
                           .read<NotificationService>()
                           .deleteNotification(id: notif.id);
                     },
-                  ),
-                  Text(
-                    // timeAgo(notif.notificationTime),
-                    '${formatDateTime(notif.notificationTime).date} '
-                    '${formatDateTime(notif.notificationTime).time}',
-                    style: textStyles.bodySmall!
-                        .copyWith(color: AppTheme.customColors.secondaryText),
                   ),
                 ],
               ),
@@ -337,49 +294,6 @@ class RecurringNotificationCard extends StatefulWidget {
 class _RecurringNotificationCardState extends State<RecurringNotificationCard> {
   bool _isExpanded = false;
 
-  Widget getIconForType(BuildContext context, NotificationType type) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final CustomColors customColors =
-        Theme.of(context).extension<CustomColors>()!;
-
-    switch (type) {
-      case NotificationType.noType:
-        return const Icon(Icons.question_mark);
-      case NotificationType.debug:
-        return const Icon(Icons.construction);
-      case NotificationType.medicalGreen:
-        return Icon(
-          Icons.check_circle,
-          color: customColors.green,
-        );
-      case NotificationType.medicalYellow:
-        return Icon(
-          // Icons.thermostat,
-          Icons.error,
-          color: Colors.yellow[600],
-        );
-      case NotificationType.medicalOrange:
-        return Icon(
-          // Icons.thermostat,
-          Icons.error,
-          color: Colors.orange[700],
-        );
-      case NotificationType.medicalRed:
-        return Icon(
-          Icons.error,
-          color: colorScheme.primary,
-        );
-      case NotificationType.medication:
-        return const Icon(Icons.medication);
-      case NotificationType.socialComment:
-        return const Icon(Icons.chat);
-      case NotificationType.socialLike:
-        return const Icon(Icons.favorite);
-      default:
-        return const Icon(Icons.info);
-    }
-  }
-
   void _toggleExpansion() {
     setState(() {
       _isExpanded = !_isExpanded;
@@ -407,7 +321,7 @@ class _RecurringNotificationCardState extends State<RecurringNotificationCard> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  getIconForType(context, notif.type),
+                  _getIconForType(context, notif.type),
                   const SizedBox(
                     width: 10,
                   ),
@@ -447,7 +361,7 @@ class _RecurringNotificationCardState extends State<RecurringNotificationCard> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  getIconForType(context, notif.type),
+                  _getIconForType(context, notif.type),
                   const SizedBox(
                     width: 10,
                   ),
@@ -469,8 +383,16 @@ class _RecurringNotificationCardState extends State<RecurringNotificationCard> {
                 ],
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Text(
+                    'Started '
+                    '${formatDateTime(notif.startTime).date} '
+                    '${formatDateTime(notif.startTime).time}, '
+                    '\nEvery ${formatDuration(notif.interval)}',
+                    style: textStyles.bodySmall!
+                        .copyWith(color: AppTheme.customColors.secondaryText),
+                  ),
                   AppIconButtonSmall(
                     icon: Icon(
                       Icons.delete_rounded,
@@ -483,14 +405,6 @@ class _RecurringNotificationCardState extends State<RecurringNotificationCard> {
                           .deleteNotification(id: notif.id);
                     },
                   ),
-                  Text(
-                    'Started '
-                    '${formatDateTime(notif.startTime).date} '
-                    '${formatDateTime(notif.startTime).time}, '
-                    'Every ${formatDuration(notif.interval)}',
-                    style: textStyles.bodySmall!
-                        .copyWith(color: AppTheme.customColors.secondaryText),
-                  ),
                 ],
               ),
             ],
@@ -502,5 +416,48 @@ class _RecurringNotificationCardState extends State<RecurringNotificationCard> {
         ),
       ),
     );
+  }
+}
+
+Widget _getIconForType(BuildContext context, NotificationType type) {
+  final ColorScheme colorScheme = Theme.of(context).colorScheme;
+  final CustomColors customColors =
+      Theme.of(context).extension<CustomColors>()!;
+
+  switch (type) {
+    case NotificationType.noType:
+      return const Icon(Icons.question_mark);
+    case NotificationType.debug:
+      return const Icon(Icons.construction);
+    case NotificationType.medicalGreen:
+      return Icon(
+        Icons.check_circle,
+        color: customColors.green,
+      );
+    case NotificationType.medicalYellow:
+      return Icon(
+        // Icons.thermostat,
+        Icons.error,
+        color: Colors.yellow[600],
+      );
+    case NotificationType.medicalOrange:
+      return Icon(
+        // Icons.thermostat,
+        Icons.error,
+        color: Colors.orange[700],
+      );
+    case NotificationType.medicalRed:
+      return Icon(
+        Icons.error,
+        color: colorScheme.primary,
+      );
+    case NotificationType.medication:
+      return const Icon(Icons.medication);
+    case NotificationType.socialComment:
+      return const Icon(Icons.chat);
+    case NotificationType.socialLike:
+      return const Icon(Icons.favorite);
+    default:
+      return const Icon(Icons.info);
   }
 }

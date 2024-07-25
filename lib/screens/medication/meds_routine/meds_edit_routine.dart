@@ -88,7 +88,9 @@ class _MedsEditRoutineState extends State<MedsEditRoutine> {
     appointmentNumberController.text = routineData.appointmentNumber;
     diagnosisController.text = routineData.diagnosis;
     commentsController.text = routineData.comments;
-    medicationList = routineData.medications;
+
+    // medicationList is cloned so the original is not edited
+    medicationList = routineData.medications.toList();
 
     // To get the symptoms - need to use SymptomService
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -451,7 +453,7 @@ class _MedsEditRoutineState extends State<MedsEditRoutine> {
                       addInfoValidation &&
                       medicationList.isNotEmpty) {
                     // Update routine
-                    medicationService.updateMedication(
+                    medicationService.updateMedicationRoutine(
                       id: widget.routineData.oid ?? "",
                       title: titleController.text,
                       clinicName: clinicNameController.text,

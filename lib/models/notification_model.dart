@@ -262,7 +262,7 @@ class AppRecurringNotification {
     if (isEmpty) {
       return "AppRecurringNotification[Empty]";
     }
-    return "AppRecurringNotification[id: $id]";
+    return "AppRecurringNotification[id: $id, oid: $oid]";
   }
 
   @override

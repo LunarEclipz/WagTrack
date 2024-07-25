@@ -52,12 +52,30 @@ String timeAgo(DateTime dateTime) {
   }
 }
 
-/// Converts a given `Duration` into a string
+/// Converts a given `Duration` into a string of the form
+/// _ day(s) _ hour(s) _ minute(s) _ second(s)
 String formatDuration(Duration duration) {
   int days = duration.inDays;
   int hours = duration.inHours.remainder(24);
   int minutes = duration.inMinutes.remainder(60);
   int seconds = duration.inSeconds.remainder(60);
 
-  return "${days}d ${hours}h ${minutes}m ${seconds}s";
+  String durationString = '';
+
+  if (days > 0) {
+    durationString = '$durationString$days day' '${days > 1 ? 's ' : ' '}';
+  }
+  if (hours > 0) {
+    durationString = '$durationString$hours hour' '${hours > 1 ? 's ' : ' '}';
+  }
+  if (minutes > 0) {
+    durationString =
+        '$durationString$minutes minute' '${minutes > 1 ? 's ' : ' '}';
+  }
+  if (seconds > 0) {
+    durationString =
+        '$durationString$seconds second' '${seconds > 1 ? 's ' : ' '}';
+  }
+
+  return durationString;
 }
