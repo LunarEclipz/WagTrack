@@ -524,6 +524,7 @@ class _EditSymptomsPageState extends State<EditSymptomsPage> {
 
                       symptomService.addSymptom(
                         formData: Symptom(
+                          location: widget.symptomData.location,
                           petID: widget.symptomData.petID,
                           // Add symptom can only be accessed through PetID
                           category: selectedCategory,
