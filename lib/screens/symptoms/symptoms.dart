@@ -45,12 +45,14 @@ class _SymptomsPageState extends State<SymptomsPage> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
+
     if (!loaded) {
       getAllSymptoms();
       setState(() {
         loaded = true;
       });
     }
+
     final SymptomService symptomService = context.watch<SymptomService>();
     pastSymptoms = symptomService.pastSymptoms;
     currentSymptoms = symptomService.currentSymptoms;
@@ -70,6 +72,13 @@ class _SymptomsPageState extends State<SymptomsPage> {
                 symptom: currentSymptoms[index],
               );
             }),
+          ),
+
+        // empty symptoms
+        if (currentSymptoms.isEmpty)
+          Text(
+            'You do not have any ongoing symptom records for this pet.',
+            style: textStyles.bodySmall!.copyWith(fontStyle: FontStyle.italic),
           ),
         const SizedBoxh20(),
       ]),

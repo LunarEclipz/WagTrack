@@ -36,12 +36,15 @@ class _MedsRoutinePageState extends State<MedsRoutinePage> {
   @override
   Widget build(BuildContext context) {
     // final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textStyles = Theme.of(context).textTheme;
+
     if (!loaded) {
       getAllMedicationRoutine();
       setState(() {
         loaded = true;
       });
     }
+
     final MedicationService medicationService =
         context.watch<MedicationService>();
     medicationRoutine = medicationService.medicationRoutines;
@@ -49,6 +52,7 @@ class _MedsRoutinePageState extends State<MedsRoutinePage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (medicationRoutine.isNotEmpty)
             Column(
@@ -57,7 +61,15 @@ class _MedsRoutinePageState extends State<MedsRoutinePage> {
                   medicationRoutine: medicationRoutine[index],
                 );
               }),
-            )
+            ),
+
+          // empty routines
+          if (medicationRoutine.isEmpty)
+            Text(
+              'You do not have any medical routine records for this pet.',
+              style:
+                  textStyles.bodySmall!.copyWith(fontStyle: FontStyle.italic),
+            ),
         ],
       ),
     );

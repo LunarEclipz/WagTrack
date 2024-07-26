@@ -9,6 +9,8 @@ import 'package:wagtrack/shared/themes.dart';
 import 'package:wagtrack/shared/utils.dart';
 
 /// This page is called "Records" in the App UI
+///
+/// TODO rename?
 class MedsOverviewPage extends StatefulWidget {
   final Pet petData;
 
@@ -214,6 +216,14 @@ class _MedsOverviewPageState extends State<MedsOverviewPage> {
                   ),
                 );
               }),
+            ),
+
+          // empty vaccines list
+          if (petData.vaccineRecords.isEmpty)
+            Text(
+              'You do not have any vaccine records for this pet.',
+              style:
+                  textStyles.bodySmall!.copyWith(fontStyle: FontStyle.italic),
             ),
         ],
       ),

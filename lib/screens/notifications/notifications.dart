@@ -85,6 +85,13 @@ class _NotificationsState extends State<Notifications> {
           shrinkWrap: true,
         ),
 
+        // no notifications
+        if (notificationList.isEmpty)
+          Text(
+            'You have no notifications!',
+            style: textStyles.bodySmall!.copyWith(fontStyle: FontStyle.italic),
+          ),
+
         // SECTION: under notifications
         const SizedBoxh10(),
         // Text('A maximum of $maxNotifCount notifications shown. '
