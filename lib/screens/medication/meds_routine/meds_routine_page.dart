@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/models/medication_model.dart';
 import 'package:wagtrack/models/pet_model.dart';
-import 'package:wagtrack/screens/medication/meds_routine/meds_add_routine.dart';
 import 'package:wagtrack/screens/medication/meds_routine/meds_edit_routine.dart';
 import 'package:wagtrack/services/medication_service.dart';
 import 'package:wagtrack/shared/components/button_components.dart';
@@ -51,41 +50,6 @@ class _MedsRoutinePageState extends State<MedsRoutinePage> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          Center(
-            child: AppButtonLarge(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(1.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.ease;
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-
-                      return SlideTransition(
-                        position: animation.drive(tween),
-                        child: child,
-                      );
-                    },
-                    transitionDuration: const Duration(
-                        milliseconds: 300), // Adjust the duration here
-                    pageBuilder: (context, a, b) => MedsAddRoutine(
-                      petData: widget.petData,
-                    ),
-                  ),
-                );
-              },
-              buttonTextPrefix: const Icon(
-                Icons.add_rounded,
-                color: Colors.white,
-              ),
-              text: 'Add Routine',
-            ),
-          ),
-          const SizedBoxh20(),
           if (medicationRoutine.isNotEmpty)
             Column(
               children: List.generate(medicationRoutine.length, (index) {
