@@ -212,10 +212,11 @@ class _ReportsState extends State<Reports> {
       context: context,
       builder: (context) {
         List<ReportTileObject> symptomReports = [];
-        final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
         List<Symptom> symptomsInLocation = symptomsInMonth
-            .where((obj) => obj.location == tappedLines[0].title)
+            .where((obj) =>
+                obj.location.toLowerCase() ==
+                tappedLines[0].title.toLowerCase())
             .toList();
         Set<String> uniqueSymptomCategories =
             symptomsInLocation.map((symptom) => symptom.symptom).toSet();
