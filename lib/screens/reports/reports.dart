@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wagtrack/models/report_model.dart';
+import 'package:wagtrack/models/symptom_enums.dart';
+import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/screens/reports/news_card.dart';
 import 'package:wagtrack/screens/reports/report_news.dart';
+import 'package:wagtrack/screens/reports/report_tile.dart';
 import 'package:wagtrack/services/news_service.dart';
+import 'package:wagtrack/services/symptom_service.dart';
+import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
+import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/sg_geo.dart';
 import 'package:wagtrack/shared/themes.dart';
 import 'package:wagtrack/shared/utils.dart';
 
-typedef HitValue = ({String title, List<String> symptom, List<Widget> widget});
+typedef HitValue = ({
+  String title,
+  // List<String> symptom,
+  // List<Widget> widget,
+});
 
 class Reports extends StatefulWidget {
   const Reports({super.key});
@@ -22,7 +34,12 @@ class Reports extends StatefulWidget {
 }
 
 class _ReportsState extends State<Reports> {
+  List<Symptom> symptomsInMonth = [];
+  bool loaded = false;
+
   late List<AVSNews> allNews;
+  late String selectedMonth = (monthsList[DateTime.now().month - 1]);
+
   late String displayTitle = "";
   late String displayCaption = "";
   late String displayDate = "";
@@ -44,6 +61,16 @@ class _ReportsState extends State<Reports> {
     setMap();
   }
 
+  getSymptomsByMonth() async {
+    final SymptomService symptomService = context.watch<SymptomService>();
+    List<Symptom> symptoms = await symptomService.getSymptomsByMonth(
+        month: monthsList.indexOf(selectedMonth) + 1, year: 2024);
+
+    setState(() {
+      symptomsInMonth = symptoms;
+    });
+  }
+
   void getAllNews() async {
     List<AVSNews> news = await NewsService().getAllNews();
     setState(() {
@@ -60,7 +87,12 @@ class _ReportsState extends State<Reports> {
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
+    if (!loaded) {
+      getSymptomsByMonth();
+      setState(() {
+        loaded = true;
+      });
+    }
     return
         // const MapControllerPage();
         AppScrollablePage(
@@ -107,7 +139,18 @@ class _ReportsState extends State<Reports> {
             ),
           ),
         ),
-        // const SizedBoxh10(),
+        AppDropdown(
+          onChanged: (String? value) {
+            setState(() {
+              selectedMonth = value!;
+            });
+            getSymptomsByMonth();
+          },
+          optionsList: monthsList,
+          selectedText: selectedMonth,
+          enabled: true,
+        ),
+        const SizedBoxh10(),
         NewsCard(
             displayOrgURL: displayOrgURL,
             displayTitle: displayTitle,
@@ -168,7 +211,42 @@ class _ReportsState extends State<Reports> {
       barrierColor: Colors.black.withOpacity(0.1),
       context: context,
       builder: (context) {
+        List<ReportTileObject> symptomReports = [];
         final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+        List<Symptom> symptomsInLocation = symptomsInMonth
+            .where((obj) => obj.location == tappedLines[0].title)
+            .toList();
+        Set<String> uniqueSymptomCategories =
+            symptomsInLocation.map((symptom) => symptom.symptom).toSet();
+        for (int i = 0; i < uniqueSymptomCategories.length; i++) {
+          List<Symptom> symptomsMatch = symptomsInLocation
+              .where(
+                  (obj) => obj.symptom == uniqueSymptomCategories.toList()[i])
+              .toList();
+          ReportTileObject tileObject = ReportTileObject(
+              green: 0,
+              red: 0,
+              orange: 0,
+              yellow: 0,
+              symptom: symptomsMatch[0].symptom);
+
+          for (int j = 0; j < symptomsMatch.length; j++) {
+            if (symptomsMatch[j].level == SymptomLevel.red) {
+              tileObject.red += 1;
+            }
+            if (symptomsMatch[j].level == SymptomLevel.orange) {
+              tileObject.orange += 1;
+            }
+            if (symptomsMatch[j].level == SymptomLevel.yellow) {
+              tileObject.yellow += 1;
+            }
+            if (symptomsMatch[j].level == SymptomLevel.green) {
+              tileObject.green += 1;
+            }
+          }
+          symptomReports.add(tileObject);
+        }
 
         return FractionallySizedBox(
           heightFactor: 0.5,
@@ -183,45 +261,37 @@ class _ReportsState extends State<Reports> {
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Total Reports in June',
-                    ),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.red,
-                      radius: 5,
-                    ),
-                    Text("15"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.orange,
-                      radius: 5,
-                    ),
-                    Text("11"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.yellow,
-                      radius: 5,
-                    ),
-                    Text("20"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.green,
-                      radius: 5,
-                    ),
-                    Text("25"),
-                    SizedBox(
-                      width: 5,
-                    ),
-                  ],
-                ),
+                ReportTile(
+                    month: selectedMonth,
+                    red: symptomsInLocation
+                        .where((obj) => obj.level == SymptomLevel.red)
+                        .length
+                        .toString(),
+                    orange: symptomsInLocation
+                        .where((obj) => obj.level == SymptomLevel.orange)
+                        .length
+                        .toString(),
+                    yellow: symptomsInLocation
+                        .where((obj) => obj.level == SymptomLevel.yellow)
+                        .length
+                        .toString(),
+                    green: symptomsInLocation
+                        .where((obj) => obj.level == SymptomLevel.green)
+                        .length
+                        .toString()),
                 const SizedBox(height: 8),
                 Column(
-                  children:
-                      List.generate(tappedLines[0].symptom.length, (index) {
+                  children: List.generate(symptomReports.length, (index) {
                     return ListTile(
                       leading: const Icon(Icons.sick_rounded),
-                      title: Text(tappedLines[0].symptom[index]),
-                      subtitle: tappedLines[0].widget[index],
+                      title: Text(symptomReports[index].symptom),
+                      subtitle: ReportTile(
+                        month: '',
+                        red: symptomReports[index].red.toString(),
+                        orange: symptomReports[index].orange.toString(),
+                        yellow: symptomReports[index].yellow.toString(),
+                        green: symptomReports[index].green.toString(),
+                      ),
                     );
                   }),
                 ),
@@ -264,93 +334,93 @@ class _ReportsState extends State<Reports> {
           borderColor: Colors.black,
           hitValue: (
             title: sgGeo["features"][i]["properties"]["Name"],
-            symptom: ["Bad Odour", "Vomitting", "Lethargy"],
-            widget: [
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.red,
-                    radius: 5,
-                  ),
-                  Text("4"),
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.orange,
-                    radius: 5,
-                  ),
-                  Text("5"),
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.yellow,
-                    radius: 5,
-                  ),
-                  Text("7"),
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.green,
-                    radius: 5,
-                  ),
-                  Text("21"),
-                  SizedBox(
-                    width: 5,
-                  ),
-                ],
-              ),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.red,
-                    radius: 5,
-                  ),
-                  Text("9"),
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.orange,
-                    radius: 5,
-                  ),
-                  Text("1"),
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.yellow,
-                    radius: 5,
-                  ),
-                  Text("12"),
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.green,
-                    radius: 5,
-                  ),
-                  Text("1"),
-                  SizedBox(
-                    width: 5,
-                  ),
-                ],
-              ),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.red,
-                    radius: 5,
-                  ),
-                  Text("2"),
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.orange,
-                    radius: 5,
-                  ),
-                  Text("5"),
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.yellow,
-                    radius: 5,
-                  ),
-                  Text("1"),
-                  CircleAvatar(
-                    backgroundColor: SeverityColors.green,
-                    radius: 5,
-                  ),
-                  Text("3"),
-                  SizedBox(
-                    width: 5,
-                  ),
-                ],
-              ),
-            ]
+            // symptom: ["Bad Odour", "Vomitting", "Lethargy"],
+            // widget: [
+            //   const Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       CircleAvatar(
+            //         backgroundColor: SeverityColors.red,
+            //         radius: 5,
+            //       ),
+            //       Text("4"),
+            //       CircleAvatar(
+            //         backgroundColor: SeverityColors.orange,
+            //         radius: 5,
+            //       ),
+            //       Text("5"),
+            //       CircleAvatar(
+            //         backgroundColor: SeverityColors.yellow,
+            //         radius: 5,
+            //       ),
+            //       Text("7"),
+            //       CircleAvatar(
+            //         backgroundColor: SeverityColors.green,
+            //         radius: 5,
+            //       ),
+            //       Text("21"),
+            //       SizedBox(
+            //         width: 5,
+            //       ),
+            //     ],
+            // ),
+            // const Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.red,
+            //       radius: 5,
+            //     ),
+            //     Text("9"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.orange,
+            //       radius: 5,
+            //     ),
+            //     Text("1"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.yellow,
+            //       radius: 5,
+            //     ),
+            //     Text("12"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.green,
+            //       radius: 5,
+            //     ),
+            //     Text("1"),
+            //     SizedBox(
+            //       width: 5,
+            //     ),
+            //   ],
+            // ),
+            // const Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.red,
+            //       radius: 5,
+            //     ),
+            //     Text("2"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.orange,
+            //       radius: 5,
+            //     ),
+            //     Text("5"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.yellow,
+            //       radius: 5,
+            //     ),
+            //     Text("1"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.green,
+            //       radius: 5,
+            //     ),
+            //     Text("3"),
+            //     SizedBox(
+            //       width: 5,
+            //     ),
+            //     ],
+            //   ),
+            // ]
           ),
         );
 
@@ -373,93 +443,93 @@ class _ReportsState extends State<Reports> {
             borderColor: Colors.black,
             hitValue: (
               title: sgGeo["features"][i]["properties"]["Name"],
-              symptom: ["Bad Odour"],
-              widget: [
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.red,
-                      radius: 5,
-                    ),
-                    Text("4"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.orange,
-                      radius: 5,
-                    ),
-                    Text("5"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.yellow,
-                      radius: 5,
-                    ),
-                    Text("7"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.green,
-                      radius: 5,
-                    ),
-                    Text("21"),
-                    SizedBox(
-                      width: 5,
-                    ),
-                  ],
-                ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.red,
-                      radius: 5,
-                    ),
-                    Text("9"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.orange,
-                      radius: 5,
-                    ),
-                    Text("1"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.yellow,
-                      radius: 5,
-                    ),
-                    Text("12"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.green,
-                      radius: 5,
-                    ),
-                    Text("1"),
-                    SizedBox(
-                      width: 5,
-                    ),
-                  ],
-                ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.red,
-                      radius: 5,
-                    ),
-                    Text("2"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.orange,
-                      radius: 5,
-                    ),
-                    Text("5"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.yellow,
-                      radius: 5,
-                    ),
-                    Text("1"),
-                    CircleAvatar(
-                      backgroundColor: SeverityColors.green,
-                      radius: 5,
-                    ),
-                    Text("3"),
-                    SizedBox(
-                      width: 5,
-                    ),
-                  ],
-                ),
-              ]
+              //   symptom: ["Bad Odour"],
+              //   widget: [
+              //     const Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //       children: [
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.red,
+              //           radius: 5,
+              //         ),
+              //         Text("4"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.orange,
+              //           radius: 5,
+              //         ),
+              //         Text("5"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.yellow,
+              //           radius: 5,
+              //         ),
+              //         Text("7"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.green,
+              //           radius: 5,
+              //         ),
+              //         Text("21"),
+              //         SizedBox(
+              //           width: 5,
+              //         ),
+              //       ],
+              //     ),
+              //     const Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //       children: [
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.red,
+              //           radius: 5,
+              //         ),
+              //         Text("9"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.orange,
+              //           radius: 5,
+              //         ),
+              //         Text("1"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.yellow,
+              //           radius: 5,
+              //         ),
+              //         Text("12"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.green,
+              //           radius: 5,
+              //         ),
+              //         Text("1"),
+              //         SizedBox(
+              //           width: 5,
+              //         ),
+              //       ],
+              //     ),
+              //     const Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //       children: [
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.red,
+              //           radius: 5,
+              //         ),
+              //         Text("2"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.orange,
+              //           radius: 5,
+              //         ),
+              //         Text("5"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.yellow,
+              //           radius: 5,
+              //         ),
+              //         Text("1"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.green,
+              //           radius: 5,
+              //         ),
+              //         Text("3"),
+              //         SizedBox(
+              //           width: 5,
+              //         ),
+              //       ],
+              //     ),
+              //   ]
             ),
           );
 

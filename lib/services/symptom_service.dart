@@ -24,9 +24,11 @@ class SymptomService with ChangeNotifier {
 
   List<Symptom> _currentSymptoms = [];
   List<Symptom> _pastSymptoms = [];
+  List<Symptom> _monthSymptoms = [];
 
   List<Symptom> get currentSymptoms => _currentSymptoms;
   List<Symptom> get pastSymptoms => _pastSymptoms;
+  List<Symptom> get monthSymptoms => _monthSymptoms;
 
   /// Adds a new symptom document to the "symptoms" collection in Firestore
   ///
@@ -62,6 +64,14 @@ class SymptomService with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Sets List of pastSymptoms and currentSymptoms based from the input list of
+  /// symptoms.
+  void setMonthSymptoms({required List<Symptom> symptoms}) async {
+    AppLogger.d("[SYMP] Setting pastSymptoms and currentSymptoms");
+    _monthSymptoms = symptoms;
+    notifyListeners();
+  }
+
   /// Fetches all symptoms from Firestore associated with a specific pet ID
   Future<List<Symptom>> getAllSymptomsByPetID({required String petID}) async {
     try {
@@ -93,6 +103,50 @@ class SymptomService with ChangeNotifier {
     } catch (e) {
       // **Bold Error Message**
       AppLogger.e("[SYMP] Error fetching symptoms for pet ID $petID: $e", e);
+      return []; // Return an empty list on error
+    }
+  }
+
+  /// Fetches all symptoms from Firestore associated in the month
+  Future<List<Symptom>> getSymptomsByMonth({
+    required int month,
+    required int year,
+  }) async {
+    try {
+      // 2. Calculate timestamp boundaries for the month
+      final startDate = DateTime(year, month, 1);
+      final endDate = startDate
+          .add(Duration(days: getDaysInMonth(year: year, month: month)));
+
+      // 3. Convert timestamps to milliseconds since epoch
+      final startTimestamp = startDate.millisecondsSinceEpoch;
+      final endTimestamp = endDate.millisecondsSinceEpoch;
+
+      // 4. Query Firestore for documents with "time" field within the timestamp range
+      final querySnapshot = await _firestoreSymptomCollection
+          .where("startDate", isGreaterThanOrEqualTo: startTimestamp)
+          .where("startDate", isLessThan: endTimestamp)
+          .get();
+
+      // 5. Process and return symptoms (same logic as getAllSymptomsByPetID)
+      final List<Symptom> symptoms = [];
+      for (final docSnapshot in querySnapshot.docs) {
+        final symptomData = docSnapshot.data();
+        if (symptomData["mid"] == null) {
+          symptomData["mid"] = [];
+        }
+        if (symptomData["mName"] == null) {
+          symptomData["mName"] = [];
+        }
+        final symptom = Symptom.fromJson(symptomData);
+        symptom.oid = docSnapshot.id;
+        symptoms.add(symptom);
+      }
+      return symptoms;
+    } catch (e) {
+      // **Bold Error Message**
+      AppLogger.e(
+          "[SYMP] Error fetching symptoms for month $month/$year: $e", e);
       return []; // Return an empty list on error
     }
   }

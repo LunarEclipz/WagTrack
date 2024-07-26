@@ -81,3 +81,18 @@ String formatDuration(Duration duration) {
 
   return durationString;
 }
+
+int getDaysInMonth({required int year, required int month}) {
+  // Handle February for leap years
+  if (month == 2) {
+    return isLeapYear(year) ? 29 : 28;
+  } else if (month == 4 || month == 6 || month == 9 || month == 11) {
+    return 30;
+  } else {
+    return 31;
+  }
+}
+
+bool isLeapYear(int year) {
+  return (year % 4 == 0) && (year % 100 != 0 || year % 400 == 0);
+}
