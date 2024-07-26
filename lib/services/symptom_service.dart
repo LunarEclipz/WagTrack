@@ -99,6 +99,7 @@ class SymptomService with ChangeNotifier {
         // Add the converted symptom object to the list
         symptoms.add(symptom);
       }
+
       return symptoms;
     } catch (e) {
       // **Bold Error Message**
@@ -142,6 +143,7 @@ class SymptomService with ChangeNotifier {
         symptom.oid = docSnapshot.id;
         symptoms.add(symptom);
       }
+
       return symptoms;
     } catch (e) {
       // **Bold Error Message**

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:wagtrack/models/report_model.dart';
 import 'package:wagtrack/models/symptom_enums.dart';
 import 'package:wagtrack/models/symptom_model.dart';
@@ -17,7 +15,6 @@ import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/sg_geo.dart';
-import 'package:wagtrack/shared/themes.dart';
 import 'package:wagtrack/shared/utils.dart';
 
 typedef HitValue = ({
@@ -62,13 +59,26 @@ class _ReportsState extends State<Reports> {
   }
 
   getSymptomsByMonth() async {
-    final SymptomService symptomService = context.watch<SymptomService>();
-    List<Symptom> symptoms = await symptomService.getSymptomsByMonth(
-        month: monthsList.indexOf(selectedMonth) + 1, year: 2024);
-
-    setState(() {
-      symptomsInMonth = symptoms;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _fetchAndSetSymptoms();
     });
+  }
+
+  Future<void> _fetchAndSetSymptoms() async {
+    final SymptomService symptomService =
+        Provider.of<SymptomService>(context, listen: false);
+
+    List<Symptom> symptoms = await symptomService.getSymptomsByMonth(
+      month: monthsList.indexOf(selectedMonth) + 1,
+      year: 2024,
+    );
+
+    if (mounted) {
+      // mounted: whether this state object is in a tree.
+      setState(() {
+        symptomsInMonth = symptoms;
+      });
+    }
   }
 
   void getAllNews() async {
