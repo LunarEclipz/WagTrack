@@ -31,7 +31,7 @@ class _PastSymptomsState extends State<PastSymptoms> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              "Help (Reports)",
+              "Archives (Symptoms)",
               style: textStyles.bodyLarge,
             ),
           ],

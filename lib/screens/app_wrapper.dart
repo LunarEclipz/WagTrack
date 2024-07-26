@@ -19,7 +19,7 @@ class AppWrapper extends StatefulWidget {
 class _AppWrapperState extends State<AppWrapper> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  int currentPageIndex = 1;
+  int currentPageIndex = 0;
 
   List<Widget> screens = [
     const Home(),
