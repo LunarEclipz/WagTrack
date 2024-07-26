@@ -17,6 +17,9 @@ import 'package:wagtrack/screens/symptoms/symptoms.dart';
 import 'package:wagtrack/shared/background_img.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
 
+/// Widget that wraps the whole pet details section
+///
+/// Including tab controllers
 class PetDetailsWrapper extends StatefulWidget {
   final Pet petData;
   const PetDetailsWrapper({super.key, required this.petData});
@@ -309,6 +312,7 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper>
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               NavigationBar(
                 labelBehavior:
