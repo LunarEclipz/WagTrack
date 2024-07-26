@@ -31,7 +31,7 @@ android {
     // need 34 for FLNP
     // compileSdk flutter.compileSdkVersion
     compileSdk 34
-    ndkVersion flutter.ndkVersion
+    ndkVersion "26.1.10909125"
 
     compileOptions {
         // Flag to enable support for the new language APIs
@@ -55,7 +55,7 @@ android {
         applicationId "com.example.wagtrack"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -84,4 +84,5 @@ dependencies {
     // crash at startup fix: https://github.com/flutter/flutter/issues/110658
     implementation "androidx.window:window:1.0.0-rc01"
     implementation "androidx.window:window-java:1.0.0-rc01"
+    implementation "androidx.multidex:multidex:2.0.1"
 }

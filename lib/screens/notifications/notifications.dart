@@ -85,17 +85,27 @@ class _NotificationsState extends State<Notifications> {
           shrinkWrap: true,
         ),
 
+        // no notifications
+        if (notificationList.isEmpty)
+          Text(
+            'You have no notifications!',
+            style: textStyles.bodySmall!.copyWith(fontStyle: FontStyle.italic),
+          ),
+
         // SECTION: under notifications
         const SizedBoxh10(),
-        Text('A maximum of $maxNotifCount notifications shown. '
-            'Configure this in settings (WIP).'),
-
+        // Text('A maximum of $maxNotifCount notifications shown. '
+        //     'Configure this in settings (WIP).'),
+        Text('A maximum of $maxNotifCount notifications shown. '),
         const SizedBoxh10(),
+
         // SECTION: RECURRING NOTIFICATIONS
-        Text(
-          'Recurring Notifications',
-          style: textStyles.titleMedium!.copyWith(color: colorScheme.secondary),
-        ),
+        if (recurringNotificationList.isNotEmpty)
+          Text(
+            'Recurring Notifications',
+            style:
+                textStyles.titleMedium!.copyWith(color: colorScheme.secondary),
+          ),
         ListView.separated(
           itemBuilder: (BuildContext context, int index) =>
               RecurringNotificationCard(recurringNotificationList[index]),
@@ -435,13 +445,13 @@ Widget _getIconForType(BuildContext context, NotificationType type) {
         color: SeverityColors.green,
       );
     case NotificationType.medicalYellow:
-      return Icon(
+      return const Icon(
         // Icons.thermostat,
         Icons.error,
         color: SeverityColors.yellow,
       );
     case NotificationType.medicalOrange:
-      return Icon(
+      return const Icon(
         // Icons.thermostat,
         Icons.error,
         color: SeverityColors.orange,

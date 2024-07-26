@@ -52,6 +52,9 @@ class _NewsCardState extends State<NewsCard> {
                   Image.network(
                     widget.displayOrgURL,
                     height: 50,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(child: Text('Error loading image'));
+                    },
                   ),
                   Text(
                     widget.displayDate,

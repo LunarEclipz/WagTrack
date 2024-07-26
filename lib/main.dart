@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/firebase_options.dart';
 import 'package:wagtrack/screens/app_wrapper.dart';
@@ -17,6 +18,8 @@ import 'package:wagtrack/services/symptom_service.dart';
 import 'package:wagtrack/services/user_service.dart';
 import 'package:wagtrack/shared/themes.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -26,11 +29,13 @@ void main() async {
   // now wait for dependency injection
   await InjectionService.injectAll();
 
-  runApp(const WagTrackApp());
+  runApp(WagTrackApp(navigatorKey));
 }
 
 class WagTrackApp extends StatelessWidget {
-  const WagTrackApp({super.key});
+  final GlobalKey<NavigatorState> navigatorKey;
+
+  const WagTrackApp(this.navigatorKey, {super.key});
 
   // This widget is the root of your application.
   @override
@@ -43,7 +48,7 @@ class WagTrackApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => NotificationService(),
+          create: (context) => NotificationService(navigatorKey),
         ),
         ChangeNotifierProvider(
           create: (context) => UserService(),
@@ -96,11 +101,49 @@ class WagTrackApp extends StatelessWidget {
         title: 'wagtrack',
         theme: AppTheme.light,
         home: const Authenticate(),
+
+        // Navigation routes
         routes: {
           '/home': (context) => const AppWrapper(),
           '/notifications': (context) => const Notifications(),
         },
+
+        navigatorKey: navigatorKey,
       ),
     );
+  }
+}
+
+/// Notification tap background action
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  AppLogger.t('[NOTIF:TAP] notification(${notificationResponse.id}) '
+      'action tapped: '
+      '${notificationResponse.actionId} with'
+      ' payload: ${notificationResponse.payload}');
+
+  if (notificationResponse.input?.isNotEmpty ?? false) {
+    AppLogger.t('[NOTIF:TAP] notification action tapped with input: '
+        '${notificationResponse.input}');
+  }
+
+  /// navigate to payload
+  if (notificationResponse.payload != null &&
+      notificationResponse.payload!.isNotEmpty) {
+    navigatorKey.currentState?.pushNamed(notificationResponse.payload!);
+  }
+}
+
+/// Notification tap action
+void notificationTapAction(NotificationResponse notificationResponse) {
+  AppLogger.t('[NOTIF:TAP] notification(${notificationResponse.id}) '
+      'action tapped: '
+      '${notificationResponse.actionId} with'
+      ' payload: ${notificationResponse.payload}');
+
+  /// navigate to payload
+  if (notificationResponse.payload != null &&
+      notificationResponse.payload!.isNotEmpty) {
+    navigatorKey.currentState?.pushNamed(notificationResponse.payload!);
   }
 }

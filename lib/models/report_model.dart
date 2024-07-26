@@ -26,3 +26,17 @@ class AVSNews {
     return news;
   }
 }
+
+class ReportTileObject {
+  late int red;  late String symptom;
+
+  late int yellow;
+  late int orange;
+  late int green;
+  ReportTileObject(
+      {required this.red,
+      required this.yellow,      required this.symptom,
+
+      required this.green,
+      required this.orange});
+}

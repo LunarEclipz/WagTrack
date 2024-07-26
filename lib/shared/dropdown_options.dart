@@ -1,10 +1,12 @@
 // For Milestone 1, our location will be the following 5. In future, we
 // may transit to using postal codes.
 
-import 'package:wagtrack/shared/sg_mrt.dart';
+import 'package:wagtrack/shared/sg_geo.dart';
 
-List<String> locationList =
-    sgMrt.map((obg) => obg["Station Name"] as String).toList();
+List<String> locationList = sgGeo["features"]
+    .map((obg) => obg["properties"]["Name"] as String)
+    .toList()
+    .cast<String>();
 
 List<String> sexList = <String>[
   "Female",
@@ -398,4 +400,19 @@ List<String> postCategory = [
   "Lifestyle",
   "Health",
   "Fashion",
+];
+
+List<String> monthsList = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];

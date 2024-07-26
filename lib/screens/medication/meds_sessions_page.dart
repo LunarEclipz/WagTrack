@@ -220,6 +220,14 @@ class _MedsSessionsPageState extends State<MedsSessionsPage> {
                 },
               ),
             ),
+
+          // empty sessiong list
+          if (petData.sessionRecords.isEmpty)
+            Text(
+              'You do not have any session records for this pet.',
+              style:
+                  textStyles.bodySmall!.copyWith(fontStyle: FontStyle.italic),
+            ),
         ],
       ),
     );

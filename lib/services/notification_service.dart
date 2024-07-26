@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:wagtrack/main.dart';
 import 'package:wagtrack/models/notification_enums.dart';
 import 'package:wagtrack/models/notification_model.dart';
 import 'package:wagtrack/services/logging.dart';
@@ -27,6 +29,8 @@ enum NotificationSortingMode {
 ///
 /// Also storing notifications as a list given the operations seems very
 /// inefficient, but we aren't storing that much so ¯\_(ツ)_/¯
+///
+/// TODO Streams?
 class NotificationService with ChangeNotifier {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       GetIt.I<FlutterLocalNotificationsPlugin>();
@@ -36,6 +40,9 @@ class NotificationService with ChangeNotifier {
   final String _notificationsListKey = 'notificationsList';
   final String _recurringNotificationsListKey = 'recurringNotificationsList';
   final String _notificationsMaxIdKey = 'notificationsMaxId';
+
+  /// navigatorKey for navigation
+  final GlobalKey<NavigatorState> navigatorKey;
 
   /// Whether the service is ready to be used.
   ///
@@ -67,7 +74,7 @@ class NotificationService with ChangeNotifier {
   /// Constructor to create notification service.
   ///
   /// All the main initialisation happens in
-  NotificationService() {
+  NotificationService(this.navigatorKey) {
     initialize();
   }
 
@@ -87,6 +94,7 @@ class NotificationService with ChangeNotifier {
     ///
     /// Future TODO:
     /// - allow user to press notification to go to a page (use payloads)
+    /// - ^ CURRENTLY NOT SET UP FOR IOS. Need to set up actions and all that
 
     if (isReady) {
       // already initialised, no need to reinit
@@ -105,21 +113,26 @@ class NotificationService with ChangeNotifier {
       const AndroidInitializationSettings initializationSettingsAndroid =
           AndroidInitializationSettings('notification_icon_main');
 
-      const DarwinInitializationSettings initializationSettingsDarwin =
+      final DarwinInitializationSettings initializationSettingsDarwin =
           DarwinInitializationSettings(
         requestAlertPermission: false,
         requestBadgePermission: false,
         requestSoundPermission: false,
+        onDidReceiveLocalNotification: (id, title, body, payload) => (),
       );
 
-      const InitializationSettings initializationSettings =
+      final InitializationSettings initializationSettings =
           InitializationSettings(
         android: initializationSettingsAndroid,
         iOS: initializationSettingsDarwin,
       );
 
       // initialize with settings
-      await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+      await _flutterLocalNotificationsPlugin.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse: notificationTapAction,
+        onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+      );
 
       // Setup notification details
       const AndroidNotificationDetails androidNotificationDetails =
@@ -138,6 +151,8 @@ class NotificationService with ChangeNotifier {
 
       // not really necessary?
       notifyListeners();
+
+      AppLogger.t('notifs is Ready');
 
       // Complete loading
       isReady = true;
@@ -223,6 +238,7 @@ class NotificationService with ChangeNotifier {
         newNotif.title,
         newNotif.body,
         _mainNotificationDetails,
+        payload: '/home/notifications',
       );
 
       // Save notification to storage
@@ -285,6 +301,7 @@ class NotificationService with ChangeNotifier {
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time,
+        payload: '/notifications',
       );
 
       // Save scheduled notification to storage
@@ -328,6 +345,7 @@ class NotificationService with ChangeNotifier {
         newNotif.body,
         interval,
         _mainNotificationDetails,
+        payload: '/notifications',
       );
 
       // Save scheduled recurring notification to list and storage
@@ -415,6 +433,8 @@ class NotificationService with ChangeNotifier {
   }
 
   /// loads notifications from shared preferences.
+  ///
+  /// This will always set `isReady` to true. For loading reasons.
   Future<void> loadNotifications() async {
     AppLogger.t("[NOTIF] Loading notifications");
     try {
@@ -437,6 +457,10 @@ class NotificationService with ChangeNotifier {
 
       // loads maxId
       notificationsMaxId = _prefs.getInt(_notificationsMaxIdKey) ?? 0;
+
+      // set isReady to true
+      isReady = true;
+
       AppLogger.t("[NOTIF] Succesfully loaded notifications");
     } catch (e) {
       AppLogger.e("[NOTIF] Error loading notifications: $e", e);

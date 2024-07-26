@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
 import 'package:wagtrack/models/report_model.dart';
+import 'package:wagtrack/models/symptom_enums.dart';
+import 'package:wagtrack/models/symptom_model.dart';
 import 'package:wagtrack/screens/reports/news_card.dart';
 import 'package:wagtrack/screens/reports/report_news.dart';
+import 'package:wagtrack/screens/reports/report_tile.dart';
 import 'package:wagtrack/services/news_service.dart';
+import 'package:wagtrack/services/symptom_service.dart';
+import 'package:wagtrack/shared/components/input_components.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
+import 'package:wagtrack/shared/dropdown_options.dart';
 import 'package:wagtrack/shared/sg_geo.dart';
-import 'package:wagtrack/shared/sg_mrt.dart';
 import 'package:wagtrack/shared/utils.dart';
 
-typedef HitValue = ({String title, String subtitle});
+typedef HitValue = ({
+  String title,
+  // List<String> symptom,
+  // List<Widget> widget,
+});
 
 class Reports extends StatefulWidget {
   const Reports({super.key});
@@ -22,7 +31,12 @@ class Reports extends StatefulWidget {
 }
 
 class _ReportsState extends State<Reports> {
+  List<Symptom> symptomsInMonth = [];
+  bool loaded = false;
+
   late List<AVSNews> allNews;
+  late String selectedMonth = (monthsList[DateTime.now().month - 1]);
+
   late String displayTitle = "";
   late String displayCaption = "";
   late String displayDate = "";
@@ -35,7 +49,6 @@ class _ReportsState extends State<Reports> {
       const LatLng(1.4571497742692037, 103.63295554087519),
       const LatLng(1.262197454651967, 104.01267050889712));
   List<Polygon<HitValue>>? _polygons;
-  late List<Marker> customMarkers = [];
 
   @override
   void initState() {
@@ -43,6 +56,29 @@ class _ReportsState extends State<Reports> {
     super.initState();
     getAllNews();
     setMap();
+  }
+
+  getSymptomsByMonth() async {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _fetchAndSetSymptoms();
+    });
+  }
+
+  Future<void> _fetchAndSetSymptoms() async {
+    final SymptomService symptomService =
+        Provider.of<SymptomService>(context, listen: false);
+
+    List<Symptom> symptoms = await symptomService.getSymptomsByMonth(
+      month: monthsList.indexOf(selectedMonth) + 1,
+      year: 2024,
+    );
+
+    if (mounted) {
+      // mounted: whether this state object is in a tree.
+      setState(() {
+        symptomsInMonth = symptoms;
+      });
+    }
   }
 
   void getAllNews() async {
@@ -61,7 +97,12 @@ class _ReportsState extends State<Reports> {
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
+    if (!loaded) {
+      getSymptomsByMonth();
+      setState(() {
+        loaded = true;
+      });
+    }
     return
         // const MapControllerPage();
         AppScrollablePage(
@@ -82,7 +123,7 @@ class _ReportsState extends State<Reports> {
                       CameraConstraint.containCenter(bounds: bounds),
                   backgroundColor: Colors.transparent,
                   initialCenter:
-                      const LatLng(1.365759871533472, 103.8133714773305),
+                      const LatLng(1.3669343734539168, 103.83339687268919),
                   initialZoom: 10,
                   maxZoom: 14,
                   minZoom: 10),
@@ -104,13 +145,22 @@ class _ReportsState extends State<Reports> {
                     ),
                   ),
                 ),
-                if (customMarkers.isNotEmpty)
-                  MarkerLayer(markers: customMarkers)
               ],
             ),
           ),
         ),
-        // const SizedBoxh10(),
+        AppDropdown(
+          onChanged: (String? value) {
+            setState(() {
+              selectedMonth = value!;
+            });
+            getSymptomsByMonth();
+          },
+          optionsList: monthsList,
+          selectedText: selectedMonth,
+          enabled: true,
+        ),
+        const SizedBoxh10(),
         NewsCard(
             displayOrgURL: displayOrgURL,
             displayTitle: displayTitle,
@@ -171,6 +221,44 @@ class _ReportsState extends State<Reports> {
       barrierColor: Colors.black.withOpacity(0.1),
       context: context,
       builder: (context) {
+        List<ReportTileObject> symptomReports = [];
+
+        List<Symptom> symptomsInLocation = symptomsInMonth
+            .where((obj) =>
+                obj.location.toLowerCase() ==
+                tappedLines[0].title.toLowerCase())
+            .toList();
+        Set<String> uniqueSymptomCategories =
+            symptomsInLocation.map((symptom) => symptom.symptom).toSet();
+        for (int i = 0; i < uniqueSymptomCategories.length; i++) {
+          List<Symptom> symptomsMatch = symptomsInLocation
+              .where(
+                  (obj) => obj.symptom == uniqueSymptomCategories.toList()[i])
+              .toList();
+          ReportTileObject tileObject = ReportTileObject(
+              green: 0,
+              red: 0,
+              orange: 0,
+              yellow: 0,
+              symptom: symptomsMatch[0].symptom);
+
+          for (int j = 0; j < symptomsMatch.length; j++) {
+            if (symptomsMatch[j].level == SymptomLevel.red) {
+              tileObject.red += 1;
+            }
+            if (symptomsMatch[j].level == SymptomLevel.orange) {
+              tileObject.orange += 1;
+            }
+            if (symptomsMatch[j].level == SymptomLevel.yellow) {
+              tileObject.yellow += 1;
+            }
+            if (symptomsMatch[j].level == SymptomLevel.green) {
+              tileObject.green += 1;
+            }
+          }
+          symptomReports.add(tileObject);
+        }
+
         return FractionallySizedBox(
           heightFactor: 0.5,
           child: Padding(
@@ -184,27 +272,39 @@ class _ReportsState extends State<Reports> {
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                const Text(
-                  '0 reports this month',
-                ),
+                ReportTile(
+                    month: selectedMonth,
+                    red: symptomsInLocation
+                        .where((obj) => obj.level == SymptomLevel.red)
+                        .length
+                        .toString(),
+                    orange: symptomsInLocation
+                        .where((obj) => obj.level == SymptomLevel.orange)
+                        .length
+                        .toString(),
+                    yellow: symptomsInLocation
+                        .where((obj) => obj.level == SymptomLevel.yellow)
+                        .length
+                        .toString(),
+                    green: symptomsInLocation
+                        .where((obj) => obj.level == SymptomLevel.green)
+                        .length
+                        .toString()),
                 const SizedBox(height: 8),
-                Expanded(
-                  child: ListView.builder(
-                    itemBuilder: (context, index) {
-                      final tappedLineData = tappedLines[index];
-                      return ListTile(
-                        leading: index == 0
-                            ? const Icon(Icons.vertical_align_top)
-                            : index == tappedLines.length - 1
-                                ? const Icon(Icons.vertical_align_bottom)
-                                : const SizedBox.shrink(),
-                        title: Text(tappedLineData.title),
-                        subtitle: Text(tappedLineData.subtitle),
-                        dense: true,
-                      );
-                    },
-                    itemCount: tappedLines.length,
-                  ),
+                Column(
+                  children: List.generate(symptomReports.length, (index) {
+                    return ListTile(
+                      leading: const Icon(Icons.sick_rounded),
+                      title: Text(symptomReports[index].symptom),
+                      subtitle: ReportTile(
+                        month: '',
+                        red: symptomReports[index].red.toString(),
+                        orange: symptomReports[index].orange.toString(),
+                        yellow: symptomReports[index].yellow.toString(),
+                        green: symptomReports[index].green.toString(),
+                      ),
+                    );
+                  }),
                 ),
                 const SizedBox(height: 8),
                 // Align(
@@ -226,50 +326,227 @@ class _ReportsState extends State<Reports> {
   }
 
   setMap() {
-    // Set Markers
-    List<Marker> tempMarkers = [];
-    for (int i = 0; i < sgMrt.length; i++) {
-      tempMarkers.add(Marker(
-        point: LatLng(sgMrt[i]["Lat"], sgMrt[i]["Lng"]),
-        child: GestureDetector(
-            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Tapped ${sgMrt[i]["Station Name"]}'),
-                    duration: const Duration(seconds: 1),
-                    showCloseIcon: true,
-                  ),
-                ),
-            child:
-                CircleAvatar(backgroundColor: Colors.amber.withOpacity(0.1))),
-      ));
-    }
-    setState(() {
-      customMarkers = tempMarkers;
-    });
-
     // Set Map
     List<Polygon<HitValue>> polygonList = [];
     for (int i = 0; i < sgGeo["features"].length; i++) {
-      var objectICoords = sgGeo["features"][i]["geometry"]["coordinates"];
-      List<LatLng> points = [];
-      for (int j = 0; j < objectICoords[0].length; j++) {
-        print(objectICoords[0][j][1]);
-        LatLng coord = LatLng(objectICoords[0][j][1], objectICoords[0][j][0]);
-        points.add(coord);
-      }
-      Polygon<HitValue> polygon = Polygon(
-        pattern: StrokePattern.dashed(segments: const [50, 20]),
-        points: points,
-        color: Colors.blue.withOpacity(0.2),
-        borderStrokeWidth: 2,
-        borderColor: Colors.black,
-        hitValue: (
-          title: sgGeo["features"][i]["properties"]["name"],
-          subtitle: 'Nothing really special here...',
-        ),
-      );
+      var objectIType = sgGeo["features"][i]["geometry"]["type"];
+      // If type is polygon
+      if (objectIType == "Polygon") {
+        var objectICoords = sgGeo["features"][i]["geometry"]["coordinates"];
+        List<LatLng> points = [];
+        for (int j = 0; j < objectICoords[0].length; j++) {
+          LatLng coord = LatLng(objectICoords[0][j][1], objectICoords[0][j][0]);
+          points.add(coord);
+        }
+        Polygon<HitValue> polygon = Polygon(
+          points: points,
+          color: Colors.blue.withOpacity(0.2),
+          borderStrokeWidth: 2,
+          borderColor: Colors.black,
+          hitValue: (
+            title: sgGeo["features"][i]["properties"]["Name"],
+            // symptom: ["Bad Odour", "Vomitting", "Lethargy"],
+            // widget: [
+            //   const Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       CircleAvatar(
+            //         backgroundColor: SeverityColors.red,
+            //         radius: 5,
+            //       ),
+            //       Text("4"),
+            //       CircleAvatar(
+            //         backgroundColor: SeverityColors.orange,
+            //         radius: 5,
+            //       ),
+            //       Text("5"),
+            //       CircleAvatar(
+            //         backgroundColor: SeverityColors.yellow,
+            //         radius: 5,
+            //       ),
+            //       Text("7"),
+            //       CircleAvatar(
+            //         backgroundColor: SeverityColors.green,
+            //         radius: 5,
+            //       ),
+            //       Text("21"),
+            //       SizedBox(
+            //         width: 5,
+            //       ),
+            //     ],
+            // ),
+            // const Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.red,
+            //       radius: 5,
+            //     ),
+            //     Text("9"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.orange,
+            //       radius: 5,
+            //     ),
+            //     Text("1"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.yellow,
+            //       radius: 5,
+            //     ),
+            //     Text("12"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.green,
+            //       radius: 5,
+            //     ),
+            //     Text("1"),
+            //     SizedBox(
+            //       width: 5,
+            //     ),
+            //   ],
+            // ),
+            // const Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.red,
+            //       radius: 5,
+            //     ),
+            //     Text("2"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.orange,
+            //       radius: 5,
+            //     ),
+            //     Text("5"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.yellow,
+            //       radius: 5,
+            //     ),
+            //     Text("1"),
+            //     CircleAvatar(
+            //       backgroundColor: SeverityColors.green,
+            //       radius: 5,
+            //     ),
+            //     Text("3"),
+            //     SizedBox(
+            //       width: 5,
+            //     ),
+            //     ],
+            //   ),
+            // ]
+          ),
+        );
 
-      polygonList.add(polygon);
+        polygonList.add(polygon);
+      }
+      // If type is MultiPolygon
+      if (objectIType == "MultiPolygon") {
+        var objectICoords = sgGeo["features"][i]["geometry"]["coordinates"];
+        List<LatLng> points = [];
+        for (int z = 0; z < objectICoords[0].length; z++) {
+          for (int j = 0; j < objectICoords[0][z].length; j++) {
+            LatLng coord =
+                LatLng(objectICoords[0][z][j][1], objectICoords[0][z][j][0]);
+            points.add(coord);
+          }
+          Polygon<HitValue> polygon = Polygon(
+            points: points,
+            color: Colors.blue.withOpacity(0.2),
+            borderStrokeWidth: 2,
+            borderColor: Colors.black,
+            hitValue: (
+              title: sgGeo["features"][i]["properties"]["Name"],
+              //   symptom: ["Bad Odour"],
+              //   widget: [
+              //     const Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //       children: [
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.red,
+              //           radius: 5,
+              //         ),
+              //         Text("4"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.orange,
+              //           radius: 5,
+              //         ),
+              //         Text("5"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.yellow,
+              //           radius: 5,
+              //         ),
+              //         Text("7"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.green,
+              //           radius: 5,
+              //         ),
+              //         Text("21"),
+              //         SizedBox(
+              //           width: 5,
+              //         ),
+              //       ],
+              //     ),
+              //     const Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //       children: [
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.red,
+              //           radius: 5,
+              //         ),
+              //         Text("9"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.orange,
+              //           radius: 5,
+              //         ),
+              //         Text("1"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.yellow,
+              //           radius: 5,
+              //         ),
+              //         Text("12"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.green,
+              //           radius: 5,
+              //         ),
+              //         Text("1"),
+              //         SizedBox(
+              //           width: 5,
+              //         ),
+              //       ],
+              //     ),
+              //     const Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //       children: [
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.red,
+              //           radius: 5,
+              //         ),
+              //         Text("2"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.orange,
+              //           radius: 5,
+              //         ),
+              //         Text("5"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.yellow,
+              //           radius: 5,
+              //         ),
+              //         Text("1"),
+              //         CircleAvatar(
+              //           backgroundColor: SeverityColors.green,
+              //           radius: 5,
+              //         ),
+              //         Text("3"),
+              //         SizedBox(
+              //           width: 5,
+              //         ),
+              //       ],
+              //     ),
+              //   ]
+            ),
+          );
+
+          polygonList.add(polygon);
+        }
+      }
     }
     setState(() {
       _polygons = polygonList;
