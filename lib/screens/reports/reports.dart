@@ -50,6 +50,14 @@ class _ReportsState extends State<Reports> {
       const LatLng(1.262197454651967, 104.01267050889712));
   List<Polygon<HitValue>>? _polygons;
 
+  /// which polygon has been pressed
+  Polygon<HitValue>? _pressedPolygon;
+
+  // set colors
+  final Color borderColor = Colors.white;
+  final Color regionColor = const Color.fromARGB(255, 206, 210, 214);
+  final Color regionTappedColor = const Color.fromARGB(255, 164, 177, 185);
+
   @override
   void initState() {
     // TODO: implement initState
@@ -97,6 +105,7 @@ class _ReportsState extends State<Reports> {
   Widget build(BuildContext context) {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     if (!loaded) {
       getSymptomsByMonth();
       setState(() {
@@ -132,6 +141,21 @@ class _ReportsState extends State<Reports> {
                   behavior: HitTestBehavior.deferToChild,
                   child: GestureDetector(
                     onTap: () {
+                      setState(() {
+                        // for setting hit animation
+
+                        // set which polygon has been pressed
+                        final hitVal = _hitNotifier.value!.hitValues.first;
+
+                        final hitPolygons = _polygons!.where((polygon) =>
+                            polygon.hitValue!.title == hitVal.title);
+                        if (hitPolygons.isNotEmpty) {
+                          _pressedPolygon = hitPolygons.first;
+                        }
+
+                        setMap();
+                      });
+
                       _openTouchedGonsModal(
                         'Tapped',
                         _hitNotifier.value!.hitValues,
@@ -243,17 +267,16 @@ class _ReportsState extends State<Reports> {
               symptom: symptomsMatch[0].symptom);
 
           for (int j = 0; j < symptomsMatch.length; j++) {
-            if (symptomsMatch[j].level == SymptomLevel.red) {
-              tileObject.red += 1;
-            }
-            if (symptomsMatch[j].level == SymptomLevel.orange) {
-              tileObject.orange += 1;
-            }
-            if (symptomsMatch[j].level == SymptomLevel.yellow) {
-              tileObject.yellow += 1;
-            }
-            if (symptomsMatch[j].level == SymptomLevel.green) {
-              tileObject.green += 1;
+            switch (symptomsMatch[j].level) {
+              case SymptomLevel.red:
+                tileObject.red += 1;
+              case SymptomLevel.orange:
+                tileObject.orange += 1;
+              case SymptomLevel.yellow:
+                tileObject.yellow += 1;
+              case SymptomLevel.green:
+                tileObject.green += 1;
+              default:
             }
           }
           symptomReports.add(tileObject);
@@ -322,9 +345,14 @@ class _ReportsState extends State<Reports> {
           ),
         );
       },
-    );
+    ).then((_) {
+      /// reset the pressed region
+      _pressedPolygon = null;
+      setMap();
+    });
   }
 
+  /// Sets the map
   setMap() {
     // Set Map
     List<Polygon<HitValue>> polygonList = [];
@@ -338,105 +366,26 @@ class _ReportsState extends State<Reports> {
           LatLng coord = LatLng(objectICoords[0][j][1], objectICoords[0][j][0]);
           points.add(coord);
         }
+        final ({String title}) hitValue =
+            (title: sgGeo["features"][i]["properties"]["Name"],);
+        Color fillColor = regionColor;
+
+        // check if it's pressed:
+        if (_pressedPolygon != null && hitValue == _pressedPolygon!.hitValue) {
+          fillColor = regionTappedColor;
+        }
+
         Polygon<HitValue> polygon = Polygon(
           points: points,
-          color: Colors.blue.withOpacity(0.2),
-          borderStrokeWidth: 2,
-          borderColor: Colors.black,
-          hitValue: (
-            title: sgGeo["features"][i]["properties"]["Name"],
-            // symptom: ["Bad Odour", "Vomitting", "Lethargy"],
-            // widget: [
-            //   const Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       CircleAvatar(
-            //         backgroundColor: SeverityColors.red,
-            //         radius: 5,
-            //       ),
-            //       Text("4"),
-            //       CircleAvatar(
-            //         backgroundColor: SeverityColors.orange,
-            //         radius: 5,
-            //       ),
-            //       Text("5"),
-            //       CircleAvatar(
-            //         backgroundColor: SeverityColors.yellow,
-            //         radius: 5,
-            //       ),
-            //       Text("7"),
-            //       CircleAvatar(
-            //         backgroundColor: SeverityColors.green,
-            //         radius: 5,
-            //       ),
-            //       Text("21"),
-            //       SizedBox(
-            //         width: 5,
-            //       ),
-            //     ],
-            // ),
-            // const Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     CircleAvatar(
-            //       backgroundColor: SeverityColors.red,
-            //       radius: 5,
-            //     ),
-            //     Text("9"),
-            //     CircleAvatar(
-            //       backgroundColor: SeverityColors.orange,
-            //       radius: 5,
-            //     ),
-            //     Text("1"),
-            //     CircleAvatar(
-            //       backgroundColor: SeverityColors.yellow,
-            //       radius: 5,
-            //     ),
-            //     Text("12"),
-            //     CircleAvatar(
-            //       backgroundColor: SeverityColors.green,
-            //       radius: 5,
-            //     ),
-            //     Text("1"),
-            //     SizedBox(
-            //       width: 5,
-            //     ),
-            //   ],
-            // ),
-            // const Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     CircleAvatar(
-            //       backgroundColor: SeverityColors.red,
-            //       radius: 5,
-            //     ),
-            //     Text("2"),
-            //     CircleAvatar(
-            //       backgroundColor: SeverityColors.orange,
-            //       radius: 5,
-            //     ),
-            //     Text("5"),
-            //     CircleAvatar(
-            //       backgroundColor: SeverityColors.yellow,
-            //       radius: 5,
-            //     ),
-            //     Text("1"),
-            //     CircleAvatar(
-            //       backgroundColor: SeverityColors.green,
-            //       radius: 5,
-            //     ),
-            //     Text("3"),
-            //     SizedBox(
-            //       width: 5,
-            //     ),
-            //     ],
-            //   ),
-            // ]
-          ),
+          color: fillColor,
+          borderStrokeWidth: 1,
+          borderColor: borderColor,
+          hitValue: hitValue,
         );
 
         polygonList.add(polygon);
       }
+
       // If type is MultiPolygon
       if (objectIType == "MultiPolygon") {
         var objectICoords = sgGeo["features"][i]["geometry"]["coordinates"];
@@ -447,101 +396,22 @@ class _ReportsState extends State<Reports> {
                 LatLng(objectICoords[0][z][j][1], objectICoords[0][z][j][0]);
             points.add(coord);
           }
+          final ({String title}) hitValue =
+              (title: sgGeo["features"][i]["properties"]["Name"],);
+          Color fillColor = regionColor;
+
+          // check if it's pressed:
+          if (_pressedPolygon != null &&
+              hitValue == _pressedPolygon!.hitValue) {
+            fillColor = regionTappedColor;
+          }
+
           Polygon<HitValue> polygon = Polygon(
             points: points,
-            color: Colors.blue.withOpacity(0.2),
-            borderStrokeWidth: 2,
-            borderColor: Colors.black,
-            hitValue: (
-              title: sgGeo["features"][i]["properties"]["Name"],
-              //   symptom: ["Bad Odour"],
-              //   widget: [
-              //     const Row(
-              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //       children: [
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.red,
-              //           radius: 5,
-              //         ),
-              //         Text("4"),
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.orange,
-              //           radius: 5,
-              //         ),
-              //         Text("5"),
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.yellow,
-              //           radius: 5,
-              //         ),
-              //         Text("7"),
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.green,
-              //           radius: 5,
-              //         ),
-              //         Text("21"),
-              //         SizedBox(
-              //           width: 5,
-              //         ),
-              //       ],
-              //     ),
-              //     const Row(
-              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //       children: [
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.red,
-              //           radius: 5,
-              //         ),
-              //         Text("9"),
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.orange,
-              //           radius: 5,
-              //         ),
-              //         Text("1"),
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.yellow,
-              //           radius: 5,
-              //         ),
-              //         Text("12"),
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.green,
-              //           radius: 5,
-              //         ),
-              //         Text("1"),
-              //         SizedBox(
-              //           width: 5,
-              //         ),
-              //       ],
-              //     ),
-              //     const Row(
-              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //       children: [
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.red,
-              //           radius: 5,
-              //         ),
-              //         Text("2"),
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.orange,
-              //           radius: 5,
-              //         ),
-              //         Text("5"),
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.yellow,
-              //           radius: 5,
-              //         ),
-              //         Text("1"),
-              //         CircleAvatar(
-              //           backgroundColor: SeverityColors.green,
-              //           radius: 5,
-              //         ),
-              //         Text("3"),
-              //         SizedBox(
-              //           width: 5,
-              //         ),
-              //       ],
-              //     ),
-              //   ]
-            ),
+            color: fillColor,
+            borderStrokeWidth: 1,
+            borderColor: borderColor,
+            hitValue: hitValue,
           );
 
           polygonList.add(polygon);
