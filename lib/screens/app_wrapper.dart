@@ -5,6 +5,7 @@ import 'package:wagtrack/screens/explore/explore.dart';
 import 'package:wagtrack/screens/home/home.dart';
 import 'package:wagtrack/screens/notifications/notifications.dart';
 import 'package:wagtrack/screens/pet_details/add_pet.dart';
+import 'package:wagtrack/screens/reports/help_report.dart';
 import 'package:wagtrack/screens/reports/reports.dart';
 import 'package:wagtrack/screens/settings/app_settings.dart';
 
@@ -112,6 +113,36 @@ class _AppWrapperState extends State<AppWrapper> {
               },
               child: const Icon(
                 Icons.add,
+                color: Colors.white,
+              ),
+            ),
+          if (currentPageIndex == 1)
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                    transitionDuration: const Duration(
+                        milliseconds: 500), // Adjust the duration here
+                    pageBuilder: (context, a, b) => const HelpReport(),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.question_mark_rounded,
                 color: Colors.white,
               ),
             ),
