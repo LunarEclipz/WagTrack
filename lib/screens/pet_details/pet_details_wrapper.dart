@@ -12,6 +12,7 @@ import 'package:wagtrack/screens/posts/add_post_page.dart';
 import 'package:wagtrack/screens/posts/pet_posts_page.dart';
 import 'package:wagtrack/screens/symptoms/add_symptoms.dart';
 import 'package:wagtrack/screens/symptoms/help_symptoms.dart';
+import 'package:wagtrack/screens/symptoms/past_symptoms.dart';
 import 'package:wagtrack/screens/symptoms/symptoms.dart';
 import 'package:wagtrack/shared/background_img.dart';
 import 'package:wagtrack/shared/components/text_components.dart';
@@ -128,7 +129,40 @@ class _PetDetailsWrapperState extends State<PetDetailsWrapper>
               ),
             ),
           const SizedBoxh20(),
+          // ARCHIVED SYMPTOMS BUTTON (symptoms tab)
+          // TODO these Floating action buttons can and should be refactored!
+          if (currentPetPageIndex == 2)
+            FloatingActionButton(
+              heroTag: "pastSymptoms",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
 
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                    transitionDuration: const Duration(
+                        milliseconds: 300), // Adjust the duration here
+                    pageBuilder: (context, a, b) => const PastSymptoms(),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.archive_rounded,
+                color: Colors.white,
+              ),
+            ),
+          const SizedBoxh20(),
           // ADD POST BUTTON (posts tab)
           if (currentPetPageIndex == 1)
             FloatingActionButton(

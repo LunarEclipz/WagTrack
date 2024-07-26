@@ -72,21 +72,6 @@ class _SymptomsPageState extends State<SymptomsPage> {
             }),
           ),
         const SizedBoxh20(),
-        const Divider(),
-        const SizedBoxh20(),
-        Text(
-          'Past Symptoms',
-          style: textStyles.headlineMedium,
-        ),
-        const SizedBoxh10(),
-        if (pastSymptoms.isNotEmpty)
-          Column(
-            children: List.generate(pastSymptoms.length, (index) {
-              return SymptomsCard(
-                symptom: pastSymptoms[index],
-              );
-            }),
-          ),
       ]),
     );
   }
