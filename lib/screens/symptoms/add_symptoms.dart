@@ -427,6 +427,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                     Symptom formData = !isEndDateSet
                         ? Symptom(
                             petID: widget.petData.petID!,
+                            location: widget.petData.location,
                             // Add symptom can only be accessed through PetID
                             category: selectedCategory,
                             symptom: selectedSymptom,
@@ -439,6 +440,7 @@ class _AddSymptomsPageState extends State<AddSymptomsPage> {
                           )
                         : Symptom(
                             petID: widget.petData.petID!,
+                            location: widget.petData.location,
                             // Add symptom can only be accessed through PetID
                             category: selectedCategory,
                             symptom: selectedSymptom,

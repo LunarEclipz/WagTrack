@@ -35,6 +35,9 @@ class Symptom {
   /// PetID of Pet which is associated with this symptom
   late String petID;
 
+  /// Location of Pet which is associated with this symptom
+  late String location;
+
   /// Document id that represents symptom
   String? oid;
 
@@ -55,6 +58,7 @@ class Symptom {
       required this.severity,
       required this.tags,
       required this.petID,
+      required this.location,
       this.endDate,
       this.oid,
       List<String>? mid,
@@ -71,6 +75,7 @@ class Symptom {
     final symptomData = {
       "category": category,
       "symptom": symptom,
+      "location": location,
       "factors": factors,
       "startDate": startDate.millisecondsSinceEpoch,
       "severity": severity,
@@ -87,6 +92,8 @@ class Symptom {
     return Symptom(
       category: json['category'] as String,
       symptom: json['symptom'] as String,
+      location: json['location'] as String,
+
       factors: json['factors'] as String,
       tags:
           (json['tags'] as List).cast<String>(), // Convert tags to String list
