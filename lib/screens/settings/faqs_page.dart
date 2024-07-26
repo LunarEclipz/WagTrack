@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wagtrack/shared/components/page_components.dart';
-import 'package:wagtrack/shared/components/text_components.dart';
+import 'package:wagtrack/shared/components/text_section.dart';
 
 class FaqsPage extends StatefulWidget {
   const FaqsPage({super.key});
@@ -15,30 +15,28 @@ class _FaqsPageState extends State<FaqsPage> {
     final TextTheme textStyles = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    // TODO: "Question", "Section", "Answer" widgets
-
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Frequently Asked Questions',
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: colorScheme.primary,
-          iconTheme: const IconThemeData(
-            color: Colors.white,
-          ),
+      appBar: AppBar(
+        title: const Text(
+          'Frequently Asked Questions',
+          style: TextStyle(color: Colors.white),
         ),
-        body: DefaultTextStyle.merge(
-          style: textStyles.bodyLarge,
-          child: AppScrollablePage(children: [
-            // SECTION: PERSONAL INFORMATION
-            Text(
-              'Section',
-              style: textStyles.headlineMedium,
+        backgroundColor: colorScheme.primary,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
+      ),
+      body: DefaultTextStyle.merge(
+        style: textStyles.bodyLarge,
+        child: const AppScrollablePage(
+          children: [
+            TextSection(
+              header: 'Question',
+              body: 'Answer',
             ),
-            const SizedBoxh10(),
-            const Text('test'),
-          ]),
-        ));
+          ],
+        ),
+      ),
+    );
   }
 }
