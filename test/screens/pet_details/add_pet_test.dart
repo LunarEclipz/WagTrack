@@ -16,7 +16,13 @@ class MockPetService extends Mock implements PetService {}
 
 class MockUserService extends Mock implements UserService {}
 
+class FakeBuildContext extends Fake implements BuildContext {}
+
 void main() {
+  setUpAll(() {
+    registerFallbackValue(FakeBuildContext());
+  });
+
   late MockAuthService mockAuthService;
   late MockPetService mockPetService;
   late MockUserService mockUserService;
@@ -27,50 +33,127 @@ void main() {
     mockUserService = MockUserService();
   });
 
-  testWidgets('AddPetPage adds personal pet', (WidgetTester tester) async {
-    // Stub the user service to return a default user with location.
-    when(() => mockUserService.user).thenReturn(
-        AppUser(uid: '123', name: 'TestUser', defaultLocation: 'Singapore'));
+  Future<void> pumpAddPet(WidgetTester tester) async {
+    // Build the widget with mocked providers'
+    await tester.binding.setSurfaceSize(const Size(2000, 600));
 
-    // Build the widget with mocked providers
     await tester.pumpWidget(
       MultiProvider(
         providers: [
-          Provider<AuthenticationService>(create: (_) => mockAuthService),
-          Provider<PetService>(create: (_) => mockPetService),
-          Provider<UserService>(create: (_) => mockUserService),
+          ChangeNotifierProvider<AuthenticationService>(
+            create: (_) => mockAuthService,
+          ),
+          ChangeNotifierProvider<PetService>(
+            create: (_) => mockPetService,
+          ),
+          ChangeNotifierProvider<UserService>(
+            create: (_) => mockUserService,
+          ),
         ],
         child: const MaterialApp(home: AddPetPage()),
       ),
     );
+  }
 
-    // Find the personal pet type card and tap it
-    await tester.tap(find.text('Personal\nPet'));
-    await tester.pump();
+  testWidgets('adds pet with correct fields when Add Pet button is tapped',
+      (WidgetTester tester) async {
+    // Stub the user service to return a default user with location.
+    when(() => mockUserService.user).thenReturn(
+        AppUser(uid: '123', name: 'TestUser', defaultLocation: 'YISHUN'));
 
-    // Fill in the pet information (replace with actual test data)
-    await tester.enterText(find.byType(TextFormField).at(0), 'Fluffy'); // Name
-    await tester.enterText(
-        find.byType(TextFormField).at(1), 'Golden Retriever'); // Breed
-    await tester.enterText(
-        find.byType(TextFormField).at(2), '123456789'); // Chip
-    // ... (Fill in the rest of the required fields)
+    // Pet fields
+    const name = 'Test pet';
+    const desc = 'Test description';
+    const breed = 'Test breed';
+    const idNum = '1234Test';
+    const location = 'PAYA LEBAR';
 
-    // Tap the 'Set Birthday' button
-    await tester.tap(find.text('Set Birthday'));
+    await pumpAddPet(tester);
+
+    // // get page scroll
+    final pageScrollFinder = find.byType(SingleChildScrollView).last;
+    expect(pageScrollFinder, findsOneWidget);
+
+    // // Find the personal pet type card and tap it
+    await tester.dragUntilVisible(
+      find.text('Personal\nPet').at(0),
+      pageScrollFinder,
+      const Offset(0.0, -100.0),
+    );
+    await tester.tap(find.text('Personal\nPet').at(0));
     await tester.pumpAndSettle();
 
-    // Select a birthday date (implement logic to choose a date on the picker)
-    // ...
+    // Select location
+    await tester.dragUntilVisible(
+      find.byKey(const ValueKey('location_dropdown')),
+      pageScrollFinder,
+      const Offset(0.0, -100.0),
+    );
+    await tester.tap(find.byKey(const ValueKey('location_dropdown')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(location));
+    await tester.pumpAndSettle();
+
+    // Fill in the pet information (replace with actual test data)
+    // scroll first
+    await tester.dragUntilVisible(
+      find.byKey(const ValueKey('name_field')),
+      pageScrollFinder,
+      const Offset(0.0, -100.0),
+    );
+
+    await tester.enterText(find.byKey(const ValueKey('name_field')), name);
+    await tester.enterText(
+        find.byKey(const ValueKey('description_field')), desc);
+    await tester.enterText(find.byKey(const ValueKey('breed_field')), breed);
+
+    // Scroll down
+    await tester.dragUntilVisible(
+      find.byKey(const ValueKey('microchip_field')),
+      pageScrollFinder,
+      const Offset(0.0, -100.0),
+    );
+    await tester.enterText(
+        find.byKey(const ValueKey('microchip_field')), idNum);
+
+    // Tap the 'Set Birthday' button
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(InkWell, 'Set Birthday'));
+    await tester.pumpAndSettle();
+
+    // Select a birthday date
+    // Just choose the first date
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
 
     // Tap the "Add Pet" button
-    await tester.tap(find.text('Add Pet'));
+    await tester.dragUntilVisible(
+      find.byKey(const ValueKey('add_pet_button')),
+      pageScrollFinder,
+      const Offset(0.0, -100.0),
+    );
+    await tester.tap(find.byKey(const Key('add_pet_button')));
     await tester.pumpAndSettle();
 
     // Verify that the petService's `addPet` method is called with the correct Pet object and image (null in this case)
     final expectedPet = Pet(
-        // ... fill in details for expectedPet object based on test input
-        );
+      location: location,
+      name: name,
+      description: desc,
+      sex: 'Male',
+      species: 'Dog',
+      petType: 'personal',
+      idNumber: idNum,
+      breed: breed,
+      birthDate: DateTime.now(),
+      weight: [],
+      caretakers: [],
+      posts: 0,
+      fans: 0,
+      caretakerIDs: [],
+      vaccineRecords: [],
+      sessionRecords: [],
+    );
     verify(() => mockPetService.addPet(pet: expectedPet, img: null, uid: '123'))
         .called(1); // Assuming uid '123' for this example
   });
