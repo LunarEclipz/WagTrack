@@ -158,7 +158,7 @@ class _HomeState extends State<Home> {
         children: List.generate(
             communityPets.length,
             (int index) => BuildPetCard(
-                  revPosts: PostService().getPostsByPetId(
+                  revPosts: context.read<PostService>().getPostsByPetId(
                       targetPetID: communityPets[index].petID!,
                       posts: allPosts),
                   petData: communityPets[index],

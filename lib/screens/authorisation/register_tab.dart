@@ -80,6 +80,7 @@ class _RegisterTabState extends State<RegisterTab> {
             ),
             const SizedBox(height: 16.0),
             AppButtonLarge(
+              key: const Key('register-button'),
               onTap: () async {
                 // first validate
 
