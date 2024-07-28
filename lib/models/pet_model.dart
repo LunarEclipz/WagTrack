@@ -126,7 +126,9 @@ class Pet {
         species == other.species &&
         petType == other.petType &&
         idNumber == other.idNumber &&
-        birthDate.compareTo(other.birthDate) == 0 &&
+        birthDate.day == other.birthDate.day &&
+        birthDate.month == other.birthDate.month &&
+        birthDate.year == other.birthDate.year &&
         imgPath == other.imgPath &&
         breed == other.breed;
     // listEquals(weight, other.weight) &&
