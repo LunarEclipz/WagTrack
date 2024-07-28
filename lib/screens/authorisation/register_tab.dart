@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/authorisation/login_social_account.dart';
 import 'package:wagtrack/services/auth_service.dart';
+import 'package:wagtrack/services/logging.dart';
 import 'package:wagtrack/shared/components/button_components.dart';
 import 'package:wagtrack/shared/components/dialogs.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
@@ -46,7 +47,7 @@ class _RegisterTabState extends State<RegisterTab> {
                     labelText: 'Email Address',
                     validator: (value) => !context
                             .read<AuthenticationService>()
-                            .isEmailValidEmail(value!)
+                            .isEmailValidEmail((value ?? ''))
                         ? 'Invalid email'
                         : null,
                   ),
@@ -54,8 +55,9 @@ class _RegisterTabState extends State<RegisterTab> {
                     controller: passwordController,
                     labelText: 'Password',
                     isObscurable: true,
-                    validator: (value) =>
-                        value!.length < 6 ? 'Minimum of 6 characters' : null,
+                    validator: (value) => (value ?? '').length < 6
+                        ? 'Minimum of 6 characters'
+                        : null,
                   ),
                   AppTextFormFieldLarge(
                     controller: confirmPasswordController,
@@ -67,7 +69,7 @@ class _RegisterTabState extends State<RegisterTab> {
                         // checks for similarity before length
 
                         return 'Passwords not the same';
-                      } else if (value!.length < 6) {
+                      } else if ((value ?? '').length < 6) {
                         return 'Minimum of 6 characters';
                       }
                       return null;
@@ -80,6 +82,7 @@ class _RegisterTabState extends State<RegisterTab> {
             AppButtonLarge(
               onTap: () async {
                 // first validate
+
                 if (!_registerFormKey.currentState!.validate()) {
                   // if it doesn't validate, returns and doesn't send to API
                   return;
@@ -97,6 +100,7 @@ class _RegisterTabState extends State<RegisterTab> {
                     .read<AuthenticationService>()
                     .passwordDontMatchConfirmPassword(passwordController.text,
                         confirmPasswordController.text)) {
+                  AppLogger.d('wrongpass');
                   // check password != confirmPassword
                   showAppErrorAlertDialog(
                       // ignore: use_build_context_synchronously
@@ -106,6 +110,7 @@ class _RegisterTabState extends State<RegisterTab> {
                           'Passwords not the same. Please re-enter password.');
                 } else {
                   //after username and password checks, register the user
+
                   String? result = await context
                       .read<AuthenticationService>()
                       .registerWithEmailAndPassword(
