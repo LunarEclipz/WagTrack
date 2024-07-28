@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// Local object to represent pets
 ///
 /// Pet Model applies to both Community and Personal Pets.
@@ -112,6 +114,30 @@ class Pet {
     );
     return pet;
   }
+
+  /// to check for strict equality
+  @override
+  bool operator ==(Object other) {
+    return other is Pet &&
+        petID == other.petID &&
+        name == other.name &&
+        description == other.description &&
+        sex == other.sex &&
+        species == other.species &&
+        petType == other.petType &&
+        idNumber == other.idNumber &&
+        birthDate.compareTo(other.birthDate) == 0 &&
+        imgPath == other.imgPath &&
+        breed == other.breed &&
+        listEquals(weight, other.weight) &&
+        listEquals(vaccineRecords, other.vaccineRecords) &&
+        listEquals(sessionRecords, other.sessionRecords) &&
+        listEquals(caretakerIDs, other.caretakerIDs);
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      petID, name, description, sex, species, petType, idNumber, breed);
 }
 
 /// Caretaker Model determined the role of the caretaker
@@ -159,6 +185,17 @@ class DateTimeStringPair {
       value: json["value"] as String,
     );
   }
+
+  /// to check for strict equality
+  @override
+  bool operator ==(Object other) {
+    return other is DateTimeStringPair &&
+        dateTime.compareTo(other.dateTime) == 0 &&
+        value == other.value;
+  }
+
+  @override
+  int get hashCode => Object.hash(dateTime, value);
 }
 
 class PetSet {
