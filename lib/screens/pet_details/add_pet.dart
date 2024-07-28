@@ -178,12 +178,15 @@ class _AddPetPageState extends State<AddPetPage> {
                                 ? Colors.white
                                 : Colors.black,
                           ),
-                          Text("Personal\nPet",
-                              style: textStyles.bodyMedium!.copyWith(
-                                color: selectedPetType == PetType.personal
-                                    ? Colors.white
-                                    : Colors.black,
-                              ))
+                          Text(
+                            "Personal\nPet",
+                            style: textStyles.bodyMedium!.copyWith(
+                              color: selectedPetType == PetType.personal
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          )
                         ],
                       ),
                     ),
@@ -211,12 +214,15 @@ class _AddPetPageState extends State<AddPetPage> {
                                 ? Colors.white
                                 : Colors.black,
                           ),
-                          Text("Community\nPet",
-                              style: textStyles.bodyMedium!.copyWith(
-                                color: selectedPetType == PetType.community
-                                    ? Colors.white
-                                    : Colors.black,
-                              ))
+                          Text(
+                            "Community\nPet",
+                            style: textStyles.bodyMedium!.copyWith(
+                              color: selectedPetType == PetType.community
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          )
                         ],
                       ),
                     ),
@@ -244,6 +250,7 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
                 const SizedBoxh10(),
                 AppDropdown(
+                  key: const Key('location_dropdown'),
                   enabled: !caretakerModeHasSelectedPet,
                   optionsList: locationList,
                   selectedText: selectedLocation,
@@ -255,6 +262,7 @@ class _AddPetPageState extends State<AddPetPage> {
                 ),
               ],
             ),
+
           // only for community
           if (selectedPetType == PetType.community)
             InkWell(
@@ -263,85 +271,86 @@ class _AddPetPageState extends State<AddPetPage> {
                     location: selectedLocation);
 
                 showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Pets"),
-                        content: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                width: double.infinity,
-                                child: Text(
-                                  '${pets.length} pets in $selectedLocation.',
-                                  style: textStyles.bodyMedium!
-                                      .copyWith(color: colorScheme.primary),
-                                ),
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Pets"),
+                      content: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                '${pets.length} pets in $selectedLocation.',
+                                style: textStyles.bodyMedium!
+                                    .copyWith(color: colorScheme.primary),
                               ),
-                              Column(
-                                children: List.generate(pets.length, (index) {
-                                  return Column(
-                                    children: [
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            selectedPet = pets[index];
-                                          });
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: DropdownMenuItem(
-                                            child: Row(
-                                          children: [
-                                            pets[index].imgPath == null
-                                                ? const CircleAvatar(
-                                                    backgroundColor:
-                                                        Color.fromARGB(
-                                                            255, 41, 41, 41),
-                                                    radius: 60,
-                                                  )
-                                                : CircleAvatar(
-                                                    backgroundImage:
-                                                        Image.network(
-                                                      pets[index].imgPath!,
-                                                      fit: BoxFit.cover,
-                                                      width: double.infinity,
-                                                    ).image,
-                                                    radius: 60,
-                                                  ),
-                                            const SizedBox(
-                                              width: 10,
+                            ),
+                            Column(
+                              children: List.generate(pets.length, (index) {
+                                return Column(
+                                  children: [
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedPet = pets[index];
+                                        });
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: DropdownMenuItem(
+                                          child: Row(
+                                        children: [
+                                          pets[index].imgPath == null
+                                              ? const CircleAvatar(
+                                                  backgroundColor:
+                                                      Color.fromARGB(
+                                                          255, 41, 41, 41),
+                                                  radius: 60,
+                                                )
+                                              : CircleAvatar(
+                                                  backgroundImage:
+                                                      Image.network(
+                                                    pets[index].imgPath!,
+                                                    fit: BoxFit.cover,
+                                                    width: double.infinity,
+                                                  ).image,
+                                                  radius: 60,
+                                                ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          SizedBox(
+                                            width: 100,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  pets[index].name,
+                                                  style: textStyles.bodyLarge,
+                                                ),
+                                                Text(pets[index].description),
+                                              ],
                                             ),
-                                            SizedBox(
-                                              width: 100,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    pets[index].name,
-                                                    style: textStyles.bodyLarge,
-                                                  ),
-                                                  Text(pets[index].description),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        )),
-                                      ),
-                                    ],
-                                  );
-                                }),
-                              ),
-                            ],
-                          ),
+                                          ),
+                                        ],
+                                      )),
+                                    ),
+                                  ],
+                                );
+                              }),
+                            ),
+                          ],
                         ),
-                      );
-                    });
+                      ),
+                    );
+                  },
+                );
               },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -435,12 +444,14 @@ class _AddPetPageState extends State<AddPetPage> {
                             radius: 100,
                             backgroundImage: Image.file(_imageFile!).image)),
                   AppTextFormField(
+                    key: const Key('name_field'),
                     enabled: !caretakerModeHasSelectedPet,
                     controller: nameController,
                     hintText: 'Name',
                     prefixIcon: const Icon(Icons.person_outline),
                   ),
                   AppTextFormField(
+                    key: const Key('description_field'),
                     enabled: !caretakerModeHasSelectedPet,
                     controller: descController,
                     hintText: 'Description',
@@ -450,6 +461,7 @@ class _AddPetPageState extends State<AddPetPage> {
                         InputStringValidators.emptyValidator(value),
                   ),
                   AppTextFormField(
+                    key: const Key('breed_field'),
                     enabled: !caretakerModeHasSelectedPet,
                     controller: breedController,
                     hintText: 'Breed',
@@ -493,6 +505,7 @@ class _AddPetPageState extends State<AddPetPage> {
                     style: textStyles.headlineMedium,
                   ),
                   AppTextFormField(
+                    key: const Key('microchip_field'),
                     enabled: !caretakerModeHasSelectedPet,
                     controller: idController,
                     hintText: 'Microchip Number',
@@ -500,6 +513,7 @@ class _AddPetPageState extends State<AddPetPage> {
                   ),
                   const SizedBoxh10(),
                   AppTextFormField(
+                    key: const Key('weight_field'),
                     enabled: !caretakerModeHasSelectedPet,
                     controller: weightController,
                     hintText: 'Weight',
@@ -552,74 +566,68 @@ class _AddPetPageState extends State<AddPetPage> {
                             children: [
                               Card(
                                 color: Colors.white,
-                                child: SizedBox(
-                                  width: 170,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                      8,
-                                    ),
-                                    child: isBirthdaySet == false
-                                        ? Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "Set Birthday",
-                                                    style: textStyles.bodyLarge!
-                                                        .copyWith(
-                                                            color: colorScheme
-                                                                .primary),
-                                                  ),
-                                                  Icon(Icons.cake_rounded,
-                                                      size: 20,
-                                                      color:
-                                                          colorScheme.primary),
-                                                ],
-                                              ),
-                                              Text(
-                                                "Mandatory*",
-                                                style: textStyles.bodyMedium!
-                                                    .copyWith(
-                                                        color: colorScheme
-                                                            .primary),
-                                              ),
-                                            ],
-                                          )
-                                        : Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "Birthday",
-                                                    style: textStyles.bodyLarge!
-                                                        .copyWith(
-                                                            color: colorScheme
-                                                                .primary),
-                                                  ),
-                                                  Icon(Icons.cake_rounded,
-                                                      size: 20,
-                                                      color:
-                                                          colorScheme.primary),
-                                                ],
-                                              ),
-                                              Text(
-                                                  formatDateTime(
-                                                          birthdayDateTime)
-                                                      .date,
-                                                  style: textStyles.labelLarge),
-                                            ],
-                                          ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(
+                                    8,
                                   ),
+                                  child: isBirthdaySet == false
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Set Birthday",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(Icons.cake_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
+                                            ),
+                                            Text(
+                                              "Mandatory*",
+                                              style: textStyles.bodyMedium!
+                                                  .copyWith(
+                                                      color:
+                                                          colorScheme.primary),
+                                            ),
+                                          ],
+                                        )
+                                      : Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Birthday",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(Icons.cake_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
+                                            ),
+                                            Text(
+                                                formatDateTime(birthdayDateTime)
+                                                    .date,
+                                                style: textStyles.labelLarge),
+                                          ],
+                                        ),
                                 ),
                               ),
                             ],
@@ -655,76 +663,71 @@ class _AddPetPageState extends State<AddPetPage> {
                             children: [
                               Card(
                                 color: Colors.white,
-                                child: SizedBox(
-                                  width: 170,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                      8,
-                                    ),
-                                    child: isApptDateSet == false
-                                        ? Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "Check Up",
-                                                    style: textStyles.bodyLarge!
-                                                        .copyWith(
-                                                            color: colorScheme
-                                                                .primary),
-                                                  ),
-                                                  Icon(
-                                                      Icons
-                                                          .calendar_month_rounded,
-                                                      size: 20,
-                                                      color:
-                                                          colorScheme.primary),
-                                                ],
-                                              ),
-                                              Text("(optional)",
-                                                  style: textStyles.bodyMedium),
-                                            ],
-                                          )
-                                        : Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "Check Up",
-                                                    style: textStyles.bodyLarge!
-                                                        .copyWith(
-                                                            color: colorScheme
-                                                                .primary),
-                                                  ),
-                                                  Icon(
-                                                      Icons
-                                                          .calendar_month_rounded,
-                                                      size: 20,
-                                                      color:
-                                                          colorScheme.primary),
-                                                ],
-                                              ),
-                                              Text(
-                                                  formatDateTime(apptDateTime)
-                                                      .date,
-                                                  style: textStyles.labelLarge),
-                                              Text(
-                                                  formatDateTime(apptDateTime)
-                                                      .time,
-                                                  style: textStyles.labelLarge),
-                                            ],
-                                          ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(
+                                    8,
                                   ),
+                                  child: isApptDateSet == false
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Check Up",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(
+                                                    Icons
+                                                        .calendar_month_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
+                                            ),
+                                            Text("(optional)",
+                                                style: textStyles.bodyMedium),
+                                          ],
+                                        )
+                                      : Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Check Up",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(
+                                                    Icons
+                                                        .calendar_month_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
+                                            ),
+                                            Text(
+                                                formatDateTime(apptDateTime)
+                                                    .date,
+                                                style: textStyles.labelLarge),
+                                            Text(
+                                                formatDateTime(apptDateTime)
+                                                    .time,
+                                                style: textStyles.labelLarge),
+                                          ],
+                                        ),
                                 ),
                               ),
                             ],
@@ -864,6 +867,7 @@ class _AddPetPageState extends State<AddPetPage> {
               width: MediaQuery.of(context).size.width,
               child: Center(
                 child: AppButtonLarge(
+                  key: const Key('add_pet_button'),
                   onTap: () {
                     if (_petInputFormKey.currentState!.validate() &&
                         isBirthdaySet &&
@@ -1052,7 +1056,9 @@ class _RoleListSRow extends State<RoleRow> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Flexible(
-            flex: 2, child: Text(widget.username, style: textStyles.bodyLarge)),
+          flex: 2,
+          child: Text(widget.username, style: textStyles.bodyLarge),
+        ),
         Flexible(
           flex: 2,
           child: widget.role == "Main"

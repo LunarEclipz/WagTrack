@@ -118,6 +118,22 @@ class Pet {
   /// Doesn't check for the attached lists
   @override
   bool operator ==(Object other) {
+    // for debug
+    // if (other is Pet) {
+    //   AppLogger.d('petID:${petID == other.petID}');
+    //   AppLogger.d('name:${name == other.name}');
+    //   AppLogger.d('description:${description == other.description}');
+    //   AppLogger.d('sex:${sex == other.sex}');
+    //   AppLogger.d('species:${species == other.species}');
+    //   AppLogger.d('petType:${petType == other.petType}');
+    //   AppLogger.d('idNumber:${idNumber == other.idNumber}');
+    //   AppLogger.d('birthDate:${birthDate.day == other.birthDate.day}');
+    //   AppLogger.d('birthDate:${birthDate.month == other.birthDate.month}');
+    //   AppLogger.d('birthDate:${birthDate.year == other.birthDate.year}');
+    //   AppLogger.d('imgPath:${imgPath == other.imgPath}');
+    //   AppLogger.d('breed:${breed == other.breed}');
+    // }
+
     return other is Pet &&
         petID == other.petID &&
         name == other.name &&
