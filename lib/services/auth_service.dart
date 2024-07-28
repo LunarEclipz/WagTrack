@@ -105,6 +105,7 @@ class AuthenticationService with ChangeNotifier {
   }
 
   /// Returns `true` if the passwords don't match. very stupid yes I know.
+  /// Ask the person who wrote this before me. Too lazy to refactor this yet.
   bool passwordDontMatchConfirmPassword(
       String password, String confirmPassword) {
     return password != confirmPassword;
