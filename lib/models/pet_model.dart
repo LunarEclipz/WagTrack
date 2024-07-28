@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// Local object to represent pets
 ///
 /// Pet Model applies to both Community and Personal Pets.
@@ -116,6 +114,8 @@ class Pet {
   }
 
   /// to check for strict equality
+  ///
+  /// Doesn't check for the attached lists
   @override
   bool operator ==(Object other) {
     return other is Pet &&
@@ -128,11 +128,11 @@ class Pet {
         idNumber == other.idNumber &&
         birthDate.compareTo(other.birthDate) == 0 &&
         imgPath == other.imgPath &&
-        breed == other.breed &&
-        listEquals(weight, other.weight) &&
-        listEquals(vaccineRecords, other.vaccineRecords) &&
-        listEquals(sessionRecords, other.sessionRecords) &&
-        listEquals(caretakerIDs, other.caretakerIDs);
+        breed == other.breed;
+    // listEquals(weight, other.weight) &&
+    // listEquals(vaccineRecords, other.vaccineRecords) &&
+    // listEquals(sessionRecords, other.sessionRecords) &&
+    // listEquals(caretakerIDs, other.caretakerIDs);
   }
 
   @override
