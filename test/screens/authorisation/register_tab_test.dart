@@ -6,7 +6,7 @@ import 'package:wagtrack/screens/authorisation/register_tab.dart';
 import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/shared/components/input_components.dart';
 
-class MockAuthenticationService extends Mock implements AuthenticationService {}
+class MockAuthService extends Mock implements AuthenticationService {}
 
 class FakeBuildContext extends Fake implements BuildContext {}
 
@@ -16,10 +16,10 @@ void main() {
   });
 
   group('RegisterTab Widget Tests', () {
-    late MockAuthenticationService mockAuthService;
+    late MockAuthService mockAuthService;
 
     setUp(() {
-      mockAuthService = MockAuthenticationService();
+      mockAuthService = MockAuthService();
     });
 
     Future<void> pumpRegisterTab(WidgetTester tester) async {

@@ -8,7 +8,6 @@ import 'package:wagtrack/screens/pet_details/add_pet.dart';
 import 'package:wagtrack/services/auth_service.dart';
 import 'package:wagtrack/services/pet_service.dart';
 import 'package:wagtrack/services/user_service.dart';
-// ... other imports
 
 class MockAuthService extends Mock implements AuthenticationService {}
 
@@ -35,7 +34,6 @@ void main() {
 
   Future<void> pumpAddPet(WidgetTester tester) async {
     // Build the widget with mocked providers'
-    await tester.binding.setSurfaceSize(const Size(2000, 600));
 
     await tester.pumpWidget(
       MultiProvider(
