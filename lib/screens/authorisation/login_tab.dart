@@ -79,6 +79,7 @@ class _LoginTabState extends State<LoginTab> {
             ),
             const SizedBox(height: 16.0),
             AppButtonLarge(
+              key: const Key('login-button'),
               onTap: () async {
                 // first validate
                 if (!_loginFormKey.currentState!.validate()) {

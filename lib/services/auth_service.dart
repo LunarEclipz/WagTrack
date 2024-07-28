@@ -21,7 +21,11 @@ class AuthenticationService with ChangeNotifier {
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
   /// Get uid of current user.
-  String get uid => _firebaseAuth.currentUser!.uid;
+  String get uid {
+    if (_firebaseAuth.currentUser == null) return '';
+
+    return _firebaseAuth.currentUser!.uid;
+  }
 
   /// Updates local user based on current uid
   ///
@@ -30,7 +34,7 @@ class AuthenticationService with ChangeNotifier {
   /// returns whether the user has onboarded.
   Future<bool> updateCurrentLocalUserFromAuth() async {
     AppLogger.d("[AUTH] Updating local user from Firebase Auth");
-    String? uid = this.uid;
+    String uid = this.uid;
 
     AppLogger.t(uid);
 
@@ -100,6 +104,8 @@ class AuthenticationService with ChangeNotifier {
         .hasMatch(email);
   }
 
+  /// Returns `true` if the passwords don't match. very stupid yes I know.
+  /// Ask the person who wrote this before me. Too lazy to refactor this yet.
   bool passwordDontMatchConfirmPassword(
       String password, String confirmPassword) {
     return password != confirmPassword;

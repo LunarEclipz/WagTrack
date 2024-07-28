@@ -112,6 +112,50 @@ class Pet {
     );
     return pet;
   }
+
+  /// to check for strict equality
+  ///
+  /// Doesn't check for the attached lists
+  @override
+  bool operator ==(Object other) {
+    // for debug
+    // if (other is Pet) {
+    //   AppLogger.d('petID:${petID == other.petID}');
+    //   AppLogger.d('name:${name == other.name}');
+    //   AppLogger.d('description:${description == other.description}');
+    //   AppLogger.d('sex:${sex == other.sex}');
+    //   AppLogger.d('species:${species == other.species}');
+    //   AppLogger.d('petType:${petType == other.petType}');
+    //   AppLogger.d('idNumber:${idNumber == other.idNumber}');
+    //   AppLogger.d('birthDate:${birthDate.day == other.birthDate.day}');
+    //   AppLogger.d('birthDate:${birthDate.month == other.birthDate.month}');
+    //   AppLogger.d('birthDate:${birthDate.year == other.birthDate.year}');
+    //   AppLogger.d('imgPath:${imgPath == other.imgPath}');
+    //   AppLogger.d('breed:${breed == other.breed}');
+    // }
+
+    return other is Pet &&
+        petID == other.petID &&
+        name == other.name &&
+        description == other.description &&
+        sex == other.sex &&
+        species == other.species &&
+        petType == other.petType &&
+        idNumber == other.idNumber &&
+        birthDate.day == other.birthDate.day &&
+        birthDate.month == other.birthDate.month &&
+        birthDate.year == other.birthDate.year &&
+        imgPath == other.imgPath &&
+        breed == other.breed;
+    // listEquals(weight, other.weight) &&
+    // listEquals(vaccineRecords, other.vaccineRecords) &&
+    // listEquals(sessionRecords, other.sessionRecords) &&
+    // listEquals(caretakerIDs, other.caretakerIDs);
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      petID, name, description, sex, species, petType, idNumber, breed);
 }
 
 /// Caretaker Model determined the role of the caretaker
@@ -159,6 +203,17 @@ class DateTimeStringPair {
       value: json["value"] as String,
     );
   }
+
+  /// to check for strict equality
+  @override
+  bool operator ==(Object other) {
+    return other is DateTimeStringPair &&
+        dateTime.compareTo(other.dateTime) == 0 &&
+        value == other.value;
+  }
+
+  @override
+  int get hashCode => Object.hash(dateTime, value);
 }
 
 class PetSet {

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:wagtrack/screens/app_wrapper.dart';
 import 'package:wagtrack/screens/authorisation/authorisation_frame.dart';
@@ -34,7 +35,7 @@ class _AuthenticateState extends State<Authenticate> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
+      stream: GetIt.I<FirebaseAuth>().authStateChanges(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return LoginPage(toggleView: toggleView);
@@ -45,9 +46,13 @@ class _AuthenticateState extends State<Authenticate> {
 
           return FutureBuilder<bool>(
               // future: _checkUserOnboarded(context),
-              future: Provider.of<AuthenticationService>(context, listen: false)
+              future: context
+                  .read<AuthenticationService>()
                   .updateCurrentLocalUserFromAuth(),
               builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                debugPrint(
+                    'Snapshot has data: ${snapshot.hasData} DATA: ${snapshot.data}');
+
                 if (snapshot.hasData) {
                   // final temp = snapshot.data;
                   // AppLogger.i("HAS USER ONBOARDED [2]: $temp");

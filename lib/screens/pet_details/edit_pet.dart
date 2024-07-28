@@ -192,6 +192,7 @@ class _EditPetPageState extends State<EditPetPage> {
                 ),
                 const SizedBoxh10(),
                 AppDropdown(
+                  key: const Key('location_dropdown'),
                   enabled: !caretakerModeHasSelectedPet,
                   optionsList: locationList,
                   selectedText: selectedLocation,
@@ -239,12 +240,14 @@ class _EditPetPageState extends State<EditPetPage> {
                             radius: 100,
                             backgroundImage: Image.file(_imageFile!).image)),
                   AppTextFormField(
+                    key: const Key('name_field'),
                     enabled: !caretakerModeHasSelectedPet,
                     controller: nameController,
                     hintText: 'Name',
                     prefixIcon: const Icon(Icons.person_outline),
                   ),
                   AppTextFormField(
+                    key: const Key('description_field'),
                     enabled: !caretakerModeHasSelectedPet,
                     controller: descController,
                     hintText: 'Description',
@@ -254,6 +257,7 @@ class _EditPetPageState extends State<EditPetPage> {
                         InputStringValidators.emptyValidator(value),
                   ),
                   AppTextFormField(
+                    key: const Key('breed_field'),
                     enabled: !caretakerModeHasSelectedPet,
                     controller: breedController,
                     hintText: 'Breed',
@@ -297,6 +301,7 @@ class _EditPetPageState extends State<EditPetPage> {
                     style: textStyles.headlineMedium,
                   ),
                   AppTextFormField(
+                    key: const Key('microchip_field'),
                     enabled: !caretakerModeHasSelectedPet,
                     controller: idController,
                     hintText: 'Microchip Number',
@@ -304,6 +309,7 @@ class _EditPetPageState extends State<EditPetPage> {
                   ),
                   const SizedBoxh10(),
                   AppTextFormField(
+                    key: const Key('weight_field'),
                     enabled: !caretakerModeHasSelectedPet,
                     controller: weightController,
                     hintText: 'Weight',
@@ -356,74 +362,68 @@ class _EditPetPageState extends State<EditPetPage> {
                             children: [
                               Card(
                                 color: Colors.white,
-                                child: SizedBox(
-                                  width: 170,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                      8,
-                                    ),
-                                    child: isBirthdaySet == false
-                                        ? Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "Set Birthday",
-                                                    style: textStyles.bodyLarge!
-                                                        .copyWith(
-                                                            color: colorScheme
-                                                                .primary),
-                                                  ),
-                                                  Icon(Icons.cake_rounded,
-                                                      size: 20,
-                                                      color:
-                                                          colorScheme.primary),
-                                                ],
-                                              ),
-                                              Text(
-                                                "Mandatory*",
-                                                style: textStyles.bodyMedium!
-                                                    .copyWith(
-                                                        color: colorScheme
-                                                            .primary),
-                                              ),
-                                            ],
-                                          )
-                                        : Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "Birthday",
-                                                    style: textStyles.bodyLarge!
-                                                        .copyWith(
-                                                            color: colorScheme
-                                                                .primary),
-                                                  ),
-                                                  Icon(Icons.cake_rounded,
-                                                      size: 20,
-                                                      color:
-                                                          colorScheme.primary),
-                                                ],
-                                              ),
-                                              Text(
-                                                  formatDateTime(
-                                                          birthdayDateTime)
-                                                      .date,
-                                                  style: textStyles.labelLarge),
-                                            ],
-                                          ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(
+                                    8,
                                   ),
+                                  child: isBirthdaySet == false
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Set Birthday",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(Icons.cake_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
+                                            ),
+                                            Text(
+                                              "Mandatory*",
+                                              style: textStyles.bodyMedium!
+                                                  .copyWith(
+                                                      color:
+                                                          colorScheme.primary),
+                                            ),
+                                          ],
+                                        )
+                                      : Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Birthday",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(Icons.cake_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
+                                            ),
+                                            Text(
+                                                formatDateTime(birthdayDateTime)
+                                                    .date,
+                                                style: textStyles.labelLarge),
+                                          ],
+                                        ),
                                 ),
                               ),
                             ],
@@ -459,76 +459,71 @@ class _EditPetPageState extends State<EditPetPage> {
                             children: [
                               Card(
                                 color: Colors.white,
-                                child: SizedBox(
-                                  width: 170,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                      8,
-                                    ),
-                                    child: isApptDateSet == false
-                                        ? Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "Check Up",
-                                                    style: textStyles.bodyLarge!
-                                                        .copyWith(
-                                                            color: colorScheme
-                                                                .primary),
-                                                  ),
-                                                  Icon(
-                                                      Icons
-                                                          .calendar_month_rounded,
-                                                      size: 20,
-                                                      color:
-                                                          colorScheme.primary),
-                                                ],
-                                              ),
-                                              Text("(optional)",
-                                                  style: textStyles.bodyMedium),
-                                            ],
-                                          )
-                                        : Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    "Check Up",
-                                                    style: textStyles.bodyLarge!
-                                                        .copyWith(
-                                                            color: colorScheme
-                                                                .primary),
-                                                  ),
-                                                  Icon(
-                                                      Icons
-                                                          .calendar_month_rounded,
-                                                      size: 20,
-                                                      color:
-                                                          colorScheme.primary),
-                                                ],
-                                              ),
-                                              Text(
-                                                  formatDateTime(apptDateTime)
-                                                      .date,
-                                                  style: textStyles.labelLarge),
-                                              Text(
-                                                  formatDateTime(apptDateTime)
-                                                      .time,
-                                                  style: textStyles.labelLarge),
-                                            ],
-                                          ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(
+                                    8,
                                   ),
+                                  child: isApptDateSet == false
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Check Up",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(
+                                                    Icons
+                                                        .calendar_month_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
+                                            ),
+                                            Text("(optional)",
+                                                style: textStyles.bodyMedium),
+                                          ],
+                                        )
+                                      : Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "Check Up",
+                                                  style: textStyles.bodyLarge!
+                                                      .copyWith(
+                                                          color: colorScheme
+                                                              .primary),
+                                                ),
+                                                Icon(
+                                                    Icons
+                                                        .calendar_month_rounded,
+                                                    size: 20,
+                                                    color: colorScheme.primary),
+                                              ],
+                                            ),
+                                            Text(
+                                                formatDateTime(apptDateTime)
+                                                    .date,
+                                                style: textStyles.labelLarge),
+                                            Text(
+                                                formatDateTime(apptDateTime)
+                                                    .time,
+                                                style: textStyles.labelLarge),
+                                          ],
+                                        ),
                                 ),
                               ),
                             ],
@@ -668,6 +663,7 @@ class _EditPetPageState extends State<EditPetPage> {
               width: MediaQuery.of(context).size.width,
               child: Center(
                 child: AppButtonLarge(
+                  key: const Key('add_pet_button'),
                   onTap: () {
                     if (_petInputFormKey.currentState!.validate() &&
                         isBirthdaySet &&

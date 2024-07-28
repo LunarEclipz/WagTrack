@@ -34,6 +34,7 @@ class AppScrollablePage extends StatelessWidget {
     return BackgroundImageWrapper(
       child: AppScrollBar(
         child: SingleChildScrollView(
+          key: const Key('app_scroll_page'),
           physics: const BouncingScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
